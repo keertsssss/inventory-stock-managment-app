@@ -6,6 +6,31 @@ const num = n => Number(n).toLocaleString('en-IN', { maximumFractionDigits: 2 })
 let mode = 'ISSUE';      // ISSUE or RECEIVE
 let chosen = null;       // the item currently selected
 
+// Standard rack categories matching Srinivasa_Stock_Rack_Plan.xlsx
+const RACK_CATEGORY_MAP = {
+  'R01': 'Cables',
+  'R02': 'Cable Accessories, Connectors & Terminals',
+  'R03': 'Contactors, Relays & Controllers',
+  'R04': 'Fuses',
+  'R05': 'Lighting',
+  'R06': 'MCB / MCCB / RCCB',
+  'R07': 'Meters & Measuring Instruments',
+  'R08': 'Switches & Sockets',
+  'R09': 'Tapes & Miscellaneous (incl. Raw Material)'
+};
+
+const RACK_SHORT_NAMES = {
+  'R01': 'Cables',
+  'R02': 'Accessories',
+  'R03': 'Contactors',
+  'R04': 'Fuses',
+  'R05': 'Lighting',
+  'R06': 'MCB / RCCB',
+  'R07': 'Meters',
+  'R08': 'Switches',
+  'R09': 'Tapes & RM'
+};
+
 // ----- Tabs -----
 function switchTab(tabName) {
   document.querySelectorAll('nav button').forEach(x => x.classList.toggle('active', x.dataset.tab === tabName));
@@ -236,6 +261,37 @@ async function loadStock() {
 
   $('stockSummary').innerHTML = `Showing <b>${items.length}</b> items · Counted: <b>${countedCount}/${items.length}</b> · With variance: <b>${varianceCount}</b> · <span class="badge badge-new" style="font-size:11px;">NEW</span> (≤30d): <b>${newCount}</b> · Total Tally Count: <b>${num(totalTally)}</b>`;
 
+  // Quick navigation pills matching Excel racks
+  if ($('rackQuickNav')) {
+    const activeRack = $('rackFilter') ? $('rackFilter').value : '';
+    const rackCounts = {};
+    items.forEach(item => {
+      const rk = item.rack || (item.location ? item.location.split('-')[0] : 'OTHER');
+      rackCounts[rk] = (rackCounts[rk] || 0) + 1;
+    });
+
+    const rackKeys = ['R01', 'R02', 'R03', 'R04', 'R05', 'R06', 'R07', 'R08', 'R09'];
+    $('rackQuickNav').innerHTML = `
+      <span class="quick-nav-label">Racks:</span>
+      <button type="button" class="rack-nav-btn ${!activeRack ? 'active' : ''}" data-rack="">All (${items.length})</button>
+      ${rackKeys.map(rk => {
+        const cnt = rackCounts[rk] || 0;
+        if (!cnt && activeRack !== rk) return '';
+        return `<button type="button" class="rack-nav-btn ${activeRack === rk ? 'active' : ''}" data-rack="${rk}">
+          <b>${rk}</b> ${RACK_SHORT_NAMES[rk] || ''} <span style="opacity:0.8;">(${cnt})</span>
+        </button>`;
+      }).join('')}
+    `;
+
+    $('rackQuickNav').querySelectorAll('.rack-nav-btn').forEach(btn => {
+      btn.onclick = () => {
+        const rk = btn.dataset.rack;
+        if ($('rackFilter')) $('rackFilter').value = rk;
+        loadStock();
+      };
+    });
+  }
+
   const thead = `<tr>
     <th>Serial No</th>
     <th>Rack Location</th>
@@ -253,13 +309,49 @@ async function loadStock() {
     <th>Variance (Physical − Tally)</th>
   </tr>`;
 
-  $('stockTable').innerHTML = thead + items.map((i, index) => {
+  // Group and divide items by Rack with prominent category headings
+  let lastRack = null;
+  const rows = [];
+
+  items.forEach((i, index) => {
+    const currentRack = i.rack || (i.location ? i.location.split('-')[0] : 'OTHER');
+
+    // Section Divider Heading when rack changes
+    if (currentRack !== lastRack) {
+      lastRack = currentRack;
+      const rackItems = items.filter(item => (item.rack || (item.location ? item.location.split('-')[0] : 'OTHER')) === currentRack);
+      const rackTally = rackItems.reduce((sum, item) => sum + (Number(item.tally_qty) || 0), 0);
+      const distinctShelves = new Set(rackItems.map(item => item.location || item.section)).size;
+      const distinctMakes = [...new Set(rackItems.map(item => item.make).filter(Boolean))];
+      const categoryName = i.category || RACK_CATEGORY_MAP[currentRack] || 'Miscellaneous';
+      const makesPreview = distinctMakes.slice(0, 4).join(', ') + (distinctMakes.length > 4 ? ` +${distinctMakes.length - 4} more` : '');
+
+      rows.push(`
+        <tr class="rack-divider-row" id="section-${currentRack}">
+          <td colspan="14">
+            <div class="rack-divider-wrap">
+              <div class="rack-divider-main">
+                <span class="rack-divider-tag">${esc(currentRack)}</span>
+                <span class="rack-divider-heading">${esc(categoryName)}</span>
+                <span class="rack-divider-makes" title="${esc(distinctMakes.join(', '))}">(${esc(makesPreview)})</span>
+              </div>
+              <div class="rack-divider-meta">
+                <span class="badge" style="background:#ffedd5; color:#9a3412; font-weight:bold;">${rackItems.length} SKUs</span>
+                <span>Total Tally: <b style="color:var(--brand-dark);">${num(rackTally)}</b></span>
+                <span class="text-muted">${distinctShelves} Shelves</span>
+              </div>
+            </div>
+          </td>
+        </tr>
+      `);
+    }
+
     const serialNo = i.serial_no || (index + 1);
     const physVal = i.physical_count != null ? i.physical_count : '';
     const newBadge = i.is_new ? `<span class="badge badge-new" title="Added on ${esc(i.created_at)} (${i.days_old} days ago)" style="margin-left:6px;">NEW • ${i.days_remaining}d left</span>` : '';
     const rowClass = i.is_new ? 'row-new-product' : '';
 
-    return `<tr class="${rowClass}">
+    rows.push(`<tr class="${rowClass}">
       <td class="text-center font-mono" style="font-size:14px; font-weight:bold; color:var(--brand-dark);">
         ${serialNo}
       </td>
@@ -286,8 +378,10 @@ async function loadStock() {
         <input type="number" step="any" min="0" class="phys-input" data-id="${i.id}" data-tally="${i.tally_qty}" value="${physVal}" placeholder="Count…">
       </td>
       <td class="text-center" id="var-cell-${i.id}">${formatVariance(i.variance)}</td>
-    </tr>`;
-  }).join('');
+    </tr>`);
+  });
+
+  $('stockTable').innerHTML = thead + rows.join('');
 
   // Attach event handlers to physical count inputs
   document.querySelectorAll('.phys-input').forEach(input => {

@@ -514,3 +514,108 @@ a.btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(234, 88, 12, 0.15);
 }
+
+/* ----- Excel Rack Section Dividers & Headings ----- */
+.rack-divider-row td {
+  background: linear-gradient(90deg, #fff7ed 0%, #ffedd5 60%, #fff7ed 100%) !important;
+  border-top: 3px solid #f97316 !important;
+  border-bottom: 2px solid #fdba74 !important;
+  padding: 10px 14px !important;
+  position: sticky;
+  top: 38px;
+  z-index: 10;
+}
+
+.rack-divider-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.rack-divider-main {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.rack-divider-tag {
+  background: var(--brand);
+  color: #fff;
+  font-family: monospace;
+  font-size: 13px;
+  font-weight: 800;
+  padding: 3px 9px;
+  border-radius: 4px;
+  letter-spacing: 0.5px;
+}
+
+.rack-divider-heading {
+  font-size: 15px;
+  font-weight: 800;
+  color: #9a3412;
+  letter-spacing: -0.2px;
+}
+
+.rack-divider-makes {
+  font-size: 12px;
+  color: #78350f;
+  font-weight: 500;
+  opacity: 0.9;
+}
+
+.rack-divider-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 12px;
+  color: #78350f;
+  font-weight: 600;
+}
+
+/* ----- Rack Quick Navigation Pills ----- */
+.rack-quick-nav {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow-x: auto;
+  padding: 8px 0 4px;
+  margin-top: 8px;
+  border-top: 1px dashed #fed7aa;
+}
+
+.quick-nav-label {
+  font-size: 11px;
+  font-weight: 800;
+  color: #9a3412;
+  white-space: nowrap;
+  margin-right: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+
+.rack-nav-btn {
+  background: #fff;
+  border: 1px solid #fed7aa;
+  color: #9a3412;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 14px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+
+.rack-nav-btn:hover {
+  background: #ffedd5;
+  border-color: #f97316;
+}
+
+.rack-nav-btn.active {
+  background: var(--brand);
+  color: #fff;
+  border-color: var(--brand);
+}
