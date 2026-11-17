@@ -1,0 +1,16 @@
+# Dependencies
+node_modules/
+
+# SQLite Database & Journal files
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+
+# Temporary extraction & upload files
+.temp_*
+*.log
+
+# OS generated files
+.DS_Store
+Thumbs.db

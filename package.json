@@ -1,0 +1,15 @@
+{
+  "name": "stock-app",
+  "version": "1.0.0",
+  "description": "Stock Register and Inventory System with Dynamic SKU & Tally Tracking for Srinivasa Enterprises NOVUM Energy Infra",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "export-csv": "node scripts/generate-stock-csv.js",
+    "sync-excel": "node scripts/sync-excel.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}

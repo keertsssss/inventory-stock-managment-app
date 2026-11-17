@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Stock Register</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>Srinivasa Enterprises NOVUM Energy Infra — Stock Register</header>
+<nav>
+  <button data-tab="move" class="active">Issue / Receive</button>
+  <button data-tab="stock">Stock</button>
+  <button data-tab="report">Daily Report</button>
+  <button data-tab="onboard">+ Onboard Product</button>
+</nav>
+<main>
+
+  <!-- TAB 1: take stock out or add stock -->
+  <section id="tab-move">
+    <div class="card">
+      <div class="row mode">
+        <button class="issue active" id="mode-issue">Issue (take out)</button>
+        <button class="receive" id="mode-receive">Receive (add)</button>
+      </div>
+    </div>
+    <div class="card">
+      <div id="moveNotification" class="hidden"></div>
+      <label>1. Find item (type part of the name, make, SKU or location)</label>
+      <input id="q" placeholder="e.g. mcb 16a cns" autocomplete="off">
+      <div id="results"></div>
+      <div id="newProductsShelf"></div>
+    </div>
+    <div class="card hidden" id="form">
+      <div id="chosen"></div>
+      <label>2. Quantity <span id="uomLabel"></span></label>
+      <input id="qty" type="number" inputmode="decimal" min="0" step="any">
+      <label>3. Your name</label>
+      <input id="person" placeholder="Who is taking / adding this?">
+      <label>4. Note (job, panel, supplier — optional)</label>
+      <input id="note">
+      <div id="msg"></div>
+      <div class="row" style="margin-top:14px; gap:10px;">
+        <button class="go" id="save" style="flex:1;">Save</button>
+        <button type="button" class="btn" id="cancelMove" style="background:#f3f4f6; color:#374151; padding:12px 20px; font-weight:600;">Cancel</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- TAB 2: current stock for every item -->
+  <section id="tab-stock" class="hidden">
+    <div class="card">
+      <div class="row">
+        <input id="sq" placeholder="Search by name, SKU, make, location (R01-S01), category, S.No..." autocomplete="off">
+        <select id="rackFilter" style="max-width:270px">
+          <option value="">All Racks / Categories</option>
+          <option value="R01">R01 — Cables</option>
+          <option value="R02">R02 — Cable Accessories</option>
+          <option value="R03">R03 — Contactors & Relays</option>
+          <option value="R04">R04 — Fuses</option>
+          <option value="R05">R05 — Lighting</option>
+          <option value="R06">R06 — MCB / MCCB / RCCB</option>
+          <option value="R07">R07 — Meters & Instruments</option>
+          <option value="R08">R08 — Switches & Sockets</option>
+          <option value="R09">R09 — Tapes & Raw Material</option>
+        </select>
+      </div>
+      <div class="filter-bar">
+        <label><input type="checkbox" id="onlyZero" style="width:auto;margin:0 6px 0 0"> Zero / negative stock</label>
+        <label><input type="checkbox" id="onlyVariance" style="width:auto;margin:0 6px 0 0"> Has variance</label>
+        <label><input type="checkbox" id="onlyUncounted" style="width:auto;margin:0 6px 0 0"> Uncounted only</label>
+        <label><input type="checkbox" id="onlyNewProducts" style="width:auto;margin:0 6px 0 0"> <span class="badge badge-new" style="font-size:11px;">NEW</span> Products (≤ 30d)</label>
+        <span style="flex:1"></span>
+        <button class="btn" id="openOnboardModal" type="button" style="padding:8px 14px; font-size:13px; background:var(--brand);">+ Onboard Product</button>
+        <button class="btn" id="syncExcelBtn" type="button" style="padding:8px 14px; font-size:13px; background:#16a34a; color:#fff;" title="Sync Tally counts from Srinivasa_Stock_Rack_Plan.xlsx">&#8635; Sync from Excel</button>
+        <label class="btn" style="padding:8px 14px; font-size:13px; background:#f3f4f6; color:#1f2937; cursor:pointer; margin:0;" title="Upload Excel (.xlsx) or CSV file">
+          &#128194; Upload Excel/CSV
+          <input type="file" id="uploadExcelInput" accept=".xlsx,.csv" style="display:none;">
+        </label>
+        <a class="btn" id="exportStockCsv" href="/api/stock.csv" download="stock-master.csv" style="padding:8px 14px; font-size:13px;">Download Master (CSV)</a>
+      </div>
+      <div id="stockSummary" class="muted" style="margin-top:6px; font-size:13px;"></div>
+    </div>
+    <div class="card scroll">
+      <table id="stockTable" class="stock-master-table"></table>
+    </div>
+  </section>
+
+  <!-- TAB 3: what was issued/received on a day -->
+  <section id="tab-report" class="hidden">
+    <div class="card">
+      <label>Date</label>
+      <input id="date" type="date">
+      <a class="btn" id="csv" href="#">Download for Excel (CSV)</a>
+      <div id="summary" class="muted" style="margin-top:10px;"></div>
+    </div>
+    <div class="card scroll"><table id="reportTable"></table></div>
+  </section>
+
+  <!-- TAB 4: Onboard New Product (beside Daily Report) -->
+  <section id="tab-onboard" class="hidden">
+    <div class="card" style="max-width:760px; margin:0 auto;">
+      <h3 style="margin-top:0; color:var(--brand-dark); border-bottom:1px solid var(--line); padding-bottom:10px;">
+        Onboard New Product
+      </h3>
+      <p class="muted" style="margin-top:-4px; margin-bottom:16px; font-size:13px;">
+        Add new products to your catalog. The system will detect your category pattern, auto-generate the matching SKU, and slot the item into its alphabetical position in the Stock Master with an automatic 30-day NEW badge.
+      </p>
+      <form id="onboardForm">
+        <div class="row">
+          <div>
+            <label>Category / Rack Group</label>
+            <select id="newCatSelect">
+              <option value="R01">R01 — Cables</option>
+              <option value="R02">R02 — Cable Accessories & Terminals</option>
+              <option value="R03">R03 — Contactors, Relays & Controllers</option>
+              <option value="R04">R04 — Fuses</option>
+              <option value="R05">R05 — Lighting</option>
+              <option value="R06">R06 — MCB / MCCB / RCCB</option>
+              <option value="R07">R07 — Meters & Instruments</option>
+              <option value="R08">R08 — Switches & Sockets</option>
+              <option value="R09">R09 — Tapes & Raw Material</option>
+            </select>
+          </div>
+          <div>
+            <label>Location Code (e.g. R01-S01)</label>
+            <input id="newLocation" placeholder="e.g. R01-S01" value="R01-S01" required>
+          </div>
+        </div>
+
+        <div class="row">
+          <div>
+            <label>Make / Brand</label>
+            <input id="newMake" placeholder="e.g. Polycab, Salzer, Havells" required>
+          </div>
+          <div>
+            <label>Product Type / Group</label>
+            <input id="newProductType" placeholder="e.g. Copper Flexible Cable" required>
+          </div>
+        </div>
+
+        <label>Product Description</label>
+        <input id="newDesc" placeholder="e.g. COPPER FLEXIBLE CABLE 1C X 1.5SQMM GREEN SALZER" required>
+
+        <div class="row">
+          <div style="flex:1.5;">
+            <label>SKU Code (Auto-Generated or Custom)</label>
+            <div style="display:flex; gap:6px;">
+              <input id="newSku" placeholder="e.g. ELEC-CABLE-1.5SQMM-GREEN-SALZER" required style="font-family:monospace;font-weight:bold;">
+              <button type="button" id="btnAutoSku" class="btn" style="padding:9px 12px;font-size:12px;white-space:nowrap;">⚡ Auto SKU</button>
+            </div>
+            <small id="skuPatternHint" class="muted" style="display:block; margin-top:-6px; font-size:12px;"></small>
+          </div>
+          <div style="flex:1;">
+            <label>Sub-Variant Branch From (Optional)</label>
+            <input id="newBranchParent" placeholder="e.g. MOT-012 (makes MOT-012A)">
+          </div>
+        </div>
+
+        <div class="row">
+          <div>
+            <label>UOM (Unit of Measure)</label>
+            <select id="newUom">
+              <option value="NOS">NOS</option>
+              <option value="ROLLS">ROLLS</option>
+              <option value="MTR">MTR</option>
+              <option value="KGS">KGS</option>
+              <option value="SET">SET</option>
+              <option value="PAC">PAC</option>
+              <option value="BOX">BOX</option>
+            </select>
+          </div>
+          <div>
+            <label>Opening Tally Qty</label>
+            <input id="newQty" type="number" min="0" step="any" value="0">
+          </div>
+        </div>
+
+        <div id="onboardMsg"></div>
+        <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:16px;">
+          <button type="reset" class="btn" style="background:#78716c;">Reset Form</button>
+          <button type="submit" id="submitOnboard" class="btn" style="background:#ea580c; padding:12px 24px; font-size:15px;">Onboard Product</button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+</main>
+<script src="app.js"></script>
+</body>
+</html>
