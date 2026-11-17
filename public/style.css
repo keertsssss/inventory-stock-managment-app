@@ -637,3 +637,168 @@ a.btn:hover, button.btn:hover {
   font-weight: 700;
   box-shadow: 0 1px 3px rgba(255, 78, 8, 0.35);
 }
+
+/* ----- Visual Proof Photo Upload & Lightbox (Issue / Receive) ----- */
+.photo-upload-section {
+  margin-top: 14px;
+  margin-bottom: 14px;
+}
+
+.photo-drop-box {
+  background: var(--off-white-card);
+  border: 2px dashed var(--line);
+  border-radius: 8px;
+  padding: 14px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.photo-drop-box:hover {
+  border-color: var(--power-orange);
+  background: var(--power-orange-tint);
+}
+
+.photo-placeholder-box {
+  padding: 8px;
+}
+
+.photo-preview-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.photo-preview-container img {
+  max-width: 100%;
+  max-height: 220px;
+  border-radius: 6px;
+  border: 1px solid var(--line);
+  box-shadow: 0 2px 8px rgba(63, 60, 45, 0.15);
+  object-fit: contain;
+  background: #0A0A0A;
+}
+
+.photo-preview-actions {
+  display: flex;
+  gap: 10px;
+}
+
+/* ----- Daily Report Photo Column & Thumbnails ----- */
+.btn-view-photo {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #FFFFFF;
+  border: 1px solid var(--line);
+  padding: 3px 6px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-family: inherit;
+}
+
+.btn-view-photo:hover {
+  border-color: var(--power-orange);
+  background: var(--power-orange-tint);
+  box-shadow: 0 2px 6px rgba(255, 78, 8, 0.2);
+  transform: translateY(-1px);
+}
+
+.report-photo-thumb {
+  width: 38px;
+  height: 38px;
+  border-radius: 4px;
+  object-fit: cover;
+  border: 1px solid var(--line);
+  display: block;
+}
+
+.report-photo-badge {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--power-orange);
+  white-space: nowrap;
+}
+
+/* ----- Modal Overlay & Lightbox Content ----- */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(10, 10, 10, 0.85);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.modal-content {
+  background: #FFFFFF;
+  border-radius: 10px;
+  width: 100%;
+  max-height: 92vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 30px rgba(0, 0, 0, 0.5);
+  border: 2px solid var(--golden-pitch);
+}
+
+.photo-modal-box {
+  max-width: 780px;
+  padding: 18px 22px;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 12px;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 28px;
+  line-height: 1;
+  color: var(--muted);
+  cursor: pointer;
+  padding: 0 4px;
+  transition: color 0.15s ease;
+}
+
+.modal-close:hover {
+  color: var(--power-orange);
+}
+
+.photo-modal-body {
+  text-align: center;
+  padding: 12px 0;
+  background: var(--classic-black);
+  border-radius: 6px;
+  margin: 12px 0;
+}
+
+.photo-modal-body img {
+  max-width: 100%;
+  max-height: 65vh;
+  object-fit: contain;
+  border-radius: 4px;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+#photoModalFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+}

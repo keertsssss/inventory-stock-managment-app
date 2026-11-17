@@ -10,6 +10,8 @@ node_modules/
 # Temporary extraction & upload files
 .temp_*
 *.log
+data/uploads/*
+!data/uploads/.gitkeep
 
 # OS generated files
 .DS_Store

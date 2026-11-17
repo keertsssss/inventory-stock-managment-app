@@ -5,6 +5,54 @@ const num = n => Number(n).toLocaleString('en-IN', { maximumFractionDigits: 2 })
 
 let mode = 'ISSUE';      // ISSUE or RECEIVE
 let chosen = null;       // the item currently selected
+let currentPhotoBase64 = null; // visual proof photo for issue/receive
+
+// Client-side image compression: converts camera photos to crisp, light JPEGs (~150KB)
+function compressImage(file, maxDimension = 1280, quality = 0.82) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = new Image();
+      img.onload = () => {
+        let { width, height } = img;
+        if (width > maxDimension || height > maxDimension) {
+          if (width > height) {
+            height = Math.round((height * maxDimension) / width);
+            width = maxDimension;
+          } else {
+            width = Math.round((width * maxDimension) / height);
+            height = maxDimension;
+          }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL('image/jpeg', quality));
+      };
+      img.onerror = () => reject(new Error('Failed to load image for compression'));
+      img.src = e.target.result;
+    };
+    reader.onerror = () => reject(new Error('Failed to read image file'));
+    reader.readAsDataURL(file);
+  });
+}
+
+function resetPhotoField() {
+  currentPhotoBase64 = null;
+  if ($('photoInput')) $('photoInput').value = '';
+  if ($('photoPreview')) $('photoPreview').src = '';
+  if ($('photoPreviewContainer')) $('photoPreviewContainer').classList.add('hidden');
+  if ($('photoPlaceholder')) $('photoPlaceholder').classList.remove('hidden');
+}
+
+function setPhotoPreview(dataUrl) {
+  currentPhotoBase64 = dataUrl;
+  if ($('photoPreview')) $('photoPreview').src = dataUrl;
+  if ($('photoPlaceholder')) $('photoPlaceholder').classList.add('hidden');
+  if ($('photoPreviewContainer')) $('photoPreviewContainer').classList.remove('hidden');
+}
 
 // Standard rack categories matching Srinivasa_Stock_Rack_Plan.xlsx
 const RACK_CATEGORY_MAP = {
@@ -55,10 +103,62 @@ function setMode(m) {
   $('mode-receive').classList.toggle('active', m === 'RECEIVE');
   $('save').textContent = m === 'ISSUE' ? 'Save — take OUT of stock' : 'Save — ADD to stock';
   $('save').style.background = m === 'ISSUE' ? 'var(--out)' : 'var(--in)';
+
+  // Visual cues for photo proof field
+  if ($('photoFieldLabel') && $('photoBadge')) {
+    if (m === 'ISSUE') {
+      $('photoFieldLabel').textContent = '5. Take / Attach Photo (visual proof of quantity)';
+      $('photoBadge').textContent = 'Recommended for Issue';
+      $('photoBadge').style.background = 'var(--power-orange-tint)';
+      $('photoBadge').style.color = 'var(--power-orange)';
+    } else {
+      $('photoFieldLabel').textContent = '5. Attach Photo (optional receipt / delivery proof)';
+      $('photoBadge').textContent = 'Optional for Receive';
+      $('photoBadge').style.background = '#f3f4f6';
+      $('photoBadge').style.color = '#4b5563';
+    }
+  }
 }
 $('mode-issue').onclick = () => setMode('ISSUE');
 $('mode-receive').onclick = () => setMode('RECEIVE');
 setMode('ISSUE');
+
+// Photo drop/click and file input handlers
+if ($('photoDropArea')) {
+  $('photoDropArea').onclick = (e) => {
+    if (e.target.id === 'retakePhotoBtn' || e.target.id === 'removePhotoBtn' || e.target.closest('.photo-preview-actions')) {
+      return;
+    }
+    if ($('photoInput')) $('photoInput').click();
+  };
+}
+
+if ($('photoInput')) {
+  $('photoInput').onchange = async () => {
+    const file = $('photoInput').files[0];
+    if (!file) return;
+    try {
+      const compressed = await compressImage(file);
+      setPhotoPreview(compressed);
+    } catch (err) {
+      alert('Could not process photo: ' + err.message);
+    }
+  };
+}
+
+if ($('retakePhotoBtn')) {
+  $('retakePhotoBtn').onclick = (e) => {
+    e.stopPropagation();
+    if ($('photoInput')) $('photoInput').click();
+  };
+}
+
+if ($('removePhotoBtn')) {
+  $('removePhotoBtn').onclick = (e) => {
+    e.stopPropagation();
+    resetPhotoField();
+  };
+}
 
 let timer;
 $('q').oninput = () => { clearTimeout(timer); timer = setTimeout(search, 250); };   // wait until typing pauses
@@ -157,6 +257,7 @@ function choose(item) {
   $('uomLabel').textContent = `(${item.uom})`;
   $('qty').value = ''; $('note').value = ''; $('msg').innerHTML = '';
   $('results').innerHTML = '';
+  resetPhotoField();
   $('qty').focus();
 }
 
@@ -168,7 +269,14 @@ $('save').onclick = async () => {
     const qtyVal = Number($('qty').value);
     const r = await fetch('/api/move', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ type: mode, item_id: chosen.id, qty: $('qty').value, person, note: $('note').value })
+      body: JSON.stringify({
+        type: mode,
+        item_id: chosen.id,
+        qty: $('qty').value,
+        person,
+        note: $('note').value,
+        photo: currentPhotoBase64
+      })
     });
     const data = await r.json();
     if (!data.ok) throw new Error(data.error);
@@ -177,6 +285,12 @@ $('save').onclick = async () => {
     const notif = $('moveNotification');
     if (notif) {
       notif.classList.remove('hidden');
+      const photoBadgeHtml = data.photo 
+        ? `<div style="margin-top:6px; display:flex; align-items:center; gap:8px;">
+             <img src="${esc(data.photo)}" style="width:40px; height:40px; object-fit:cover; border-radius:4px; border:1px solid #15803d; box-shadow:0 1px 2px rgba(0,0,0,0.1);">
+             <span style="font-size:12px; font-weight:600; color:#15803d;">📷 Visual proof photo attached & logged in Daily Report</span>
+           </div>` 
+        : '';
       notif.innerHTML = `
         <div class="msg ok" style="font-size:14px; padding:12px 16px; margin:0 0 14px 0; border-left:4px solid #16a34a; background:#f0fdf4; color:#166534; display:flex; align-items:center; justify-content:space-between; gap:12px; box-shadow:0 1px 3px rgba(0,0,0,0.06); border-radius:6px;">
           <div>
@@ -184,6 +298,7 @@ $('save').onclick = async () => {
             <div style="font-size:13px; color:#166534;">
               ${verb}${num(qtyVal)} ${esc(data.item.uom)} of <b>${esc(data.item.description)}</b> (${esc(data.item.location)}). Updated Tally Count: <b>${num(data.item.tally_qty)} ${esc(data.item.uom)}</b>.
             </div>
+            ${photoBadgeHtml}
           </div>
           <button type="button" onclick="$('moveNotification').classList.add('hidden')" style="background:none; border:none; font-size:20px; line-height:1; color:#166534; cursor:pointer; padding:4px;" title="Dismiss">&times;</button>
         </div>
@@ -201,6 +316,7 @@ $('save').onclick = async () => {
     $('msg').innerHTML = '';
     $('q').value = '';
     $('results').innerHTML = '';
+    resetPhotoField();
     $('form').classList.add('hidden');
     $('form').classList.remove('card-new-product');
     
@@ -223,6 +339,7 @@ if ($('cancelMove')) {
     $('msg').innerHTML = '';
     $('q').value = '';
     $('results').innerHTML = '';
+    resetPhotoField();
     $('form').classList.add('hidden');
     $('form').classList.remove('card-new-product');
     loadNewProductsShelf();
@@ -436,18 +553,101 @@ const d = new Date();
 $('date').value = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 $('date').onchange = loadReport;
 
+function openPhotoModal({ photo, desc, qty, person, time, type, note }) {
+  if (!$('photoModal')) return;
+  $('photoModalImg').src = photo;
+  $('photoModalTitle').textContent = `${type === 'ISSUE' ? 'Issue Quantity Proof' : 'Receipt Proof'} — ${qty}`;
+  $('photoModalSubtitle').textContent = desc;
+  $('photoModalMeta').textContent = `Logged by ${person} on ${time}${note ? ` • Note: ${note}` : ''}`;
+  $('photoModalDownload').href = photo;
+  $('photoModal').classList.remove('hidden');
+}
+
+function closePhotoModal() {
+  if ($('photoModal')) {
+    $('photoModal').classList.add('hidden');
+    $('photoModalImg').src = '';
+  }
+}
+
+if ($('closePhotoModal')) $('closePhotoModal').onclick = closePhotoModal;
+if ($('photoModal')) {
+  $('photoModal').onclick = (e) => {
+    if (e.target.id === 'photoModal') closePhotoModal();
+  };
+}
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && $('photoModal') && !$('photoModal').classList.contains('hidden')) {
+    closePhotoModal();
+  }
+});
+
 async function loadReport() {
   const date = $('date').value;
   $('csv').href = '/api/report.csv?date=' + date;
   const { rows } = await (await fetch('/api/report?date=' + date)).json();
   const out = rows.filter(r => r.type === 'ISSUE').length, inn = rows.filter(r => r.type === 'RECEIVE').length;
-  $('summary').textContent = `${rows.length} entries — ${out} issued, ${inn} received`;
-  $('reportTable').innerHTML = '<tr><th>Serial No</th><th>Time</th><th>Type</th><th>Item</th><th>Qty</th><th>By</th><th>Note</th></tr>' +
-    rows.map((r, idx) => `<tr>
-      <td class="text-center font-mono"><b>${idx + 1}</b></td>
-      <td>${esc(r.ts.slice(11, 16))}</td><td class="t-${r.type}">${r.type}</td>
-      <td>${esc(r.description)}<br><small class="muted">${esc(r.location)}</small></td>
-      <td>${num(r.qty)} ${esc(r.uom)}</td><td>${esc(r.person)}</td><td>${esc(r.note)}</td></tr>`).join('');
+  const withPhoto = rows.filter(r => r.photo).length;
+  $('summary').innerHTML = `<b>${rows.length}</b> movements on ${esc(date)} — <b>${out}</b> issued, <b>${inn}</b> received · 📷 <b>${withPhoto}</b> with proof photo`;
+
+  const thead = `<tr>
+    <th class="text-center" style="width:50px;">S.No</th>
+    <th>Time</th>
+    <th>Type</th>
+    <th>Item Description</th>
+    <th>Quantity</th>
+    <th>By</th>
+    <th>Note</th>
+    <th class="text-center" style="width:90px;">Photo Proof</th>
+  </tr>`;
+
+  if (rows.length === 0) {
+    $('reportTable').innerHTML = thead + `<tr><td colspan="8" class="text-center muted" style="padding:28px 14px;">No stock movements recorded on ${esc(date)}.</td></tr>`;
+    return;
+  }
+
+  const tbody = rows.map((r, idx) => {
+    const photoCell = r.photo
+      ? `<button type="button" class="btn-view-photo" data-photo="${esc(r.photo)}" data-desc="${esc(r.description)}" data-qty="${num(r.qty)} ${esc(r.uom)}" data-person="${esc(r.person)}" data-time="${esc(r.ts)}" data-type="${esc(r.type)}" data-note="${esc(r.note || '')}" title="Click to view full photo">
+          <img src="${esc(r.photo)}" alt="Proof Thumbnail" class="report-photo-thumb">
+          <span class="report-photo-badge">&#128269; View</span>
+        </button>`
+      : `<span class="muted font-mono" style="opacity:0.4;">—</span>`;
+
+    return `<tr>
+      <td class="text-center font-mono" style="font-weight:bold; color:var(--brand-dark);">${idx + 1}</td>
+      <td class="font-mono">${esc(r.ts.slice(11, 16))}</td>
+      <td class="t-${r.type}"><span class="badge" style="background:${r.type === 'ISSUE' ? '#fee2e2' : '#dcfce7'}; color:${r.type === 'ISSUE' ? '#b91c1c' : '#15803d'}; font-size:11px;">${r.type}</span></td>
+      <td>
+        <b>${esc(r.description)}</b>
+        <div style="font-size:11px; color:#6b7280; margin-top:2px;" class="font-mono">
+          <span class="badge loc" style="font-size:10px; padding:1px 5px;">${esc(r.location)}</span>
+          <span class="sku-tag" style="font-size:10px; padding:1px 5px;">${esc(r.sku)}</span>
+        </div>
+      </td>
+      <td class="font-mono" style="font-size:14px;"><b>${num(r.qty)}</b> <small>${esc(r.uom)}</small></td>
+      <td><b>${esc(r.person)}</b></td>
+      <td>${esc(r.note || '—')}</td>
+      <td class="text-center">${photoCell}</td>
+    </tr>`;
+  }).join('');
+
+  $('reportTable').innerHTML = thead + tbody;
+
+  // Wire up photo modal clicks on report thumbnails
+  $('reportTable').querySelectorAll('.btn-view-photo').forEach(btn => {
+    btn.onclick = () => {
+      openPhotoModal({
+        photo: btn.dataset.photo,
+        desc: btn.dataset.desc,
+        qty: btn.dataset.qty,
+        person: btn.dataset.person,
+        time: btn.dataset.time,
+        type: btn.dataset.type,
+        note: btn.dataset.note
+      });
+    };
+  });
 }
 
 // ----- Product Onboarding & Dynamic SKU Generator -----

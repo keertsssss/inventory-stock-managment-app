@@ -68,6 +68,8 @@ const RACK_CATEGORY_MAP = {
 // ---------- 1. Database (located in data/stock.db) ----------
 const DB_DIR = path.join(__dirname, 'data');
 if (!fs.existsSync(DB_DIR)) fs.mkdirSync(DB_DIR, { recursive: true });
+const UPLOADS_DIR = path.join(DB_DIR, 'uploads');
+if (!fs.existsSync(UPLOADS_DIR)) fs.mkdirSync(UPLOADS_DIR, { recursive: true });
 const DB_PATH = fs.existsSync(path.join(DB_DIR, 'stock.db'))
   ? path.join(DB_DIR, 'stock.db')
   : (fs.existsSync(path.join(__dirname, 'stock.db')) ? path.join(__dirname, 'stock.db') : path.join(DB_DIR, 'stock.db'));
@@ -97,7 +99,8 @@ CREATE TABLE IF NOT EXISTS movements (   -- the ledger: every stock change is on
   type TEXT NOT NULL CHECK (type IN ('ISSUE','RECEIVE','ADJUST')),
   qty REAL NOT NULL,
   person TEXT NOT NULL,
-  note TEXT
+  note TEXT,
+  photo TEXT
 );
 CREATE INDEX IF NOT EXISTS idx_mov_ts ON movements(ts);
 CREATE INDEX IF NOT EXISTS idx_items_sku ON items(sku);
@@ -110,6 +113,7 @@ try { db.exec('ALTER TABLE items ADD COLUMN section TEXT'); } catch (_) {}
 try { db.exec('ALTER TABLE items ADD COLUMN physical_count REAL'); } catch (_) {}
 try { db.exec('ALTER TABLE items ADD COLUMN serial_no INTEGER'); } catch (_) {}
 try { db.exec('ALTER TABLE items ADD COLUMN created_at TEXT'); } catch (_) {}
+try { db.exec('ALTER TABLE movements ADD COLUMN photo TEXT'); } catch (_) {}
 
 // Default older established items to 45 days ago if not set, so they act as mature products
 db.exec("UPDATE items SET created_at = datetime('now', '-45 days', 'localtime') WHERE created_at IS NULL");
@@ -155,16 +159,16 @@ const STOCK_SELECT = `
   LEFT JOIN movements m ON m.item_id = i.id`;
 
 const getOne = db.prepare(STOCK_SELECT + ' WHERE i.id = ? GROUP BY i.id');
-const insertMove = db.prepare('INSERT INTO movements (item_id, type, qty, person, note) VALUES (?, ?, ?, ?, ?)');
+const insertMove = db.prepare('INSERT INTO movements (item_id, type, qty, person, note, photo) VALUES (?, ?, ?, ?, ?, ?)');
 
 // Runs as one all-or-nothing step, so two people saving at once cannot break the stock.
-const recordMove = db.transaction((type, itemId, qty, person, note) => {
+const recordMove = db.transaction((type, itemId, qty, person, note, photo) => {
   const item = getOne.get(itemId);
   if (!item) throw new Error('Item not found');
   if (type === 'ISSUE' && qty > item.stock) {
     throw new Error(`Only ${item.stock} ${item.uom} in stock — cannot issue ${qty}.`);
   }
-  insertMove.run(itemId, type, qty, person, note || null);
+  insertMove.run(itemId, type, qty, person, note || null, photo || null);
   return getOne.get(itemId);
 });
 
@@ -172,6 +176,7 @@ const recordMove = db.transaction((type, itemId, qty, person, note) => {
 const app = express();
 app.use(express.json({ limit: '30mb' }));
 app.use(express.static(path.join(__dirname, 'public')));   // serves the page people see
+app.use('/uploads', express.static(UPLOADS_DIR));          // serves uploaded visual proof photos
 
 /**
  * Sync / Take Tally Count & Physical Count directly from Excel (.xlsx or .csv)
@@ -396,7 +401,7 @@ app.post('/api/physical-count', (req, res) => {
 // Issue (take out) or receive (add) stock
 app.post('/api/move', (req, res) => {
   try {
-    const { type, item_id, note } = req.body;
+    const { type, item_id, note, photo } = req.body;
     const qty = Number(req.body.qty);
     const person = String(req.body.person || '').trim().slice(0, 50);
     if (!['ISSUE', 'RECEIVE'].includes(type)) throw new Error('Type must be ISSUE or RECEIVE');
@@ -407,8 +412,25 @@ app.post('/api/move', (req, res) => {
     if (!DECIMAL_UOMS.includes(item.uom) && !Number.isInteger(qty)) {
       throw new Error(`${item.uom} must be a whole number`);
     }
-    const updated = recordMove(type, item_id, qty, person, String(note || '').trim().slice(0, 200));
-    res.json({ ok: true, item: updated });
+
+    // Process photo attachment if provided (e.g. proof of issued quantity)
+    let photoUrl = null;
+    if (photo && typeof photo === 'string' && photo.startsWith('data:image/')) {
+      const match = photo.match(/^data:image\/([a-zA-Z0-9+]+);base64,(.+)$/);
+      if (match) {
+        const rawExt = match[1].toLowerCase();
+        const ext = (rawExt === 'jpeg' || rawExt === 'jpg') ? 'jpg' : (rawExt === 'png' ? 'png' : 'webp');
+        const filename = `${type.toLowerCase()}_${Date.now()}_${Math.random().toString(36).slice(2, 7)}.${ext}`;
+        const filepath = path.join(UPLOADS_DIR, filename);
+        fs.writeFileSync(filepath, Buffer.from(match[2], 'base64'));
+        photoUrl = `/uploads/${filename}`;
+      }
+    } else if (photo && typeof photo === 'string' && photo.startsWith('/uploads/')) {
+      photoUrl = photo;
+    }
+
+    const updated = recordMove(type, item_id, qty, person, String(note || '').trim().slice(0, 200), photoUrl);
+    res.json({ ok: true, item: updated, photo: photoUrl });
   } catch (e) {
     res.status(400).json({ ok: false, error: e.message });
   }
@@ -479,9 +501,9 @@ app.get('/api/stock.csv', (req, res) => {
 // Daily report: all movements on a date (default today)
 function reportRows(date) {
   return db.prepare(`
-    SELECT m.ts, m.type, i.location, i.description, i.sku, i.uom, m.qty, m.person, m.note
+    SELECT m.id, m.ts, m.type, i.location, i.description, i.sku, i.uom, m.qty, m.person, m.note, m.photo
     FROM movements m JOIN items i ON i.id = m.item_id
-    WHERE substr(m.ts, 1, 10) = ? ORDER BY m.ts`).all(date);
+    WHERE substr(m.ts, 1, 10) = ? ORDER BY m.ts DESC, m.id DESC`).all(date);
 }
 function today() {
   const d = new Date();
@@ -494,9 +516,12 @@ app.get('/api/report', (req, res) => {
 app.get('/api/report.csv', (req, res) => {
   const date = /^\d{4}-\d{2}-\d{2}$/.test(req.query.date) ? req.query.date : today();
   const esc = v => `"${String(v ?? '').replace(/"/g, '""')}"`;
-  const head = ['Time', 'Type', 'Location', 'Description', 'SKU', 'UOM', 'Qty', 'Person', 'Note'];
+  const head = ['Time', 'Type', 'Location', 'Description', 'SKU', 'UOM', 'Qty', 'Person', 'Note', 'Photo Proof URL'];
   const lines = [head.map(esc).join(',')];
-  reportRows(date).forEach(r => lines.push([r.ts, r.type, r.location, r.description, r.sku, r.uom, r.qty, r.person, r.note].map(esc).join(',')));
+  reportRows(date).forEach(r => {
+    const photoUrl = r.photo ? `${req.protocol}://${req.get('host')}${r.photo}` : '';
+    lines.push([r.ts, r.type, r.location, r.description, r.sku, r.uom, r.qty, r.person, r.note, photoUrl].map(esc).join(','));
+  });
   res.set({ 'Content-Type': 'text/csv; charset=utf-8', 'Content-Disposition': `attachment; filename="stock-report-${date}.csv"` });
   res.send('\ufeff' + lines.join('\r\n'));   // \ufeff helps Excel read it correctly
 });
