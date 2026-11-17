@@ -1,15 +1,30 @@
 :root {
-  --bg: #fcf9f5;
-  --card: #ffffff;
-  --ink: #1f2937;
-  --muted: #78716c;
-  --brand: #ea580c;
-  --brand-dark: #c2410c;
-  --brand-light: #ffedd5;
-  --brand-subtle: #fff7ed;
-  --out: #dc2626;
-  --in: #16a34a;
-  --line: #e7dfd5;
+  /* 4-Color Master Palette from Swatch */
+  --classic-black: #0A0A0A;
+  --golden-pitch: #3F3C2D;
+  --golden-pitch-dark: #27251C;
+  --golden-pitch-light: #54503D;
+  --power-orange: #FF4E08;
+  --power-orange-dark: #DC3D00;
+  --power-orange-light: #FF7038;
+  --power-orange-tint: #FFF2ED;
+  --off-white: #E6E5C7;
+  --off-white-bg: #F5F4EC;
+  --off-white-card: #FAF9F3;
+
+  /* Semantic UI Tokens */
+  --bg: #F5F4EC;
+  --card: #FFFFFF;
+  --ink: #1B1A14;
+  --muted: #6B6858;
+  --brand: #FF4E08;
+  --brand-dark: #DC3D00;
+  --brand-light: #FFE4D9;
+  --brand-subtle: #FFF3EE;
+  --pitch: #3F3C2D;
+  --out: #D92D20;
+  --in: #12824C;
+  --line: #DCD9C4;
 }
 
 * {
@@ -18,88 +33,125 @@
 
 body {
   margin: 0;
-  font-family: Arial, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
   background: var(--bg);
   color: var(--ink);
+  -webkit-font-smoothing: antialiased;
 }
 
+/* ----- Header with Classic Black & Power Orange Srinivasa Enterprises ----- */
 header {
-  background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%);
-  color: #fff;
-  padding: 13px 18px;
-  font-weight: bold;
-  letter-spacing: 0.3px;
-  box-shadow: 0 2px 4px rgba(194, 65, 12, 0.15);
+  background: var(--classic-black);
+  color: var(--off-white);
+  padding: 14px 22px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  border-bottom: 3px solid var(--power-orange);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
 }
 
+.brand-title {
+  color: var(--power-orange);
+  font-size: 20px;
+  font-weight: 900;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.brand-sep {
+  color: var(--golden-pitch-light);
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.brand-subtitle {
+  color: var(--off-white);
+  font-size: 14px;
+  font-weight: 600;
+  opacity: 0.95;
+  letter-spacing: 0.3px;
+}
+
+/* ----- Navigation Bar with Golden Pitch & Power Orange Active Tab ----- */
 nav {
   display: flex;
-  background: #fff;
-  border-bottom: 2px solid var(--line);
+  background: var(--golden-pitch-dark);
+  border-bottom: 2px solid var(--golden-pitch);
   position: sticky;
   top: 0;
-  z-index: 5;
+  z-index: 50;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
 nav button {
   flex: 1;
-  padding: 13px 4px;
+  padding: 13px 8px;
   border: 0;
   background: none;
-  font-size: 15px;
+  font-size: 14px;
+  font-weight: 700;
   cursor: pointer;
   border-bottom: 3px solid transparent;
-  color: var(--muted);
+  color: var(--off-white);
+  opacity: 0.85;
   transition: all 0.2s ease;
+  letter-spacing: 0.2px;
 }
 
 nav button:hover {
-  color: var(--brand);
-  background: #fffbf7;
+  color: var(--power-orange);
+  background: rgba(255, 78, 8, 0.1);
+  opacity: 1;
 }
 
 nav button.active {
-  border-bottom-color: var(--brand);
-  font-weight: bold;
-  color: var(--brand);
+  color: #FFFFFF;
+  background: var(--power-orange);
+  border-bottom-color: var(--power-orange-dark);
+  opacity: 1;
+  box-shadow: inset 0 -2px 4px rgba(0, 0, 0, 0.2);
 }
 
 main {
-  max-width: 1350px;
+  max-width: 1400px;
   margin: 0 auto;
-  padding: 14px;
+  padding: 16px;
 }
 
 .card {
   background: var(--card);
   border: 1px solid var(--line);
   border-radius: 8px;
-  padding: 14px;
-  margin-bottom: 14px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  padding: 16px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 4px rgba(63, 60, 45, 0.05);
 }
 
 input, textarea, select {
   width: 100%;
-  padding: 10px;
-  font-size: 15px;
+  padding: 10px 12px;
+  font-size: 14px;
   border: 1px solid var(--line);
   border-radius: 6px;
   margin: 4px 0 10px;
-  background: #fff;
+  background: #FFFFFF;
   color: var(--ink);
-  transition: border-color 0.2s ease;
+  transition: all 0.2s ease;
 }
 
 input:focus, textarea:focus, select:focus {
   outline: none;
-  border-color: var(--brand);
-  box-shadow: 0 0 0 2px rgba(234, 88, 12, 0.15);
+  border-color: var(--power-orange);
+  box-shadow: 0 0 0 3px rgba(255, 78, 8, 0.2);
 }
 
 label {
   font-size: 13px;
   color: var(--muted);
+  font-weight: 600;
 }
 
 .row {
@@ -113,9 +165,10 @@ label {
 
 .mode button {
   padding: 12px;
-  font-size: 16px;
+  font-size: 15px;
+  font-weight: 700;
   border: 2px solid var(--line);
-  background: #fff;
+  background: #FFFFFF;
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -123,13 +176,13 @@ label {
 
 .mode button.issue.active {
   background: var(--out);
-  color: #fff;
+  color: #FFFFFF;
   border-color: var(--out);
 }
 
 .mode button.receive.active {
   background: var(--in);
-  color: #fff;
+  color: #FFFFFF;
   border-color: var(--in);
 }
 
@@ -151,24 +204,29 @@ label {
 .go {
   width: 100%;
   padding: 14px;
-  font-size: 17px;
-  color: #fff;
+  font-size: 16px;
+  color: #FFFFFF;
   border: 0;
   border-radius: 6px;
   cursor: pointer;
-  background: var(--brand);
+  background: var(--power-orange);
   font-weight: bold;
-  transition: background 0.2s ease;
+  letter-spacing: 0.3px;
+  box-shadow: 0 2px 6px rgba(255, 78, 8, 0.35);
+  transition: all 0.2s ease;
 }
 
 .go:hover {
-  background: var(--brand-dark);
+  background: var(--power-orange-dark);
+  box-shadow: 0 4px 10px rgba(220, 61, 0, 0.4);
+  transform: translateY(-1px);
 }
 
 .msg {
-  padding: 10px 14px;
+  padding: 11px 14px;
   border-radius: 6px;
   margin-bottom: 10px;
+  font-size: 14px;
 }
 
 .ok {
@@ -181,6 +239,7 @@ label {
   color: #a32a1f;
 }
 
+/* ----- Stock Table with Golden Pitch Header & Power Orange Border ----- */
 table {
   width: 100%;
   border-collapse: separate;
@@ -196,15 +255,18 @@ th, td {
 }
 
 th {
-  background: #ffedd5;
-  color: #9a3412;
+  background: var(--golden-pitch);
+  color: var(--off-white);
   position: sticky;
   top: 0;
-  z-index: 10;
-  border-bottom: 2px solid #fed7aa;
-  box-shadow: 0 1px 2px rgba(154, 52, 18, 0.08);
+  z-index: 25;
+  border-bottom: 2px solid var(--power-orange);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
   font-weight: 700;
   white-space: nowrap;
+  font-size: 12px;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
 }
 
 .scroll {
@@ -232,19 +294,24 @@ th {
   font-weight: bold;
 }
 
-a.btn {
+/* Buttons in Golden Pitch & Power Orange */
+a.btn, button.btn {
   display: inline-block;
-  padding: 10px 15px;
-  background: var(--brand);
-  color: #fff;
+  padding: 9px 14px;
+  background: var(--golden-pitch);
+  color: var(--off-white);
+  border: 1px solid var(--golden-pitch-dark);
   border-radius: 6px;
   text-decoration: none;
   font-weight: 600;
-  transition: background 0.2s ease;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-a.btn:hover {
-  background: var(--brand-dark);
+a.btn:hover, button.btn:hover {
+  background: var(--golden-pitch-dark);
+  color: #FFFFFF;
 }
 
 .hidden {
@@ -267,10 +334,10 @@ a.btn:hover {
 
 .stock-master-table th {
   white-space: nowrap;
-  font-size: 13px;
-  background: #ffedd5;
-  color: #9a3412;
-  border-bottom: 2px solid #fed7aa;
+  font-size: 12px;
+  background: var(--golden-pitch);
+  color: var(--off-white);
+  border-bottom: 2px solid var(--power-orange);
 }
 
 .stock-master-table td {
@@ -279,7 +346,7 @@ a.btn:hover {
 }
 
 .stock-master-table tr:hover td {
-  background: #fffaf5;
+  background: #FFF8F4;
 }
 
 .badge {
@@ -291,10 +358,11 @@ a.btn:hover {
 }
 
 .badge.loc {
-  background: #fff7ed;
-  color: #c2410c;
-  border: 1px solid #fed7aa;
+  background: var(--off-white-card);
+  color: var(--golden-pitch);
+  border: 1px solid var(--line);
   font-family: monospace;
+  font-weight: bold;
 }
 
 .font-mono {
@@ -319,14 +387,14 @@ a.btn:hover {
   text-align: right;
   font-family: monospace;
   font-weight: bold;
-  background: #fff;
+  background: #FFFFFF;
   transition: all 0.2s ease;
 }
 
 .phys-input:focus {
   outline: none;
-  border-color: var(--brand);
-  box-shadow: 0 0 0 2px rgba(234, 88, 12, 0.2);
+  border-color: var(--power-orange);
+  box-shadow: 0 0 0 2px rgba(255, 78, 8, 0.25);
 }
 
 .phys-input.saving {
@@ -374,16 +442,16 @@ a.btn:hover {
   color: var(--muted);
 }
 
-/* ----- Dynamic New Product & Modal Styling ----- */
+/* ----- Dynamic New Product Styling in Power Orange ----- */
 .badge-new {
-  background: linear-gradient(135deg, #ea580c, #c2410c);
-  color: #fff;
-  padding: 3px 7px;
+  background: linear-gradient(135deg, var(--power-orange), var(--power-orange-dark));
+  color: #FFFFFF;
+  padding: 3px 8px;
   border-radius: 4px;
   font-size: 11px;
   font-weight: 800;
   letter-spacing: 0.4px;
-  box-shadow: 0 1px 3px rgba(234, 88, 12, 0.35);
+  box-shadow: 0 1px 3px rgba(255, 78, 8, 0.35);
   display: inline-flex;
   align-items: center;
   gap: 3px;
@@ -391,16 +459,16 @@ a.btn:hover {
 }
 
 .row-new-product {
-  background: #fff8f0 !important;
-  box-shadow: inset 3px 0 0 #ea580c;
+  background: var(--power-orange-tint) !important;
+  box-shadow: inset 3px 0 0 var(--power-orange);
 }
 
 .row-new-product td {
-  border-bottom-color: #fed7aa;
+  border-bottom-color: var(--brand-light);
 }
 
 .sku-tag {
-  background: #fff;
+  background: #FFFFFF;
   border: 1px solid var(--line);
   padding: 2px 6px;
   border-radius: 4px;
@@ -410,78 +478,24 @@ a.btn:hover {
 }
 
 .row-new-product .sku-tag {
-  border-color: #fdba74;
-  color: #9a3412;
-}
-
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(15, 23, 42, 0.6);
-  backdrop-filter: blur(2px);
-  z-index: 100;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 16px;
-}
-
-.modal-box {
-  background: #fff;
-  border-radius: 10px;
-  width: 100%;
-  max-width: 660px;
-  padding: 22px;
-  max-height: 90vh;
-  overflow-y: auto;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
-  border: 1px solid var(--line);
-}
-
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 14px;
-  border-bottom: 1px solid var(--line);
-  padding-bottom: 10px;
-}
-
-.modal-close {
-  background: none;
-  border: none;
-  font-size: 26px;
-  cursor: pointer;
-  color: var(--muted);
-  line-height: 1;
-}
-
-.modal-close:hover {
-  color: var(--brand);
-}
-
-/* ----- Issue / Receive New Product Highlights ----- */
-.pick-new-product {
-  background: #fff8f0;
-  border-left: 4px solid #ea580c;
-}
-
-.pick-new-product:hover {
-  background: #ffedd5;
+  border-color: var(--power-orange-light);
+  color: var(--power-orange-dark);
 }
 
 .card-new-product {
-  border: 2px solid #fdba74 !important;
-  box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.12) !important;
-  background: #fffdfa !important;
+  border-left: 4px solid var(--power-orange) !important;
+  background: var(--power-orange-tint) !important;
+}
+
+.pick-new-product {
+  border-left: 3px solid var(--power-orange);
+  background: var(--power-orange-tint);
 }
 
 .new-products-shelf {
-  background: #fff7ed;
-  border: 1px solid #fed7aa;
+  background: var(--off-white-card);
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--power-orange);
   border-radius: 8px;
   padding: 12px 14px;
   margin-top: 14px;
@@ -495,8 +509,8 @@ a.btn:hover {
 }
 
 .new-product-chip {
-  background: #fff;
-  border: 1px solid #fed7aa;
+  background: #FFFFFF;
+  border: 1px solid var(--line);
   padding: 10px 12px;
   border-radius: 6px;
   cursor: pointer;
@@ -505,25 +519,25 @@ a.btn:hover {
   min-width: 210px;
   max-width: 270px;
   transition: all 0.2s ease;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 1px 2px rgba(63, 60, 45, 0.06);
 }
 
 .new-product-chip:hover {
-  border-color: #ea580c;
-  background: #fffbf7;
+  border-color: var(--power-orange);
+  background: #FFFFFF;
   transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(234, 88, 12, 0.15);
+  box-shadow: 0 4px 8px rgba(255, 78, 8, 0.2);
 }
 
-/* ----- Excel Rack Section Dividers & Headings ----- */
+/* ----- Excel Rack Section Dividers & Headings with Swatch Theme ----- */
 .rack-divider-row td {
-  background: linear-gradient(90deg, #fff7ed 0%, #ffedd5 60%, #fff7ed 100%) !important;
-  border-top: 3px solid #f97316 !important;
-  border-bottom: 2px solid #fdba74 !important;
+  background: linear-gradient(90deg, #F5F4EC 0%, #FFF3EE 50%, #F5F4EC 100%) !important;
+  border-top: 3px solid var(--power-orange) !important;
+  border-bottom: 2px solid var(--line) !important;
   padding: 10px 14px !important;
   position: sticky;
-  top: 38px;
-  z-index: 10;
+  top: 34px;
+  z-index: 15;
 }
 
 .rack-divider-wrap {
@@ -542,27 +556,28 @@ a.btn:hover {
 }
 
 .rack-divider-tag {
-  background: var(--brand);
-  color: #fff;
+  background: var(--power-orange);
+  color: #FFFFFF;
   font-family: monospace;
   font-size: 13px;
   font-weight: 800;
   padding: 3px 9px;
   border-radius: 4px;
   letter-spacing: 0.5px;
+  box-shadow: 0 1px 2px rgba(255, 78, 8, 0.3);
 }
 
 .rack-divider-heading {
   font-size: 15px;
   font-weight: 800;
-  color: #9a3412;
+  color: var(--golden-pitch-dark);
   letter-spacing: -0.2px;
 }
 
 .rack-divider-makes {
   font-size: 12px;
-  color: #78350f;
-  font-weight: 500;
+  color: var(--golden-pitch);
+  font-weight: 600;
   opacity: 0.9;
 }
 
@@ -571,7 +586,7 @@ a.btn:hover {
   align-items: center;
   gap: 12px;
   font-size: 12px;
-  color: #78350f;
+  color: var(--golden-pitch);
   font-weight: 600;
 }
 
@@ -583,13 +598,13 @@ a.btn:hover {
   overflow-x: auto;
   padding: 8px 0 4px;
   margin-top: 8px;
-  border-top: 1px dashed #fed7aa;
+  border-top: 1px dashed var(--line);
 }
 
 .quick-nav-label {
   font-size: 11px;
   font-weight: 800;
-  color: #9a3412;
+  color: var(--golden-pitch);
   white-space: nowrap;
   margin-right: 4px;
   text-transform: uppercase;
@@ -597,9 +612,9 @@ a.btn:hover {
 }
 
 .rack-nav-btn {
-  background: #fff;
-  border: 1px solid #fed7aa;
-  color: #9a3412;
+  background: #FFFFFF;
+  border: 1px solid var(--line);
+  color: var(--golden-pitch);
   font-size: 12px;
   font-weight: 600;
   padding: 4px 10px;
@@ -610,12 +625,15 @@ a.btn:hover {
 }
 
 .rack-nav-btn:hover {
-  background: #ffedd5;
-  border-color: #f97316;
+  background: var(--power-orange-tint);
+  border-color: var(--power-orange);
+  color: var(--power-orange);
 }
 
 .rack-nav-btn.active {
-  background: var(--brand);
-  color: #fff;
-  border-color: var(--brand);
+  background: var(--power-orange);
+  color: #FFFFFF;
+  border-color: var(--power-orange);
+  font-weight: 700;
+  box-shadow: 0 1px 3px rgba(255, 78, 8, 0.35);
 }
