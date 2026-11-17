@@ -2,7 +2,9 @@ const fs = require('fs');
 const path = require('path');
 const { DatabaseSync } = require('node:sqlite');
 
-const dbPath = path.join(__dirname, '..', 'stock.db');
+const dbPath = fs.existsSync(path.join(__dirname, '..', 'data', 'stock.db'))
+  ? path.join(__dirname, '..', 'data', 'stock.db')
+  : path.join(__dirname, '..', 'stock.db');
 const db = new DatabaseSync(dbPath);
 
 const rackMap = {
@@ -73,6 +75,4 @@ items.forEach((item, idx) => {
 
 const outputPath = path.join(__dirname, '..', 'data', 'stock-master.csv');
 fs.writeFileSync(outputPath, '\ufeff' + lines.join('\r\n'), 'utf8');
-const rootCopy = path.join(__dirname, '..', 'stock-master.csv');
-fs.writeFileSync(rootCopy, '\ufeff' + lines.join('\r\n'), 'utf8');
 console.log(`Successfully generated ${outputPath} with dynamic Excel formulas for Serial No and Variance.`);

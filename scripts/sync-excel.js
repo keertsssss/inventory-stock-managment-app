@@ -21,7 +21,9 @@ console.log(`Reading Excel stock master from: ${xlsxPath}`);
 const rows = excelSync.parseXlsxStockMaster(xlsxPath);
 console.log(`Parsed ${rows.length} rows from Excel sheet.`);
 
-const dbPath = path.join(__dirname, '..', 'stock.db');
+const dbPath = fs.existsSync(path.join(__dirname, '..', 'data', 'stock.db'))
+  ? path.join(__dirname, '..', 'data', 'stock.db')
+  : path.join(__dirname, '..', 'stock.db');
 const db = new DatabaseSync(dbPath);
 db.transaction = (fn) => (...args) => {
   db.exec('BEGIN IMMEDIATE');

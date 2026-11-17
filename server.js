@@ -65,8 +65,13 @@ const RACK_CATEGORY_MAP = {
   'R09': 'Tapes & Miscellaneous (incl. Raw Material)'
 };
 
-// ---------- 1. Database (a single file called stock.db next to this script) ----------
-const db = new Database(path.join(__dirname, 'stock.db'));
+// ---------- 1. Database (located in data/stock.db) ----------
+const DB_DIR = path.join(__dirname, 'data');
+if (!fs.existsSync(DB_DIR)) fs.mkdirSync(DB_DIR, { recursive: true });
+const DB_PATH = fs.existsSync(path.join(DB_DIR, 'stock.db'))
+  ? path.join(DB_DIR, 'stock.db')
+  : (fs.existsSync(path.join(__dirname, 'stock.db')) ? path.join(__dirname, 'stock.db') : path.join(DB_DIR, 'stock.db'));
+const db = new Database(DB_PATH);
 db.pragma('journal_mode = WAL');
 db.exec(`
 CREATE TABLE IF NOT EXISTS items (
