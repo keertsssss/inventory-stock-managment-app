@@ -1,286 +1,407 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Stock Register</title>
-<link rel="stylesheet" href="style.css">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Stock Register</title>
+  <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
-<header>
-  <span class="brand-title">Srinivasa Enterprises</span>
-  <span class="brand-sep">•</span>
-  <span class="brand-subtitle">NOVUM Energy Infra — Stock Register</span>
-</header>
-<nav>
-  <button data-tab="move" class="active">Issue / Receive</button>
-  <button data-tab="stock">Stock</button>
-  <button data-tab="report">Daily Report</button>
-  <button data-tab="onboard">+ Onboard Product</button>
-</nav>
-<main>
+  <header>
+    <span class="brand-title">Srinivasa Enterprises</span>
+    <span class="brand-sep">•</span>
+    <span class="brand-subtitle">NOVUM Energy Infra — Stock Register</span>
+  </header>
+  <nav>
+    <button data-tab="move" class="active">Issue / Receive</button>
+    <button data-tab="stock">Stock</button>
+    <button data-tab="report">Daily Report</button>
+    <button data-tab="onboard">+ Onboard Product</button>
+  </nav>
+  <main>
 
-  <!-- TAB 1: take stock out or add stock -->
-  <section id="tab-move">
-    <div class="card">
-      <div class="row mode">
-        <button class="issue active" id="mode-issue">Issue (take out)</button>
-        <button class="receive" id="mode-receive">Receive (add)</button>
+    <!-- TAB 1: take stock out or add stock -->
+    <section id="tab-move">
+      <div class="card">
+        <div class="row mode">
+          <button class="issue active" id="mode-issue">Issue (take out)</button>
+          <button class="receive" id="mode-receive">Receive (add)</button>
+        </div>
       </div>
-    </div>
-    <div class="card">
-      <div id="moveNotification" class="hidden"></div>
-      <label>1. Find item (type part of the name, make, SKU or location)</label>
-      <input id="q" placeholder="e.g. mcb 16a cns" autocomplete="off">
-      <div id="results"></div>
-      <div id="newProductsShelf"></div>
-    </div>
-    <div class="card hidden" id="form">
-      <div id="chosen"></div>
-      <label>2. Quantity <span id="uomLabel"></span></label>
-      <input id="qty" type="number" inputmode="decimal" min="0" step="any">
-      <label>3. Your name</label>
-      <input id="person" placeholder="Who is taking / adding this?">
-      <label>4. Note (job, panel, supplier — optional)</label>
-      <input id="note">
-      <div class="photo-upload-section">
-        <label style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-          <span id="photoFieldLabel">5. Take / Attach Photo (visual proof of quantity)</span>
-          <span class="badge" id="photoBadge" style="background:var(--power-orange-tint); color:var(--power-orange); font-size:11px; font-weight:700;">Recommended for Issue</span>
-        </label>
-        <div class="photo-drop-box" id="photoDropArea">
-          <input type="file" id="photoInput" accept="image/*" capture="environment" style="display:none;">
-          <div id="photoPlaceholder" class="photo-placeholder-box">
-            <div style="font-size:26px; line-height:1; margin-bottom:4px;">📷</div>
-            <div style="font-weight:700; color:var(--golden-pitch-dark); font-size:14px;">Tap to Take Photo or Upload Image</div>
-            <small class="muted" style="font-size:12px;">Snap a picture showing the quantity and product to check later</small>
-          </div>
-          <div id="photoPreviewContainer" class="photo-preview-container hidden">
-            <img id="photoPreview" src="" alt="Proof Preview">
-            <div class="photo-preview-actions">
-              <button type="button" class="btn btn-sm" id="retakePhotoBtn" style="padding:6px 12px; font-size:12px; background:var(--golden-pitch); color:#fff;">Change / Retake</button>
-              <button type="button" class="btn btn-sm" id="removePhotoBtn" style="padding:6px 12px; font-size:12px; background:#fee2e2; color:#b91c1c; border-color:#fca5a5;">&times; Remove</button>
+      <div class="card">
+        <div id="moveNotification" class="hidden"></div>
+        <label>1. Find item (type part of the name, make, SKU or location)</label>
+        <input id="q" placeholder="e.g. mcb 16a cns" autocomplete="off">
+        <div id="results"></div>
+        <div id="newProductsShelf"></div>
+      </div>
+      <div class="card hidden" id="form">
+        <div id="chosen"></div>
+        <label>2. Quantity <span id="uomLabel"></span></label>
+        <input id="qty" type="number" inputmode="decimal" min="0" step="any">
+        <label>3. Your name</label>
+        <input id="person" placeholder="Who is taking / adding this?">
+        <label>4. Note (job, panel, supplier — optional)</label>
+        <input id="note">
+        <div class="photo-upload-section">
+          <label style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+            <span id="photoFieldLabel">5. Take / Attach Photo (visual proof of quantity)</span>
+            <span class="badge" id="photoBadge"
+              style="background:var(--power-orange-tint); color:var(--power-orange); font-size:11px; font-weight:700;">Recommended
+              for Issue</span>
+          </label>
+          <div class="photo-drop-box" id="photoDropArea">
+            <input type="file" id="photoInput" accept="image/*" capture="environment" style="display:none;">
+            <div id="photoPlaceholder" class="photo-placeholder-box">
+              <div style="font-size:26px; line-height:1; margin-bottom:4px;">📷</div>
+              <div style="font-weight:700; color:var(--golden-pitch-dark); font-size:14px;">Tap to Take Photo or Upload
+                Image</div>
+              <small class="muted" style="font-size:12px;">Snap a picture showing the quantity and product to check
+                later</small>
+            </div>
+            <div id="photoPreviewContainer" class="photo-preview-container hidden">
+              <img id="photoPreview" src="" alt="Proof Preview">
+              <div class="photo-preview-actions">
+                <button type="button" class="btn btn-sm" id="retakePhotoBtn"
+                  style="padding:6px 12px; font-size:12px; background:var(--golden-pitch); color:#fff;">Change /
+                  Retake</button>
+                <button type="button" class="btn btn-sm" id="removePhotoBtn"
+                  style="padding:6px 12px; font-size:12px; background:#fee2e2; color:#b91c1c; border-color:#fca5a5;">&times;
+                  Remove</button>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-      <div id="msg"></div>
-      <div class="row" style="margin-top:14px; gap:10px;">
-        <button class="go" id="save" style="flex:1;">Save</button>
-        <button type="button" class="btn" id="cancelMove" style="background:#f3f4f6; color:#374151; padding:12px 20px; font-weight:600;">Cancel</button>
-      </div>
-    </div>
-  </section>
-
-  <!-- TAB 2: current stock for every item -->
-  <section id="tab-stock" class="hidden">
-    <div class="card">
-      <div class="row">
-        <input id="sq" placeholder="Search by name, SKU, CAT code, make, location (R01-S01), category, S.No..." autocomplete="off">
-        <select id="rackFilter" style="max-width:270px">
-          <option value="">All Racks / Categories</option>
-          <option value="R01">R01 — Cables</option>
-          <option value="R02">R02 — Cable Accessories</option>
-          <option value="R03">R03 — Contactors & Relays</option>
-          <option value="R04">R04 — Fuses</option>
-          <option value="R05">R05 — Lighting</option>
-          <option value="R06">R06 — MCB / MCCB / RCCB</option>
-          <option value="R07">R07 — Meters & Instruments</option>
-          <option value="R08">R08 — Switches & Sockets</option>
-          <option value="R09">R09 — Tapes & Raw Material</option>
-        </select>
-      </div>
-      <div class="filter-bar">
-        <label><input type="checkbox" id="onlyZero" style="width:auto;margin:0 6px 0 0"> Zero / negative stock</label>
-        <label style="display:none;"><input type="checkbox" id="onlyVariance" style="width:auto;margin:0 6px 0 0"> Has variance</label>
-        <label><input type="checkbox" id="onlyUncounted" style="width:auto;margin:0 6px 0 0"> Uncounted only</label>
-        <label><input type="checkbox" id="onlyNewProducts" style="width:auto;margin:0 6px 0 0"> <span class="badge badge-new" style="font-size:11px;">NEW</span> Products (≤ 30d)</label>
-        <span style="flex:1"></span>
-        <button class="btn" id="openOnboardModal" type="button" style="padding:8px 14px; font-size:13px; background:var(--brand);">+ Onboard Product</button>
-        <button class="btn" id="syncExcelBtn" type="button" style="padding:8px 14px; font-size:13px; background:#16a34a; color:#fff;" title="Sync Tally counts from Srinivasa_Stock_Rack_Plan.xlsx">&#8635; Sync from Excel</button>
-        <label class="btn" style="padding:8px 14px; font-size:13px; background:#f3f4f6; color:#1f2937; cursor:pointer; margin:0;" title="Upload Excel (.xlsx) or CSV file">
-          &#128194; Upload Excel/CSV
-          <input type="file" id="uploadExcelInput" accept=".xlsx,.csv" style="display:none;">
-        </label>
-        <a class="btn" id="exportStockCsv" href="/api/stock.csv" download="stock-master.csv" style="padding:8px 14px; font-size:13px;">Download Master (CSV)</a>
-      </div>
-      <div id="stockSummary" class="muted" style="margin-top:6px; font-size:13px;"></div>
-      <div id="rackQuickNav" class="rack-quick-nav"></div>
-    </div>
-    <div class="card scroll">
-      <table id="stockTable" class="stock-master-table"></table>
-    </div>
-  </section>
-
-  <!-- TAB 3: what was issued/received on a day -->
-  <section id="tab-report" class="hidden">
-    <div class="card">
-      <label>Date</label>
-      <input id="date" type="date">
-      <a class="btn" id="csv" href="#">Download for Excel (CSV)</a>
-      <div id="summary" class="muted" style="margin-top:10px;"></div>
-    </div>
-    <div class="card scroll"><table id="reportTable"></table></div>
-  </section>
-
-  <!-- TAB 4: Onboard New Product (beside Daily Report) -->
-  <section id="tab-onboard" class="hidden">
-    <div class="card" style="max-width:760px; margin:0 auto;">
-      <h3 style="margin-top:0; color:var(--brand-dark); border-bottom:1px solid var(--line); padding-bottom:10px;">
-        Onboard New Product
-      </h3>
-      <p class="muted" style="margin-top:-4px; margin-bottom:16px; font-size:13px;">
-        Add new products to your catalog. The system will detect your category pattern, auto-generate the matching SKU, and slot the item into its alphabetical position in the Stock Master with an automatic 30-day NEW badge.
-      </p>
-      <form id="onboardForm">
-        <div class="row">
-          <div>
-            <label>Category / Rack Group</label>
-            <select id="newCatSelect">
-              <option value="R01">R01 — Cables</option>
-              <option value="R02">R02 — Cable Accessories & Terminals</option>
-              <option value="R03">R03 — Contactors, Relays & Controllers</option>
-              <option value="R04">R04 — Fuses</option>
-              <option value="R05">R05 — Lighting</option>
-              <option value="R06">R06 — MCB / MCCB / RCCB</option>
-              <option value="R07">R07 — Meters & Instruments</option>
-              <option value="R08">R08 — Switches & Sockets</option>
-              <option value="R09">R09 — Tapes & Raw Material</option>
-            </select>
-          </div>
-          <div>
-            <label>Location Code (e.g. R01-S01)</label>
-            <input id="newLocation" placeholder="e.g. R01-S01" value="R01-S01" required>
-          </div>
+        <div id="msg"></div>
+        <div class="row" style="margin-top:14px; gap:10px;">
+          <button class="go" id="save" style="flex:1;">Save</button>
+          <button type="button" class="btn" id="cancelMove"
+            style="background:#f3f4f6; color:#374151; padding:12px 20px; font-weight:600;">Cancel</button>
         </div>
+      </div>
+    </section>
 
+    <!-- TAB 2: current stock for every item -->
+    <section id="tab-stock" class="hidden">
+      <div class="card">
         <div class="row">
-          <div>
-            <label>Make / Brand (Company Name)</label>
-            <input id="newMake" placeholder="e.g. FTC, Havells, Salzer, Polycab" required>
-          </div>
-          <div>
-            <label>Product Type / Group</label>
-            <input id="newProductType" placeholder="e.g. Fuse Link, MCB, Contactor" required>
-          </div>
-          <div>
-            <label>Electrical Initials / Rating (e.g. 63A, 16A, 1.5SQMM)</label>
-            <input id="newRating" placeholder="e.g. 63A, 32A, 1.5SQMM, 415V">
-          </div>
+          <input id="sq" placeholder="Search by name, SKU, CAT code, make, location (R01-S01), category, S.No..."
+            autocomplete="off">
+          <select id="rackFilter" style="max-width:270px">
+            <option value="">All Racks / Categories</option>
+            <option value="R01">R01 — Cables</option>
+            <option value="R02">R02 — Cable Accessories</option>
+            <option value="R03">R03 — Contactors & Relays</option>
+            <option value="R04">R04 — Fuses</option>
+            <option value="R05">R05 — Lighting</option>
+            <option value="R06">R06 — MCB / MCCB / RCCB</option>
+            <option value="R07">R07 — Meters & Instruments</option>
+            <option value="R08">R08 — Switches & Sockets</option>
+            <option value="R09">R09 — Tapes & Raw Material</option>
+          </select>
         </div>
+        <div class="filter-bar">
+          <label><input type="checkbox" id="onlyZero" style="width:auto;margin:0 6px 0 0"> Zero / negative stock</label>
+          <label style="display:none;"><input type="checkbox" id="onlyVariance" style="width:auto;margin:0 6px 0 0"> Has
+            variance</label>
+          <label><input type="checkbox" id="onlyUncounted" style="width:auto;margin:0 6px 0 0"> Uncounted only</label>
+          <label><input type="checkbox" id="onlyNewProducts" style="width:auto;margin:0 6px 0 0"> <span
+              class="badge badge-new" style="font-size:11px;">NEW</span> Products (≤ 30d)</label>
+          <span style="flex:1"></span>
+          <button class="btn" id="openOnboardModal" type="button"
+            style="padding:8px 14px; font-size:13px; background:var(--brand);">+ Onboard Product</button>
+          <button class="btn" id="syncExcelBtn" type="button"
+            style="padding:8px 14px; font-size:13px; background:#16a34a; color:#fff;"
+            title="Sync Tally counts from Srinivasa_Stock_Rack_Plan.xlsx">&#8635; Sync from Excel</button>
+          <label class="btn"
+            style="padding:8px 14px; font-size:13px; background:#f3f4f6; color:#1f2937; cursor:pointer; margin:0;"
+            title="Upload Excel (.xlsx) or CSV file">
+            &#128194; Upload Excel/CSV
+            <input type="file" id="uploadExcelInput" accept=".xlsx,.csv" style="display:none;">
+          </label>
+          <a class="btn" id="exportStockCsv" href="/api/stock.csv" download="stock-master.csv"
+            style="padding:8px 14px; font-size:13px;">Download Master (CSV)</a>
+        </div>
+        <div id="stockSummary" class="muted" style="margin-top:6px; font-size:13px;"></div>
+        <div id="rackQuickNav" class="rack-quick-nav"></div>
+      </div>
+      <div class="card scroll">
+        <table id="stockTable" class="stock-master-table"></table>
+      </div>
+    </section>
 
-        <label>Product Description (Auto: Product Type + Electrical Initials + Company Name)</label>
-        <input id="newDesc" placeholder="e.g. FUSE LINK 63A FTC" required style="text-transform:uppercase;">
+    <!-- TAB 3: what was issued/received on a day -->
+    <section id="tab-report" class="hidden">
+      <div class="card">
+        <label>Date</label>
+        <input id="date" type="date">
+        <a class="btn" id="csv" href="#">Download for Excel (CSV)</a>
+        <div id="summary" class="muted" style="margin-top:10px;"></div>
+      </div>
+      <div class="card scroll">
+        <table id="reportTable"></table>
+      </div>
+    </section>
 
-        <div class="row">
-          <div style="flex:1.5;">
-            <label>SKU Code (Starts with ELEC-, space auto-inserts '-')</label>
-            <div style="display:flex; gap:6px;">
-              <input id="newSku" placeholder="e.g. ELEC-FUSE-LINK-63A-FTC" required style="font-family:monospace;font-weight:bold;">
-              <button type="button" id="btnAutoSku" class="btn" style="padding:9px 12px;font-size:12px;white-space:nowrap;">⚡ Auto SKU</button>
+    <!-- TAB 4: Onboard New Product (beside Daily Report) -->
+    <section id="tab-onboard" class="hidden">
+      <div class="card" style="max-width:760px; margin:0 auto;">
+        <h3 style="margin-top:0; color:var(--brand-dark); border-bottom:1px solid var(--line); padding-bottom:10px;">
+          Onboard New Product
+        </h3>
+        <p class="muted" style="margin-top:-4px; margin-bottom:16px; font-size:13px;">
+          Add new products to your catalog. The system will detect your category pattern, auto-generate the matching
+          SKU, and slot the item into its alphabetical position in the Stock Master with an automatic 30-day NEW badge.
+        </p>
+        <form id="onboardForm">
+          <div class="row">
+            <div>
+              <label>Category / Rack Group</label>
+              <select id="newCatSelect">
+                <option value="R01">R01 — Cables</option>
+                <option value="R02">R02 — Cable Accessories & Terminals</option>
+                <option value="R03">R03 — Contactors, Relays & Controllers</option>
+                <option value="R04">R04 — Fuses</option>
+                <option value="R05">R05 — Lighting</option>
+                <option value="R06">R06 — MCB / MCCB / RCCB</option>
+                <option value="R07">R07 — Meters & Instruments</option>
+                <option value="R08">R08 — Switches & Sockets</option>
+                <option value="R09">R09 — Tapes & Raw Material</option>
+              </select>
             </div>
-            <small id="skuPatternHint" class="muted" style="display:block; margin-top:-6px; font-size:12px;"></small>
+            <div>
+              <label>Location Code (e.g. R01-S01)</label>
+              <input id="newLocation" placeholder="e.g. R01-S01" value="R01-S01" required>
+            </div>
           </div>
-          <div style="flex:1;">
-            <label>Readable Code / CAT Code (CAPITAL)</label>
-            <input id="newCatCode" placeholder="e.g. FTC FL 63A">
-          </div>
-          <div style="flex:1;">
-            <label>Sub-Variant Branch From (Optional)</label>
-            <input id="newBranchParent" placeholder="e.g. MOT-012 (makes MOT-012A)">
-          </div>
-        </div>
 
-        <div class="row">
-          <div>
-            <label>UOM (Unit of Measure)</label>
-            <select id="newUom">
-              <option value="NOS">NOS</option>
-              <option value="ROLLS">ROLLS</option>
-              <option value="MTR">MTR</option>
-              <option value="KGS">KGS</option>
-              <option value="SET">SET</option>
-              <option value="PAC">PAC</option>
-              <option value="BOX">BOX</option>
-            </select>
+          <div class="row">
+            <div>
+              <label>Make / Brand (Company Name)</label>
+              <input id="newMake" placeholder="e.g. FTC, Havells, Salzer, Polycab" required>
+            </div>
+            <div>
+              <label>Product Type / Group</label>
+              <input id="newProductType" placeholder="e.g. Fuse Link, MCB, Contactor" required>
+            </div>
+            <div>
+              <label>Electrical Initials / Rating (e.g. 63A, 16A, 1.5SQMM)</label>
+              <input id="newRating" placeholder="e.g. 63A, 32A, 1.5SQMM, 415V">
+            </div>
           </div>
-          <div>
-            <label>Opening Tally Qty</label>
-            <input id="newQty" type="number" min="0" step="any" value="0">
+
+          <label>Product Description (Auto: Product Type + Electrical Initials + Company Name)</label>
+          <input id="newDesc" placeholder="e.g. FUSE LINK 63A FTC" required style="text-transform:uppercase;">
+
+          <div class="row">
+            <div style="flex:1.5;">
+              <label>SKU Code (Starts with ELEC-, space auto-inserts '-')</label>
+              <div style="display:flex; gap:6px;">
+                <input id="newSku" placeholder="e.g. ELEC-FUSE-LINK-63A-FTC" required
+                  style="font-family:monospace;font-weight:bold;">
+                <button type="button" id="btnAutoSku" class="btn"
+                  style="padding:9px 12px;font-size:12px;white-space:nowrap;">⚡ Auto SKU</button>
+              </div>
+              <small id="skuPatternHint" class="muted" style="display:block; margin-top:-6px; font-size:12px;"></small>
+            </div>
+            <div style="flex:1;">
+              <label>Readable Code / CAT Code (CAPITAL)</label>
+              <input id="newCatCode" placeholder="e.g. FTC FL 63A">
+            </div>
+            <div style="flex:1;">
+              <label>Sub-Variant Branch From (Optional)</label>
+              <input id="newBranchParent" placeholder="e.g. MOT-012 (makes MOT-012A)">
+            </div>
           </div>
-        </div>
 
-        <div id="onboardMsg"></div>
-        <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:16px;">
-          <button type="button" id="btnResetOnboardForm" class="btn" style="background:#64748b; color:#fff; padding:10px 20px; font-weight:600;">🔄 Reset Form</button>
-          <button type="submit" id="submitOnboard" class="btn" style="background:#ea580c; color:#fff; padding:12px 24px; font-size:15px; font-weight:700;">+ Onboard Product</button>
-        </div>
-      </form>
-    </div>
+          <div class="row">
+            <div>
+              <label>UOM (Unit of Measure)</label>
+              <select id="newUom">
+                <option value="NOS">NOS</option>
+                <option value="ROLLS">ROLLS</option>
+                <option value="MTR">MTR</option>
+                <option value="KGS">KGS</option>
+                <option value="SET">SET</option>
+                <option value="PAC">PAC</option>
+                <option value="BOX">BOX</option>
+              </select>
+            </div>
+            <div>
+              <label>Opening Tally Qty</label>
+              <input id="newQty" type="number" min="0" step="any" value="0">
+            </div>
+          </div>
 
-    <!-- Remove a Product from Stock Section -->
-    <div class="card" style="max-width:760px; margin:24px auto 0; border: 1px solid #fee2e2; border-top: 4px solid #dc2626;">
-      <h3 style="margin-top:0; color:#b91c1c; border-bottom:1px solid var(--line); padding-bottom:10px; display:flex; align-items:center; gap:8px;">
-        <span>🗑️</span> Remove a Product from Stock
-      </h3>
-      <p class="muted" style="margin-top:-4px; margin-bottom:16px; font-size:13px;">
-        Search for any existing product in your inventory to safely and permanently remove it from the catalog and stock master.
-      </p>
-
-      <div>
-        <label>Find product to remove (type name, SKU, CAT code, make, or location)</label>
-        <input id="removeSearchInput" placeholder="e.g. fuse link 63a ftc, mcb, salzer..." autocomplete="off">
-        <div id="removeSearchResults" style="margin-top:6px;"></div>
+          <div id="onboardMsg"></div>
+          <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:16px;">
+            <button type="button" id="btnResetOnboardForm" class="btn" style="background:#64748b; color:#fff; padding:10px 20px; font-weight:600;">🔄 Reset Form</button>
+            <button type="submit" id="submitOnboard" class="btn" style="background:#ea580c; color:#fff; padding:12px 24px; font-size:15px; font-weight:700;">+ Onboard Product</button>
+          </div>
+        </form>
       </div>
 
-      <div id="removeSelectedCard" class="hidden" style="background:#fff5f5; border:1px solid #fecaca; border-radius:8px; padding:16px; margin-top:14px;">
-        <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px;">
-          <div>
-            <div style="font-size:11px; font-weight:700; color:#dc2626; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;">Selected for removal</div>
-            <div id="removeSelectedTitle" style="font-size:15px; font-weight:700; color:var(--ink);"></div>
-            <div id="removeSelectedMeta" style="font-size:12px; margin-top:4px; display:flex; gap:8px; flex-wrap:wrap; align-items:center;"></div>
-          </div>
-          <button type="button" id="btnCancelRemoveSelection" class="btn" style="padding:4px 10px; font-size:12px; background:#f1f5f9; color:#475569;" title="Cancel selection">&times; Clear</button>
-        </div>
+      <!-- EDIT PRODUCT DESCRIPTION SECTION -->
+      <div class="card" style="max-width:760px; margin:24px auto 0; border: 1px solid #bae6fd; border-top: 4px solid #0284c7;">
+        <h3 style="margin-top:0; color:#0369a1; border-bottom:1px solid var(--line); padding-bottom:10px; display:flex; align-items:center; gap:8px;">
+          <span>✏️</span> Edit Product Description
+        </h3>
+        <p class="muted" style="margin-top:-4px; margin-bottom:16px; font-size:13px;">
+          Search for any product in your inventory to update its description, rating, SKU, or CAT code.
+        </p>
 
-        <div style="background:#fef2f2; border:1px dashed #fca5a5; border-radius:6px; padding:10px 12px; margin-top:12px; font-size:13px; color:#991b1b;">
-          ⚠️ <b>Warning:</b> This will permanently delete this product and its stock history from your catalog and Stock Master.
-        </div>
-
-        <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:14px;">
-          <button type="button" id="btnConfirmDeleteProduct" class="btn" style="background:#dc2626; color:#fff; padding:10px 20px; font-weight:700;">
-            🗑️ Permanently Remove from Stock
-          </button>
-        </div>
-      </div>
-
-      <div id="removeProductMsg" style="margin-top:12px;"></div>
-    </div>
-      </form>
-    </div>
-  </section>
-
-  <!-- Photo Lightbox Modal to inspect quantity proof in full size -->
-  <div id="photoModal" class="modal-overlay hidden">
-    <div class="modal-content photo-modal-box">
-      <div class="modal-header">
         <div>
-          <h3 id="photoModalTitle" style="margin:0; font-size:17px; color:var(--golden-pitch-dark);">Issue Quantity Proof Photo</h3>
-          <small id="photoModalSubtitle" class="muted" style="display:block; margin-top:3px; font-size:12px;"></small>
+          <label>Find product to edit (type name, SKU, CAT code, make, or location)</label>
+          <input id="editSearchInput" placeholder="e.g. fuse link 63a ftc, mcb, salzer..." autocomplete="off">
+          <div id="editSearchResults" style="margin-top:6px;"></div>
         </div>
-        <button type="button" class="modal-close" id="closePhotoModal" title="Close">&times;</button>
+
+        <div id="editSelectedCard" class="hidden" style="background:#f0f9ff; border:1px solid #bae6fd; border-radius:8px; padding:16px; margin-top:14px;">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px; margin-bottom:12px;">
+            <div>
+              <div style="font-size:11px; font-weight:700; color:#0369a1; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;">Editing Product</div>
+              <div id="editSelectedProductMeta" class="muted" style="font-size:12px;"></div>
+            </div>
+            <button type="button" id="btnCancelEditCard" class="btn" style="padding:4px 10px; font-size:12px; background:#e2e8f0; color:#475569;" title="Cancel editing">&times; Clear</button>
+          </div>
+
+          <form id="editCardForm">
+            <input type="hidden" id="editCardItemId">
+            <label style="font-weight:700; font-size:13px;">Product Description (ALL CAPS)</label>
+            <input id="editCardDescInput" style="font-weight:700; text-transform:uppercase; font-size:14px; margin-bottom:12px;" required autocomplete="off">
+
+            <div class="row">
+              <div style="flex:1.5;">
+                <label>SKU Code</label>
+                <input id="editCardSkuInput" style="font-family:monospace; font-weight:bold; text-transform:uppercase;">
+              </div>
+              <div style="flex:1;">
+                <label>Readable / CAT Code</label>
+                <input id="editCardCatInput" style="text-transform:uppercase;">
+              </div>
+            </div>
+
+            <div style="margin-top:8px;">
+              <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-size:13px; font-weight:600; color:#0369a1;">
+                <input type="checkbox" id="editCardAutoSync" checked style="width:auto; margin:0;">
+                Auto-sync SKU & CAT code as description changes
+              </label>
+            </div>
+
+            <div id="editCardMsg" style="margin-top:12px;"></div>
+
+            <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:16px;">
+              <button type="submit" id="btnSaveCardEdit" class="btn" style="background:#0284c7; color:#fff; padding:10px 22px; font-weight:700;">
+                💾 Save Updated Description
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
-      <div class="photo-modal-body">
-        <img id="photoModalImg" src="" alt="Full proof photo">
+
+      <!-- REMOVE A PRODUCT FROM STOCK SECTION -->
+      <div class="card" style="max-width:760px; margin:24px auto 0; border: 1px solid #fee2e2; border-top: 4px solid #dc2626;">
+        <h3 style="margin-top:0; color:#b91c1c; border-bottom:1px solid var(--line); padding-bottom:10px; display:flex; align-items:center; gap:8px;">
+          <span>🗑️</span> Remove a Product from Stock
+        </h3>
+        <p class="muted" style="margin-top:-4px; margin-bottom:16px; font-size:13px;">
+          Search for any existing product in your inventory to safely and permanently remove it from the catalog and stock master.
+        </p>
+
+        <div>
+          <label>Find product to remove (type name, SKU, CAT code, make, or location)</label>
+          <input id="removeSearchInput" placeholder="e.g. fuse link 63a ftc, mcb, salzer..." autocomplete="off">
+          <div id="removeSearchResults" style="margin-top:6px;"></div>
+        </div>
+
+        <div id="removeSelectedCard" class="hidden" style="background:#fff5f5; border:1px solid #fecaca; border-radius:8px; padding:16px; margin-top:14px;">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px;">
+            <div>
+              <div style="font-size:11px; font-weight:700; color:#dc2626; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;">Selected for removal</div>
+              <div id="removeSelectedTitle" style="font-size:15px; font-weight:700; color:var(--ink);"></div>
+              <div id="removeSelectedMeta" style="font-size:12px; margin-top:4px; display:flex; gap:8px; flex-wrap:wrap; align-items:center;"></div>
+            </div>
+            <button type="button" id="btnCancelRemoveSelection" class="btn" style="padding:4px 10px; font-size:12px; background:#f1f5f9; color:#475569;" title="Cancel selection">&times; Clear</button>
+          </div>
+
+          <div style="background:#fef2f2; border:1px dashed #fca5a5; border-radius:6px; padding:10px 12px; margin-top:12px; font-size:13px; color:#991b1b;">
+            ⚠️ <b>Warning:</b> This will permanently delete this product and its stock history from your catalog and Stock Master.
+          </div>
+
+          <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:14px;">
+            <button type="button" id="btnConfirmDeleteProduct" class="btn" style="background:#dc2626; color:#fff; padding:10px 20px; font-weight:700;">
+              🗑️ Permanently Remove from Stock
+            </button>
+          </div>
+        </div>
+
+        <div id="removeProductMsg" style="margin-top:12px;"></div>
       </div>
-      <div id="photoModalFooter">
-        <span id="photoModalMeta" class="muted font-mono" style="font-size:13px;"></span>
-        <a id="photoModalDownload" href="#" target="_blank" class="btn" style="padding:7px 16px; font-size:13px; background:var(--power-orange); color:#fff; font-weight:700;">Open Original File</a>
+    </section>
+
+    <!-- Photo Lightbox Modal to inspect quantity proof in full size -->
+    <div id="photoModal" class="modal-overlay hidden">
+      <div class="modal-content photo-modal-box">
+        <div class="modal-header">
+          <div>
+            <h3 id="photoModalTitle" style="margin:0; font-size:17px; color:var(--golden-pitch-dark);">Issue Quantity Proof Photo</h3>
+            <small id="photoModalSubtitle" class="muted" style="display:block; margin-top:3px; font-size:12px;"></small>
+          </div>
+          <button type="button" class="modal-close" id="closePhotoModal" title="Close">&times;</button>
+        </div>
+        <div class="photo-modal-body">
+          <img id="photoModalImg" src="" alt="Full proof photo">
+        </div>
+        <div id="photoModalFooter">
+          <span id="photoModalMeta" class="muted font-mono" style="font-size:13px;"></span>
+          <a id="photoModalDownload" href="#" target="_blank" class="btn" style="padding:7px 16px; font-size:13px; background:var(--power-orange); color:#fff; font-weight:700;">Open Original File</a>
+        </div>
       </div>
     </div>
-  </div>
 
-</main>
-<script src="app.js"></script>
+    <!-- Edit Product Description Modal (triggered from Stock Master table ✏️ button) -->
+    <div id="editDescModal" class="modal-overlay hidden">
+      <div class="modal-content" style="max-width:560px; padding:22px; border:2px solid var(--power-orange);">
+        <div class="modal-header" style="margin-bottom:14px; padding-bottom:10px;">
+          <div>
+            <h3 style="margin:0; font-size:17px; color:var(--brand-dark); display:flex; align-items:center; gap:8px;">
+              <span>✏️</span> Edit Product Description
+            </h3>
+            <small id="editModalProductMeta" class="muted" style="display:block; margin-top:3px; font-size:12px;"></small>
+          </div>
+          <button type="button" class="modal-close" id="closeEditDescModal" title="Close">&times;</button>
+        </div>
+        <form id="editDescForm">
+          <input type="hidden" id="editModalItemId">
+          <label style="font-weight:700; font-size:13px; margin-bottom:4px;">Product Description (ALL CAPS)</label>
+          <input id="editModalDescInput" style="width:100%; font-weight:700; text-transform:uppercase; font-size:14px; padding:10px 12px;" required autocomplete="off">
+
+          <div style="margin-top:12px;">
+            <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-size:13px; font-weight:600; color:#0369a1;">
+              <input type="checkbox" id="editModalAutoUpdateSku" checked style="width:auto; margin:0;">
+              Auto-sync SKU & CAT code with new description
+            </label>
+          </div>
+
+          <div id="editModalSkuPreview" style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px; padding:10px 12px; margin-top:10px; font-size:12px;">
+            <div><b>SKU:</b> <span id="editModalSkuVal" class="font-mono"></span></div>
+            <div style="margin-top:4px;"><b>CAT Code:</b> <span id="editModalCatVal" class="font-mono" style="color:#1d4ed8; font-weight:600;"></span></div>
+          </div>
+
+          <div id="editModalMsg" style="margin-top:12px;"></div>
+
+          <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:16px;">
+            <button type="button" id="btnCancelEditModal" class="btn" style="background:#f1f5f9; color:#475569; padding:9px 18px;">Cancel</button>
+            <button type="submit" id="btnSaveEditModal" class="btn" style="background:#ea580c; color:#fff; padding:10px 22px; font-weight:700;">Save Description</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+  </main>
+  <script src="app.js"></script>
 </body>
+
 </html>

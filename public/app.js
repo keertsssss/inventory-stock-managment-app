@@ -530,6 +530,8 @@ if ($('cancelMove')) {
 }
 
 // ----- Stock list -----
+let currentStockItems = [];
+
 function formatVariance(v) {
   if (v === null || v === undefined || v === '') return '<span class="var-badge var-none">—</span>';
   const n = Number(v);
@@ -546,6 +548,7 @@ async function loadStock() {
   if (rack) params.set('rack', rack);
 
   let items = await (await fetch('/api/items?' + params.toString())).json();
+  currentStockItems = items;
 
   if ($('onlyZero').checked) items = items.filter(i => Number(i.stock) <= 0);
   if ($('onlyVariance') && $('onlyVariance').checked) items = items.filter(i => i.variance !== null && i.variance !== 0);
@@ -701,7 +704,15 @@ async function loadStock() {
       <td><b>${esc(i.make)}</b></td>
       <td><small>${esc(i.product_type)}</small></td>
       <td class="text-center font-mono text-muted">#${esc(i.id)}</td>
-      <td><b>${esc(i.description)}</b>${ampBadge}${newBadge}</td>
+      <td>
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
+          <div>
+            <b id="desc-text-${i.id}">${esc(i.description)}</b>
+            <div style="margin-top:2px;">${ampBadge}${newBadge}</div>
+          </div>
+          <button type="button" class="btn-edit-desc" data-id="${i.id}" title="Edit Product Description" style="background:#f1f5f9; border:1px solid #cbd5e1; cursor:pointer; font-size:11px; padding:3px 7px; border-radius:4px; color:#475569; flex-shrink:0;">✏️ Edit</button>
+        </div>
+      </td>
       <td>
         <span class="font-mono sku-tag">${esc(i.sku)}</span>
       </td>
@@ -813,6 +824,15 @@ async function loadStock() {
         input.setSelectionRange(start, end);
       }
     });
+  });
+
+  // Attach click handler for Edit Description buttons in Stock table
+  document.querySelectorAll('.btn-edit-desc').forEach(btn => {
+    btn.onclick = () => {
+      const id = Number(btn.dataset.id);
+      const item = currentStockItems.find(x => x.id === id);
+      if (item) openEditDescModal(item);
+    };
   });
 }
 
@@ -1332,6 +1352,327 @@ if ($('btnConfirmDeleteProduct')) {
     } finally {
       btn.disabled = false;
       btn.textContent = '🗑️ Permanently Remove from Stock';
+    }
+  };
+}
+
+// ==========================================
+// ----- Edit Product Description Modal -----
+// ==========================================
+let currentEditingItem = null;
+
+function openEditDescModal(item) {
+  currentEditingItem = item;
+  $('editModalItemId').value = item.id;
+  $('editModalDescInput').value = item.description || '';
+  $('editModalProductMeta').textContent = `S.No #${item.serial_no || item.id} · Location: ${item.location || ''} · Make: ${item.make || ''} (${item.product_type || ''}) · Tally: ${num(item.tally_qty)} ${item.uom || ''}`;
+
+  updateEditModalSkuPreview();
+  $('editModalMsg').innerHTML = '';
+  $('editDescModal').classList.remove('hidden');
+  $('editModalDescInput').focus();
+  $('editModalDescInput').select();
+}
+
+function updateEditModalSkuPreview() {
+  if (!currentEditingItem) return;
+  const desc = $('editModalDescInput') ? $('editModalDescInput').value.trim() : '';
+  const autoSync = $('editModalAutoUpdateSku') ? $('editModalAutoUpdateSku').checked : true;
+
+  if (autoSync && desc) {
+    const newSku = generateSkuCode({
+      make: currentEditingItem.make,
+      product_type: currentEditingItem.product_type,
+      description: desc
+    });
+    const newCat = generateCatCode({
+      make: currentEditingItem.make,
+      product_type: currentEditingItem.product_type,
+      description: desc,
+      sku: newSku
+    });
+    if ($('editModalSkuVal')) $('editModalSkuVal').textContent = newSku;
+    if ($('editModalCatVal')) $('editModalCatVal').textContent = newCat;
+  } else {
+    if ($('editModalSkuVal')) $('editModalSkuVal').textContent = currentEditingItem.sku || '—';
+    if ($('editModalCatVal')) $('editModalCatVal').textContent = currentEditingItem.cat_code || '—';
+  }
+}
+
+if ($('closeEditDescModal')) {
+  $('closeEditDescModal').onclick = () => $('editDescModal').classList.add('hidden');
+}
+if ($('btnCancelEditModal')) {
+  $('btnCancelEditModal').onclick = () => $('editDescModal').classList.add('hidden');
+}
+
+if ($('editModalDescInput')) {
+  $('editModalDescInput').addEventListener('input', () => {
+    const input = $('editModalDescInput');
+    const start = input.selectionStart;
+    const end = input.selectionEnd;
+    input.value = input.value.toUpperCase();
+    input.setSelectionRange(start, end);
+    updateEditModalSkuPreview();
+  });
+}
+
+if ($('editModalAutoUpdateSku')) {
+  $('editModalAutoUpdateSku').onchange = updateEditModalSkuPreview;
+}
+
+if ($('editDescForm')) {
+  $('editDescForm').onsubmit = async (e) => {
+    e.preventDefault();
+    if (!currentEditingItem) return;
+
+    const desc = $('editModalDescInput').value.trim().toUpperCase();
+    if (!desc) {
+      $('editModalMsg').innerHTML = '<div class="msg err">Product description cannot be empty.</div>';
+      return;
+    }
+
+    const autoSync = $('editModalAutoUpdateSku') ? $('editModalAutoUpdateSku').checked : true;
+    const btn = $('btnSaveEditModal');
+    btn.disabled = true;
+    btn.textContent = 'Saving...';
+    $('editModalMsg').innerHTML = '';
+
+    const payload = {
+      id: currentEditingItem.id,
+      description: desc
+    };
+
+    if (autoSync && $('editModalSkuVal')) {
+      payload.sku = $('editModalSkuVal').textContent.trim();
+      payload.cat_code = $('editModalCatVal') ? $('editModalCatVal').textContent.trim() : '';
+    }
+
+    try {
+      const res = await fetch(`/api/products/${currentEditingItem.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      if (!data.ok) throw new Error(data.error);
+
+      $('editModalMsg').innerHTML = `<div class="msg ok"><b>Saved!</b> ${esc(data.message)}</div>`;
+
+      // Refresh stock view and new products shelf
+      loadStock();
+      loadNewProductsShelf();
+
+      setTimeout(() => {
+        $('editDescModal').classList.add('hidden');
+        $('editModalMsg').innerHTML = '';
+      }, 700);
+    } catch (err) {
+      $('editModalMsg').innerHTML = `<div class="msg err">${esc(err.message)}</div>`;
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Save Description';
+    }
+  };
+}
+
+// =============================================================
+// ----- Edit Product Description Section on Onboard Tab -----
+// =============================================================
+let selectedProductToEdit = null;
+let editSearchTimer = null;
+
+const editSearchInput = $('editSearchInput');
+if (editSearchInput) {
+  editSearchInput.addEventListener('input', () => {
+    clearTimeout(editSearchTimer);
+    editSearchTimer = setTimeout(async () => {
+      const q = editSearchInput.value.trim();
+      const resultsEl = $('editSearchResults');
+      if (!q) {
+        resultsEl.innerHTML = '';
+        return;
+      }
+      try {
+        const items = await (await fetch('/api/items?q=' + encodeURIComponent(q))).json();
+        if (!items || items.length === 0) {
+          resultsEl.innerHTML = '<div class="muted" style="padding:10px; font-size:13px;">No matching products found in stock.</div>';
+          return;
+        }
+        resultsEl.innerHTML = items.slice(0, 8).map(i => `
+          <div class="edit-pick-item" data-id="${i.id}">
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+              <div style="font-weight:700; font-size:13px; color:var(--ink);">
+                <span class="badge font-mono" style="background:#e0f2fe; color:#0369a1; font-size:10px; margin-right:4px;">#${i.serial_no || i.id}</span>
+                ${esc(i.description)}
+              </div>
+              <span class="badge loc" style="font-size:10px;">${esc(i.location)}</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; font-size:12px; margin-top:4px;">
+              <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
+                <span class="sku-tag font-mono" style="font-size:10px;">${esc(i.sku)}</span>
+                ${i.cat_code ? `<span class="font-mono" style="font-size:10px; background:#eff6ff; color:#1d4ed8; padding:1px 5px; border-radius:3px;">CAT: ${esc(i.cat_code)}</span>` : ''}
+                ${i.make ? `<span class="muted" style="font-size:11px;">Make: ${esc(i.make)}</span>` : ''}
+              </div>
+              <div>
+                <span class="muted">Tally:</span> <b style="color:var(--brand-dark);">${num(i.tally_qty)} ${esc(i.uom)}</b>
+              </div>
+            </div>
+          </div>
+        `).join('');
+
+        resultsEl.querySelectorAll('.edit-pick-item').forEach(el => {
+          el.onclick = () => {
+            const item = items.find(x => x.id == el.dataset.id);
+            if (item) selectProductToEdit(item);
+          };
+        });
+      } catch (err) {
+        resultsEl.innerHTML = `<div class="msg err" style="font-size:12px;">Search failed: ${esc(err.message)}</div>`;
+      }
+    }, 200);
+  });
+}
+
+function selectProductToEdit(item) {
+  selectedProductToEdit = item;
+  $('editSearchResults').innerHTML = '';
+  $('editSearchInput').value = '';
+  $('editSelectedCard').classList.remove('hidden');
+  $('editCardItemId').value = item.id;
+  $('editCardDescInput').value = item.description || '';
+  $('editCardSkuInput').value = item.sku || '';
+  $('editCardCatInput').value = item.cat_code || '';
+  $('editSelectedProductMeta').textContent = `S.No #${item.serial_no || item.id} · Location: ${item.location || ''} · Make: ${item.make || ''} (${item.product_type || ''}) · Tally: ${num(item.tally_qty)} ${item.uom || ''}`;
+  $('editCardMsg').innerHTML = '';
+  $('editCardDescInput').focus();
+  $('editCardDescInput').select();
+}
+
+if ($('btnCancelEditCard')) {
+  $('btnCancelEditCard').onclick = () => {
+    selectedProductToEdit = null;
+    $('editSelectedCard').classList.add('hidden');
+    $('editCardMsg').innerHTML = '';
+  };
+}
+
+function syncEditCardSkuCat() {
+  if (!selectedProductToEdit) return;
+  const autoSync = $('editCardAutoSync') ? $('editCardAutoSync').checked : true;
+  if (!autoSync) return;
+  const desc = $('editCardDescInput').value.trim();
+  if (desc) {
+    const newSku = generateSkuCode({
+      make: selectedProductToEdit.make,
+      product_type: selectedProductToEdit.product_type,
+      description: desc
+    });
+    const newCat = generateCatCode({
+      make: selectedProductToEdit.make,
+      product_type: selectedProductToEdit.product_type,
+      description: desc,
+      sku: newSku
+    });
+    $('editCardSkuInput').value = newSku;
+    $('editCardCatInput').value = newCat;
+  }
+}
+
+if ($('editCardDescInput')) {
+  $('editCardDescInput').addEventListener('input', () => {
+    const input = $('editCardDescInput');
+    const start = input.selectionStart;
+    const end = input.selectionEnd;
+    input.value = input.value.toUpperCase();
+    input.setSelectionRange(start, end);
+    syncEditCardSkuCat();
+  });
+}
+
+if ($('editCardSkuInput')) {
+  $('editCardSkuInput').addEventListener('keydown', (e) => {
+    if (e.key === ' ') {
+      e.preventDefault();
+      const input = $('editCardSkuInput');
+      const start = input.selectionStart;
+      const end = input.selectionEnd;
+      const val = input.value;
+      const before = val.slice(0, start);
+      const after = val.slice(end);
+      const charToInsert = before.endsWith('-') ? '' : '-';
+      input.value = (before + charToInsert + after).toUpperCase();
+      const newPos = start + charToInsert.length;
+      input.setSelectionRange(newPos, newPos);
+    }
+  });
+  $('editCardSkuInput').addEventListener('input', () => {
+    const input = $('editCardSkuInput');
+    input.value = input.value.toUpperCase().replace(/\s+/g, '-').replace(/-+/g, '-');
+  });
+}
+
+if ($('editCardCatInput')) {
+  $('editCardCatInput').addEventListener('input', () => {
+    const input = $('editCardCatInput');
+    input.value = input.value.toUpperCase();
+  });
+}
+
+if ($('editCardAutoSync')) {
+  $('editCardAutoSync').onchange = syncEditCardSkuCat;
+}
+
+if ($('editCardForm')) {
+  $('editCardForm').onsubmit = async (e) => {
+    e.preventDefault();
+    if (!selectedProductToEdit) return;
+
+    const desc = $('editCardDescInput').value.trim().toUpperCase();
+    if (!desc) {
+      $('editCardMsg').innerHTML = '<div class="msg err">Product description cannot be empty.</div>';
+      return;
+    }
+
+    const sku = $('editCardSkuInput').value.trim().toUpperCase();
+    const catCode = $('editCardCatInput').value.trim().toUpperCase();
+
+    const btn = $('btnSaveCardEdit');
+    btn.disabled = true;
+    btn.textContent = 'Saving...';
+    $('editCardMsg').innerHTML = '';
+
+    try {
+      const res = await fetch(`/api/products/${selectedProductToEdit.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: selectedProductToEdit.id,
+          description: desc,
+          sku: sku || undefined,
+          cat_code: catCode || undefined
+        })
+      });
+      const data = await res.json();
+      if (!data.ok) throw new Error(data.error);
+
+      $('editCardMsg').innerHTML = `
+        <div class="msg ok" style="font-size:14px; padding:12px 16px;">
+          <b>Saved!</b> ${esc(data.message)}
+        </div>
+      `;
+
+      loadStock();
+      loadNewProductsShelf();
+
+      setTimeout(() => {
+        if ($('editCardMsg')) $('editCardMsg').innerHTML = '';
+      }, 4000);
+    } catch (err) {
+      $('editCardMsg').innerHTML = `<div class="msg err">${esc(err.message)}</div>`;
+    } finally {
+      btn.disabled = false;
+      btn.textContent = '💾 Save Updated Description';
     }
   };
 }

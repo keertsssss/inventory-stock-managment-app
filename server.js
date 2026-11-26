@@ -630,6 +630,76 @@ app.post('/api/products/delete', (req, res) => {
   }
 });
 
+/**
+ * Update Product Description and details
+ */
+function updateProductDetails(id, data) {
+  const existing = db.prepare('SELECT * FROM items WHERE id = ?').get(id);
+  if (!existing) throw new Error('Product not found');
+
+  const { description, sku, cat_code, make, product_type } = data;
+  if (description !== undefined && !String(description).trim()) {
+    throw new Error('Product description cannot be empty');
+  }
+
+  const cleanDesc = description !== undefined ? String(description).trim().toUpperCase() : existing.description;
+
+  let cleanSku = existing.sku;
+  if (sku !== undefined && String(sku).trim()) {
+    cleanSku = String(sku).trim().toUpperCase().replace(/\s+/g, '-').replace(/-+/g, '-');
+    if (!cleanSku.startsWith('ELEC-')) {
+      cleanSku = 'ELEC-' + cleanSku.replace(/^ELEC-?/i, '');
+    }
+    const collision = db.prepare('SELECT id FROM items WHERE UPPER(sku) = ? AND id != ?').get(cleanSku, id);
+    if (collision) {
+      throw new Error(`SKU collision: "${cleanSku}" is already used by another product.`);
+    }
+  }
+
+  const cleanCat = cat_code !== undefined ? (String(cat_code || '').trim().toUpperCase() || null) : existing.cat_code;
+  const cleanMake = make !== undefined ? String(make || '').trim() : existing.make;
+  const cleanPType = product_type !== undefined ? String(product_type || '').trim() : existing.product_type;
+  const amperes = extractAmperes(cleanDesc, cleanSku);
+
+  db.prepare(`
+    UPDATE items 
+    SET description = ?, sku = ?, cat_code = ?, make = ?, product_type = ?, amperes = ?
+    WHERE id = ?
+  `).run(cleanDesc, cleanSku, cleanCat, cleanMake, cleanPType, amperes, id);
+
+  return getOne.get(id);
+}
+
+app.put('/api/products/:id', (req, res) => {
+  try {
+    const id = Number(req.params.id);
+    if (!Number.isInteger(id)) throw new Error('Invalid product ID');
+    const updated = updateProductDetails(id, req.body);
+    res.json({
+      ok: true,
+      message: `Product description successfully updated to "${updated.description}"!`,
+      product: updated
+    });
+  } catch (err) {
+    res.status(400).json({ ok: false, error: err.message });
+  }
+});
+
+app.post('/api/products/update', (req, res) => {
+  try {
+    const id = Number(req.body.id || req.body.item_id);
+    if (!Number.isInteger(id)) throw new Error('Invalid product ID');
+    const updated = updateProductDetails(id, req.body);
+    res.json({
+      ok: true,
+      message: `Product description successfully updated to "${updated.description}"!`,
+      product: updated
+    });
+  } catch (err) {
+    res.status(400).json({ ok: false, error: err.message });
+  }
+});
+
 // Update physical count, cartons, boxes, pieces, and CAT code for an item
 app.post('/api/physical-count', (req, res) => {
   try {

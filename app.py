@@ -588,6 +588,63 @@ def delete_product_endpoint(item_id: int = None):
     except Exception as e:
         return jsonify({'ok': False, 'error': str(e)}), 400
 
+def update_product_details(item_id: int, data: dict):
+    db = get_db()
+    cur = db.cursor()
+    cur.execute("SELECT * FROM items WHERE id = ?", (item_id,))
+    row = cur.fetchone()
+    if not row:
+        raise ValueError('Product not found')
+    existing = dict(row)
+
+    description = data.get('description')
+    if description is not None and not str(description).strip():
+        raise ValueError('Product description cannot be empty')
+
+    clean_desc = str(description).strip().upper() if description is not None else existing['description']
+
+    clean_sku = existing.get('sku') or ''
+    if data.get('sku') and str(data['sku']).strip():
+        raw_s = str(data['sku']).strip().upper().replace(' ', '-')
+        clean_sku = re.sub(r'-+', '-', raw_s)
+        if not clean_sku.startswith('ELEC-'):
+            clean_sku = 'ELEC-' + re.sub(r'^ELEC-?', '', clean_sku, flags=re.I)
+        cur.execute("SELECT id FROM items WHERE UPPER(sku) = ? AND id != ?", (clean_sku, item_id))
+        if cur.fetchone():
+            raise ValueError(f'SKU collision: "{clean_sku}" is already used by another product.')
+
+    clean_cat = str(data['cat_code']).strip().upper() if data.get('cat_code') else existing.get('cat_code')
+    clean_make = str(data['make']).strip() if data.get('make') is not None else existing.get('make')
+    clean_ptype = str(data['product_type']).strip() if data.get('product_type') is not None else existing.get('product_type')
+    amperes = extract_amperes(clean_desc, clean_sku)
+
+    cur.execute("""
+        UPDATE items 
+        SET description = ?, sku = ?, cat_code = ?, make = ?, product_type = ?, amperes = ?
+        WHERE id = ?
+    """, (clean_desc, clean_sku, clean_cat, clean_make, clean_ptype, amperes, item_id))
+    db.commit()
+
+    return get_one_item(item_id)
+
+@app.route('/api/products/<int:item_id>', methods=['PUT', 'PATCH'])
+@app.route('/api/products/update', methods=['POST'])
+def update_product_endpoint(item_id: int = None):
+    try:
+        data = request.get_json(force=True, silent=True) or {}
+        if item_id is None:
+            item_id = int(data.get('id') or data.get('item_id') or 0)
+        if item_id <= 0:
+            raise ValueError('Invalid product ID')
+        updated = update_product_details(item_id, data)
+        return jsonify({
+            'ok': True,
+            'message': f'Product description successfully updated to "{updated["description"]}"!',
+            'product': updated
+        })
+    except Exception as e:
+        return jsonify({'ok': False, 'error': str(e)}), 400
+
 @app.route('/api/physical-count', methods=['POST'])
 def update_physical_count():
     try:
