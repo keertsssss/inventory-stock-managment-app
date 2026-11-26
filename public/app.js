@@ -343,18 +343,35 @@ function renderNewProductsShelf() {
   shelf.classList.remove('hidden');
   shelf.innerHTML = `
     <div class="new-products-shelf">
-      <div style="font-size:13px; font-weight:bold; color:var(--brand-dark); margin-bottom:8px; display:flex; align-items:center; gap:6px;">
-        <span class="badge badge-new" style="font-size:11px;">NEW</span> Recently Onboarded Products (≤ 30d):
+      <div style="font-size:13px; font-weight:bold; color:var(--brand-dark); margin-bottom:10px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:6px;">
+        <span style="display:flex; align-items:center; gap:6px;">
+          <span class="badge badge-new" style="font-size:11px;">NEW</span> Recently Onboarded Products (${allNewProducts.length}):
+        </span>
+        <span class="muted" style="font-size:11px; font-weight:normal;">Tap any item to select for Issue/Receive</span>
       </div>
       <div class="new-products-scroll">
         ${allNewProducts.map(i => `
           <div class="new-product-chip" data-id="${i.id}">
-            <div style="display:flex; justify-content:space-between; gap:6px; margin-bottom:4px;">
-              <span class="badge badge-new" style="font-size:10px; padding:2px 6px;">NEW • ${i.days_remaining}d left</span>
-              <span class="badge loc" style="font-size:10px; padding:2px 6px;">${esc(i.location)}</span>
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px; margin-bottom:6px;">
+              <div style="font-size:13px; font-weight:700; color:var(--ink); line-height:1.35;">
+                ${i.serial_no ? `<span class="badge font-mono" style="background:#ffedd5; color:#9a3412; font-size:11px; margin-right:4px;">#${i.serial_no}</span>` : ''}
+                ${esc(i.description)}
+              </div>
+              <div style="display:flex; gap:4px; flex-shrink:0;">
+                <span class="badge badge-new" style="font-size:10px; padding:2px 6px;">NEW • ${i.days_remaining}d left</span>
+                <span class="badge loc" style="font-size:10px; padding:2px 6px;">${esc(i.location)}</span>
+              </div>
             </div>
-            <b>${esc(i.description.slice(0, 36))}${i.description.length > 36 ? '…' : ''}</b><br>
-            <small class="muted font-mono">${esc(i.sku)}</small> · <small>Tally: <b>${num(i.tally_qty)} ${esc(i.uom)}</b></small>
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px; font-size:12px;">
+              <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+                <span class="sku-tag font-mono" style="font-size:11px;">${esc(i.sku)}</span>
+                ${i.cat_code ? `<span class="font-mono" style="font-size:11px; font-weight:600; background:#eff6ff; color:#1d4ed8; padding:2px 6px; border-radius:4px; border:1px solid #bfdbfe;">CAT: ${esc(i.cat_code)}</span>` : ''}
+                ${i.make ? `<span class="muted" style="font-size:11px;">Make: <b>${esc(i.make)}</b></span>` : ''}
+              </div>
+              <div>
+                <span class="muted">Tally:</span> <b style="color:var(--brand-dark);">${num(i.tally_qty)} ${esc(i.uom)}</b>
+              </div>
+            </div>
           </div>
         `).join('')}
       </div>
