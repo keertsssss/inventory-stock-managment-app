@@ -410,7 +410,12 @@ a.btn:hover, button.btn:hover {
   border-radius: 4px;
   background: #FFFFFF;
   color: var(--ink);
+  text-transform: uppercase;
   transition: all 0.2s ease;
+}
+
+#newCatCode, #newSku {
+  text-transform: uppercase;
 }
 
 .phys-input:focus, .count-input:focus, .cat-input:focus {

@@ -311,7 +311,59 @@ def generate_cat_code(make: str, p_type: str, desc: str, sku: str, amps: float =
         if re.match(r'^[A-Z0-9\-]+$', last_tok, re.I) and last_tok.upper() != (make or '').upper():
             return f"{brand} {shortcut} {last_tok.upper()}"
 
-    return f"{brand} {shortcut}"
+    return f"{brand} {shortcut}".upper()
+
+def generate_sku_code(make: str, p_type: str, desc: str, amps: float = None) -> str:
+    prefix = 'ELEC'
+    p_name = (p_type or '').strip().upper()
+    if not p_name:
+        d = desc or ''
+        if re.search(r'\bFUSE\s+LINK\b', d, re.I):
+            p_name = 'FUSE-LINK'
+        elif re.search(r'\bFUSE\s+HOLDER\b', d, re.I):
+            p_name = 'FUSE-HOLDER'
+        elif re.search(r'\bKIT\s*KAT\b', d, re.I):
+            p_name = 'KIT-KAT-FUSE'
+        elif re.search(r'\bHRC\s+FUSE\b', d, re.I):
+            p_name = 'FUSE-LINK'
+        elif re.search(r'\bMCB\b', d, re.I):
+            p_name = 'MCB'
+        elif re.search(r'\bMCCB\b', d, re.I):
+            p_name = 'MCCB'
+        elif re.search(r'\bCONTACTOR\b', d, re.I):
+            p_name = 'CONTACTOR'
+        elif re.search(r'\bCABLE\b', d, re.I):
+            p_name = 'CABLE'
+        else:
+            p_name = 'ITEM'
+    else:
+        p_name = '-'.join(re.findall(r'[A-Z0-9]+', p_name))
+
+    amp_str = ''
+    if amps is not None and amps > 0:
+        amp_str = f"{int(amps) if amps.is_integer() else amps}A"
+    else:
+        amp_val = extract_amperes(desc, '')
+        if amp_val is not None:
+            amp_str = f"{int(amp_val) if amp_val.is_integer() else amp_val}A"
+
+    if not amp_str:
+        sq_match = re.search(r'(\d+(?:\.\d+)?)\s*SQMM', desc or '', re.I)
+        if sq_match:
+            amp_str = f"{sq_match.group(1)}SQMM"
+
+    brand = (make or 'GENERIC').strip().upper()
+    if brand in ('L&T', 'L & T', 'LT'):
+        brand = 'LT'
+    else:
+        brand = re.sub(r'[^A-Z0-9]', '', brand)
+
+    parts = [prefix, p_name]
+    if amp_str:
+        parts.append(amp_str)
+    parts.append(brand)
+
+    return '-'.join(parts).upper()
 
 def get_one_item(item_id: int):
     db = get_db()
@@ -420,9 +472,20 @@ def suggest_sku():
         make = data.get('make') or ''
         p_type = data.get('product_type') or ''
         desc = data.get('description') or ''
-        suggested_cat = generate_cat_code(make, p_type, desc, result.get('sku', ''))
+        suggested_sku = None
+        if make or p_type or desc:
+            base_sku = generate_sku_code(make, p_type, desc)
+            candidate = base_sku
+            counter = 1
+            while candidate in existing_skus:
+                candidate = f"{base_sku}-{counter}"
+                counter += 1
+            suggested_sku = candidate
 
-        return jsonify({'ok': True, **result, 'cat_code': suggested_cat})
+        final_sku = (suggested_sku or result.get('sku', '')).upper()
+        suggested_cat = generate_cat_code(make, p_type, desc, final_sku).upper()
+
+        return jsonify({'ok': True, **result, 'sku': final_sku, 'cat_code': suggested_cat})
     except Exception as e:
         return jsonify({'ok': False, 'error': str(e)}), 400
 
@@ -458,7 +521,7 @@ def onboard_product():
         clean_uom = raw_uom.upper()
 
         amperes = extract_amperes(desc, clean_sku)
-        final_cat = cat_code or generate_cat_code(make, p_type, desc, clean_sku, amperes)
+        final_cat = (cat_code or generate_cat_code(make, p_type, desc, clean_sku, amperes)).upper()
         cur.execute("""
             INSERT INTO items (
                 description, sku, cat_code, make, product_type, rack, location,
@@ -519,7 +582,7 @@ def update_physical_count():
             params.append(pieces_val)
         if 'cat_code' in data:
             updates.append("cat_code = ?")
-            params.append(cat_code_val.strip() if cat_code_val else None)
+            params.append(cat_code_val.strip().upper() if cat_code_val else None)
 
         if updates:
             params.append(item_id)
@@ -693,7 +756,7 @@ def export_stock_master_csv():
     output = io.StringIO()
     writer = csv.writer(output)
     writer.writerow([
-        'Serial No', 'Rack Location', 'Rack', 'Section', 'Category',
+        'Serial No', 'Rack Location', 'Rack', 'Section',
         'Make', 'Product Type', 'S.No (orig.)', 'Description', 'SKU Code',
         'Readable Code / CAT Code', 'UOM', 'Tally Qty', 'Cartons', 'Boxes', 'Pieces',
         'Physical Count', 'Total Count'
@@ -706,14 +769,13 @@ def export_stock_master_csv():
         section = item.get('section') or (loc.split('-')[1] if '-' in loc else '')
         phys = item.get('physical_count')
         phys_str = phys if phys is not None else ''
-        total_count_formula = f'=M{row_num}+IF(ISBLANK(Q{row_num}),0,Q{row_num})'
+        total_count_formula = f'=L{row_num}+IF(ISBLANK(P{row_num}),0,P{row_num})'
 
         writer.writerow([
             '=ROW()-1',
             loc,
             rack,
             section,
-            item.get('category') or RACK_CATEGORY_MAP.get(rack, ''),
             item.get('make', ''),
             item.get('product_type', ''),
             item['id'],

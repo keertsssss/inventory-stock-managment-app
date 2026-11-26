@@ -36,7 +36,6 @@ const headers = [
   'Rack Location',
   'Rack',
   'Section',
-  'Category',
   'Make',
   'Product Type',
   'S.No (orig.)',
@@ -57,21 +56,19 @@ const lines = [headers.map(esc).join(',')];
 items.forEach((item, idx) => {
   const rowNum = idx + 2; // header is row 1, data starts on row 2
   const [rack, section] = item.location ? item.location.split('-') : ['', ''];
-  const category = item.category || rackMap[rack] || '';
   const phys = item.physical_count != null ? item.physical_count : '';
   
   // Excel formula for automatic serial numbering: =ROW()-1
   const autoSerialFormula = `=ROW()-1`;
   
-  // Excel formula for Total Count: M (Tally Qty) + Q (Physical Count)
-  const totalCountFormula = `=M${rowNum}+IF(ISBLANK(Q${rowNum}),0,Q${rowNum})`;
+  // Excel formula for Total Count: L (Tally Qty) + P (Physical Count)
+  const totalCountFormula = `=L${rowNum}+IF(ISBLANK(P${rowNum}),0,P${rowNum})`;
   
   lines.push([
     autoSerialFormula,
     item.location || '',
     rack || '',
     section || '',
-    category,
     item.make || '',
     item.product_type || '',
     item.id,
@@ -90,4 +87,4 @@ items.forEach((item, idx) => {
 
 const outputPath = path.join(__dirname, '..', 'data', 'stock-master.csv');
 fs.writeFileSync(outputPath, '\ufeff' + lines.join('\r\n'), 'utf8');
-console.log(`Successfully generated ${outputPath} with 18 columns including CAT code, Cartons, Boxes, Pieces, Total Qty.`);
+console.log(`Successfully generated ${outputPath} with 17 columns including CAT code, Cartons, Boxes, Pieces, Total Count.`);

@@ -230,7 +230,53 @@ function generateCatCode({ make, product_type, description, sku, amperes }) {
     return `${brandCode} ${typeCode} ${lastToken.toUpperCase()}`;
   }
 
-  return `${brandCode} ${typeCode}`;
+  return `${brandCode} ${typeCode}`.toUpperCase();
+}
+
+function generateSkuCode({ make, product_type, description, amperes }) {
+  const prefix = 'ELEC';
+  let pName = (product_type || '').toUpperCase().trim();
+  if (!pName) {
+    if (/\bFUSE\s+LINK\b/i.test(description)) pName = 'FUSE-LINK';
+    else if (/\bFUSE\s+HOLDER\b/i.test(description)) pName = 'FUSE-HOLDER';
+    else if (/\bKIT\s*KAT\b/i.test(description)) pName = 'KIT-KAT-FUSE';
+    else if (/\bHRC\s+FUSE\b/i.test(description)) pName = 'FUSE-LINK';
+    else if (/\bMCB\b/i.test(description)) pName = 'MCB';
+    else if (/\bMCCB\b/i.test(description)) pName = 'MCCB';
+    else if (/\bCONTACTOR\b/i.test(description)) pName = 'CONTACTOR';
+    else if (/\bCABLE\b/i.test(description)) pName = 'CABLE';
+    else pName = 'ITEM';
+  } else {
+    pName = pName.replace(/[^A-Z0-9\s]/g, ' ').trim().split(/\s+/).join('-');
+  }
+
+  let ampStr = '';
+  if (amperes != null && !isNaN(amperes) && Number(amperes) > 0) {
+    ampStr = `${amperes}A`;
+  } else {
+    const text = description || '';
+    const m = text.match(/(?:^|[\s\-_/])(\d+(?:\.\d+)?)\s*(?:A|AMP|AMPS)(?:$|[\s\-_/])/i);
+    if (m) ampStr = `${parseFloat(m[1])}A`;
+    else {
+      const m2 = text.match(/(\d+(?:\.\d+)?)\s*A\b/i);
+      if (m2) ampStr = `${parseFloat(m2[1])}A`;
+    }
+  }
+
+  if (!ampStr) {
+    const sqmm = (description || '').match(/(\d+(?:\.\d+)?)\s*SQMM/i);
+    if (sqmm) ampStr = `${sqmm[1]}SQMM`;
+  }
+
+  let brand = (make || 'GENERIC').toUpperCase().trim();
+  if (brand === 'L&T' || brand === 'L & T' || brand === 'LT') brand = 'LT';
+  else brand = brand.replace(/[^A-Z0-9]/g, '');
+
+  const parts = [prefix, pName];
+  if (ampStr) parts.push(ampStr);
+  parts.push(brand);
+
+  return parts.join('-').toUpperCase();
 }
 
 // First run only: load the items from items.json
@@ -432,14 +478,26 @@ app.post('/api/products/suggest-sku', (req, res) => {
       });
     }
 
+    let suggestedSku = null;
+    if (make || product_type || description) {
+      const baseSku = generateSkuCode({ make, product_type, description });
+      let candidate = baseSku;
+      let counter = 1;
+      while (existingSkus.includes(candidate)) {
+        candidate = `${baseSku}-${counter++}`;
+      }
+      suggestedSku = candidate;
+    }
+
+    const finalSku = (suggestedSku || result.sku).toUpperCase();
     const suggestedCatCode = generateCatCode({
       make,
       product_type,
       description,
-      sku: result.sku
-    });
+      sku: finalSku
+    }).toUpperCase();
 
-    res.json({ ok: true, ...result, cat_code: suggestedCatCode });
+    res.json({ ok: true, ...result, sku: finalSku, cat_code: suggestedCatCode });
   } catch (err) {
     res.status(400).json({ ok: false, error: err.message });
   }
@@ -525,7 +583,7 @@ app.post('/api/physical-count', (req, res) => {
     const cartonsVal = parseNumOrNull(req.body.cartons);
     const boxesVal = parseNumOrNull(req.body.boxes);
     const piecesVal = parseNumOrNull(req.body.pieces);
-    const catCodeVal = req.body.cat_code !== undefined ? (String(req.body.cat_code || '').trim() || null) : undefined;
+    const catCodeVal = req.body.cat_code !== undefined ? (String(req.body.cat_code || '').trim().toUpperCase() || null) : undefined;
 
     if (countVal !== null && !Number.isFinite(countVal)) throw new Error('Total quantity must be a valid number');
     if (cartonsVal !== null && !Number.isFinite(cartonsVal)) throw new Error('Cartons must be a valid number');
@@ -630,7 +688,6 @@ app.get('/api/stock.csv', (req, res) => {
     'Rack Location',
     'Rack',
     'Section',
-    'Category',
     'Make',
     'Product Type',
     'S.No (orig.)',
@@ -650,13 +707,12 @@ app.get('/api/stock.csv', (req, res) => {
     const rowNum = idx + 2;
     const [rack, section] = item.location ? item.location.split('-') : ['', ''];
     const phys = item.physical_count != null ? item.physical_count : '';
-    const totalCountFormula = `=M${rowNum}+IF(ISBLANK(Q${rowNum}),0,Q${rowNum})`;
+    const totalCountFormula = `=L${rowNum}+IF(ISBLANK(P${rowNum}),0,P${rowNum})`;
     lines.push([
       `=ROW()-1`,
       item.location || '',
       rack || '',
       section || '',
-      item.category || RACK_CATEGORY_MAP[rack] || '',
       item.make || '',
       item.product_type || '',
       item.id,

@@ -171,21 +171,67 @@ function generateCatCode(item) {
   const amp = extractAmperes(item.description, item.sku, item.amperes);
 
   if (amp) {
-    return `${brandCode} ${typeCode} ${amp}`;
+    return `${brandCode} ${typeCode} ${amp}`.toUpperCase();
   }
 
   const sqmmMatch = (item.description || '').match(/(\d+(?:\.\d+)?)\s*SQMM/i);
   if (sqmmMatch) {
-    return `${brandCode} ${typeCode} ${sqmmMatch[1]}SQ`;
+    return `${brandCode} ${typeCode} ${sqmmMatch[1]}SQ`.toUpperCase();
   }
 
   const words = (item.description || '').split(/\s+/).filter(Boolean);
   const lastToken = words.length > 2 ? words[words.length - 2] : '';
   if (lastToken && /^[A-Z0-9\-]+$/i.test(lastToken) && lastToken.toUpperCase() !== item.make?.toUpperCase()) {
-    return `${brandCode} ${typeCode} ${lastToken.toUpperCase()}`;
+    return `${brandCode} ${typeCode} ${lastToken.toUpperCase()}`.toUpperCase();
   }
 
-  return `${brandCode} ${typeCode}`;
+  return `${brandCode} ${typeCode}`.toUpperCase();
+}
+
+function generateSkuCode({ make, product_type, description, amperes }) {
+  const prefix = 'ELEC';
+  let pName = (product_type || '').toUpperCase().trim();
+  if (!pName) {
+    if (/\bFUSE\s+LINK\b/i.test(description)) pName = 'FUSE-LINK';
+    else if (/\bFUSE\s+HOLDER\b/i.test(description)) pName = 'FUSE-HOLDER';
+    else if (/\bKIT\s*KAT\b/i.test(description)) pName = 'KIT-KAT-FUSE';
+    else if (/\bHRC\s+FUSE\b/i.test(description)) pName = 'FUSE-LINK';
+    else if (/\bMCB\b/i.test(description)) pName = 'MCB';
+    else if (/\bMCCB\b/i.test(description)) pName = 'MCCB';
+    else if (/\bCONTACTOR\b/i.test(description)) pName = 'CONTACTOR';
+    else if (/\bCABLE\b/i.test(description)) pName = 'CABLE';
+    else pName = 'ITEM';
+  } else {
+    pName = pName.replace(/[^A-Z0-9\s]/g, ' ').trim().split(/\s+/).join('-');
+  }
+
+  let ampStr = '';
+  if (amperes != null && !isNaN(amperes) && Number(amperes) > 0) {
+    ampStr = `${amperes}A`;
+  } else {
+    const text = description || '';
+    const m = text.match(/(?:^|[\s\-_/])(\d+(?:\.\d+)?)\s*(?:A|AMP|AMPS)(?:$|[\s\-_/])/i);
+    if (m) ampStr = `${parseFloat(m[1])}A`;
+    else {
+      const m2 = text.match(/(\d+(?:\.\d+)?)\s*A\b/i);
+      if (m2) ampStr = `${parseFloat(m2[1])}A`;
+    }
+  }
+
+  if (!ampStr) {
+    const sqmm = (description || '').match(/(\d+(?:\.\d+)?)\s*SQMM/i);
+    if (sqmm) ampStr = `${sqmm[1]}SQMM`;
+  }
+
+  let brand = (make || 'GENERIC').toUpperCase().trim();
+  if (brand === 'L&T' || brand === 'L & T' || brand === 'LT') brand = 'LT';
+  else brand = brand.replace(/[^A-Z0-9]/g, '');
+
+  const parts = [prefix, pName];
+  if (ampStr) parts.push(ampStr);
+  parts.push(brand);
+
+  return parts.join('-').toUpperCase();
 }
 
 // ----- Tabs -----
@@ -523,7 +569,6 @@ async function loadStock() {
     <th>Rack Location</th>
     <th>Rack</th>
     <th>Section</th>
-    <th>Category</th>
     <th>Make</th>
     <th>Product Type</th>
     <th>S.No (Orig.)</th>
@@ -561,7 +606,7 @@ async function loadStock() {
 
       rows.push(`
         <tr class="rack-divider-row" id="section-${currentRack}">
-          <td colspan="18">
+          <td colspan="17">
             <div class="rack-divider-wrap">
               <div class="rack-divider-main">
                 <span class="rack-divider-tag">${esc(currentRack)}</span>
@@ -591,7 +636,7 @@ async function loadStock() {
 
       rows.push(`
         <tr class="company-divider-row">
-          <td colspan="18">
+          <td colspan="17">
             <div class="company-divider-wrap">
               <span class="company-divider-tag">
                 Company: <b>${esc(i.make)}</b>
@@ -627,7 +672,6 @@ async function loadStock() {
       <td><span class="badge loc">${esc(i.location)}</span></td>
       <td class="text-center">${esc(i.rack)}</td>
       <td class="text-center">${esc(i.section || (i.location ? i.location.split('-')[1] : ''))}</td>
-      <td><small>${esc(i.category)}</small></td>
       <td><b>${esc(i.make)}</b></td>
       <td><small>${esc(i.product_type)}</small></td>
       <td class="text-center font-mono text-muted">#${esc(i.id)}</td>
@@ -678,7 +722,8 @@ async function loadStock() {
 
     const tally = Number(totalInput.dataset.tally || 0);
 
-    const catCode = catInput ? catInput.value.trim() : null;
+    const catCode = catInput ? catInput.value.trim().toUpperCase() : null;
+    if (catInput && catCode) catInput.value = catCode;
     const cartons = cartonInput && cartonInput.value.trim() !== '' ? Number(cartonInput.value) : null;
     const boxes = boxInput && boxInput.value.trim() !== '' ? Number(boxInput.value) : null;
     const pieces = pieceInput && pieceInput.value.trim() !== '' ? Number(pieceInput.value) : null;
