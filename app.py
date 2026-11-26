@@ -558,7 +558,7 @@ def export_stock_master_csv():
         'Serial No', 'Rack Location', 'Rack', 'Section', 'Category',
         'Make', 'Product Type', 'S.No (orig.)', 'Description', 'SKU Code',
         'Readable Code / CAT Code', 'UOM', 'Tally Qty', 'Cartons', 'Boxes', 'Pieces',
-        'Total Quantity', 'Variance (Physical − Tally)'
+        'Physical Count', 'Total Count'
     ])
 
     for idx, item in enumerate(items):
@@ -568,11 +568,7 @@ def export_stock_master_csv():
         section = item.get('section') or (loc.split('-')[1] if '-' in loc else '')
         phys = item.get('physical_count')
         phys_str = phys if phys is not None else ''
-
-        if phys is not None:
-            variance_val = round(float(phys) - float(item.get('tally_qty', 0)), 2)
-        else:
-            variance_val = f'=IF(ISBLANK(Q{row_num}),"",Q{row_num}-M{row_num})'
+        total_count_formula = f'=M{row_num}+IF(ISBLANK(Q{row_num}),0,Q{row_num})'
 
         writer.writerow([
             '=ROW()-1',
@@ -592,7 +588,7 @@ def export_stock_master_csv():
             item.get('boxes') if item.get('boxes') is not None else '',
             item.get('pieces') if item.get('pieces') is not None else '',
             phys_str,
-            variance_val
+            total_count_formula
         ])
 
     csv_data = '\ufeff' + output.getvalue()

@@ -514,15 +514,15 @@ app.get('/api/stock.csv', (req, res) => {
     'Cartons',
     'Boxes',
     'Pieces',
-    'Total Quantity',
-    'Variance (Physical − Tally)'
+    'Physical Count',
+    'Total Count'
   ];
   const lines = [headers.map(esc).join(',')];
   items.forEach((item, idx) => {
     const rowNum = idx + 2;
     const [rack, section] = item.location ? item.location.split('-') : ['', ''];
     const phys = item.physical_count != null ? item.physical_count : '';
-    const varianceFormula = phys !== '' ? (Number(phys) - Number(item.tally_qty)) : `=IF(ISBLANK(Q${rowNum}),"",Q${rowNum}-M${rowNum})`;
+    const totalCountFormula = `=M${rowNum}+IF(ISBLANK(Q${rowNum}),0,Q${rowNum})`;
     lines.push([
       `=ROW()-1`,
       item.location || '',
@@ -541,7 +541,7 @@ app.get('/api/stock.csv', (req, res) => {
       item.boxes != null ? item.boxes : '',
       item.pieces != null ? item.pieces : '',
       phys,
-      varianceFormula
+      totalCountFormula
     ].map(esc).join(','));
   });
 

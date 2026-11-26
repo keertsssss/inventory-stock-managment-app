@@ -40,8 +40,8 @@ const headers = [
   'Cartons',
   'Boxes',
   'Pieces',
-  'Total Quantity',
-  'Variance (Physical − Tally)'
+  'Physical Count',
+  'Total Count'
 ];
 
 const lines = [headers.map(esc).join(',')];
@@ -55,8 +55,8 @@ items.forEach((item, idx) => {
   // Excel formula for automatic serial numbering: =ROW()-1
   const autoSerialFormula = `=ROW()-1`;
   
-  // Excel formula for Variance: Q (Total Qty) - M (Tally Qty)
-  const varianceFormula = phys !== '' ? (Number(phys) - Number(item.opening_qty)) : `=IF(ISBLANK(Q${rowNum}),"",Q${rowNum}-M${rowNum})`;
+  // Excel formula for Total Count: M (Tally Qty) + Q (Physical Count)
+  const totalCountFormula = `=M${rowNum}+IF(ISBLANK(Q${rowNum}),0,Q${rowNum})`;
   
   lines.push([
     autoSerialFormula,
@@ -76,7 +76,7 @@ items.forEach((item, idx) => {
     item.boxes != null ? item.boxes : '',
     item.pieces != null ? item.pieces : '',
     phys,
-    varianceFormula
+    totalCountFormula
   ].map(esc).join(','));
 });
 

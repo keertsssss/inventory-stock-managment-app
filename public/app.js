@@ -367,16 +367,16 @@ async function loadStock() {
   let items = await (await fetch('/api/items?' + params.toString())).json();
 
   if ($('onlyZero').checked) items = items.filter(i => Number(i.stock) <= 0);
-  if ($('onlyVariance').checked) items = items.filter(i => i.variance !== null && i.variance !== 0);
+  if ($('onlyVariance') && $('onlyVariance').checked) items = items.filter(i => i.variance !== null && i.variance !== 0);
   if ($('onlyUncounted').checked) items = items.filter(i => i.physical_count === null || i.physical_count === undefined || i.physical_count === '');
   if ($('onlyNewProducts') && $('onlyNewProducts').checked) items = items.filter(i => i.is_new === 1);
 
   const totalTally = items.reduce((s, i) => s + (Number(i.tally_qty) || 0), 0);
+  const grandTotal = items.reduce((s, i) => s + (Number(i.tally_qty) || 0) + (Number(i.physical_count) || 0), 0);
   const countedCount = items.filter(i => i.physical_count != null && i.physical_count !== '').length;
-  const varianceCount = items.filter(i => i.variance !== null && i.variance !== 0).length;
   const newCount = items.filter(i => i.is_new === 1).length;
 
-  $('stockSummary').innerHTML = `Showing <b>${items.length}</b> items · Counted: <b>${countedCount}/${items.length}</b> · With variance: <b>${varianceCount}</b> · <span class="badge badge-new" style="font-size:11px;">NEW</span> (≤30d): <b>${newCount}</b> · Total Tally Count: <b>${num(totalTally)}</b>`;
+  $('stockSummary').innerHTML = `Showing <b>${items.length}</b> items · Counted: <b>${countedCount}/${items.length}</b> · <span class="badge badge-new" style="font-size:11px;">NEW</span> (≤30d): <b>${newCount}</b> · Total Tally: <b>${num(totalTally)}</b> · Total Count: <b style="color:var(--power-orange);">${num(grandTotal)}</b>`;
 
   // Quick navigation pills matching Excel racks
   if ($('rackQuickNav')) {
@@ -423,11 +423,11 @@ async function loadStock() {
     <th>Readable Code / CAT Code</th>
     <th>UOM</th>
     <th>Tally Qty</th>
-    <th style="min-width:70px;">Cartons</th>
-    <th style="min-width:70px;">Boxes</th>
-    <th style="min-width:70px;">Pieces</th>
-    <th style="min-width:85px;">Total Quantity</th>
-    <th>Variance (Physical − Tally)</th>
+    <th style="min-width:65px;">Cartons</th>
+    <th style="min-width:65px;">Boxes</th>
+    <th style="min-width:65px;">Pieces</th>
+    <th style="min-width:85px;">Physical Count</th>
+    <th style="min-width:95px; background:var(--power-orange); color:#fff;">Total Count</th>
   </tr>`;
 
   // Group and divide items by Rack with prominent category headings
@@ -473,6 +473,7 @@ async function loadStock() {
     const boxVal = i.boxes != null ? i.boxes : '';
     const pieceVal = i.pieces != null ? i.pieces : '';
     const physVal = i.physical_count != null ? i.physical_count : '';
+    const totalCountVal = Number(i.tally_qty || 0) + Number(i.physical_count || 0);
     const newBadge = i.is_new ? `<span class="badge badge-new" title="Added on ${esc(i.created_at)} (${i.days_old} days ago)" style="margin-left:6px;">NEW • ${i.days_remaining}d left</span>` : '';
     const rowClass = i.is_new ? 'row-new-product' : '';
 
@@ -512,22 +513,24 @@ async function loadStock() {
         <input type="number" step="any" min="0" class="count-input piece-input" data-id="${i.id}" value="${pieceVal}" placeholder="Pcs">
       </td>
       <td>
-        <input type="number" step="any" min="0" class="count-input total-input" data-id="${i.id}" data-tally="${i.tally_qty}" value="${physVal}" placeholder="Total">
+        <input type="number" step="any" min="0" class="count-input total-input phys-input" data-id="${i.id}" data-tally="${i.tally_qty}" value="${physVal}" placeholder="Count…">
       </td>
-      <td class="text-center" id="var-cell-${i.id}">${formatVariance(i.variance)}</td>
+      <td class="text-right font-mono" id="total-cell-${i.id}">
+        <b style="font-size:14px; color:var(--power-orange);">${num(totalCountVal)}</b>
+      </td>
     </tr>`);
   });
 
   $('stockTable').innerHTML = thead + rows.join('');
 
-  // Save changes to Cat Code, Cartons, Boxes, Pieces, or Total Quantity
+  // Save changes to Cat Code, Cartons, Boxes, Pieces, or Physical Count
   async function saveStockAuditRow(id) {
     const catInput = document.querySelector(`.cat-input[data-id="${id}"]`);
     const cartonInput = document.querySelector(`.carton-input[data-id="${id}"]`);
     const boxInput = document.querySelector(`.box-input[data-id="${id}"]`);
     const pieceInput = document.querySelector(`.piece-input[data-id="${id}"]`);
     const totalInput = document.querySelector(`.total-input[data-id="${id}"]`);
-    const cell = $(`var-cell-${id}`);
+    const totalCell = $(`total-cell-${id}`);
     if (!totalInput) return;
 
     const tally = Number(totalInput.dataset.tally || 0);
@@ -538,9 +541,10 @@ async function loadStock() {
     const pieces = pieceInput && pieceInput.value.trim() !== '' ? Number(pieceInput.value) : null;
     let totalVal = totalInput.value.trim() !== '' ? Number(totalInput.value) : null;
 
-    // Optimistic variance update
-    if (cell) {
-      cell.innerHTML = formatVariance(totalVal !== null ? Math.round((totalVal - tally) * 100) / 100 : null);
+    // Dynamically update Total Count cell: Tally Qty + Physical Count
+    if (totalCell) {
+      const combinedTotal = tally + (totalVal !== null ? totalVal : 0);
+      totalCell.innerHTML = `<b style="font-size:14px; color:var(--power-orange);">${num(combinedTotal)}</b>`;
     }
 
     const rowInputs = [catInput, cartonInput, boxInput, pieceInput, totalInput].filter(Boolean);
