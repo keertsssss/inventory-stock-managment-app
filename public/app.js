@@ -205,6 +205,8 @@ function generateSkuCode({ make, product_type, description, amperes }) {
     pName = pName.replace(/[^A-Z0-9\s]/g, ' ').trim().split(/\s+/).join('-');
   }
 
+  pName = pName.replace(/^ELEC-?/i, '');
+
   let ampStr = '';
   if (amperes != null && !isNaN(amperes) && Number(amperes) > 0) {
     ampStr = `${amperes}A`;
@@ -225,13 +227,20 @@ function generateSkuCode({ make, product_type, description, amperes }) {
 
   let brand = (make || 'GENERIC').toUpperCase().trim();
   if (brand === 'L&T' || brand === 'L & T' || brand === 'LT') brand = 'LT';
-  else brand = brand.replace(/[^A-Z0-9]/g, '');
+  else brand = brand.replace(/[^A-Z0-9\s]/g, '').split(/\s+/).join('-');
+
+  if (ampStr && (pName.endsWith(`-${ampStr}`) || pName.includes(`-${ampStr}-`))) {
+    ampStr = '';
+  }
+  if (brand && (pName.endsWith(`-${brand}`) || pName.includes(`-${brand}-`))) {
+    brand = '';
+  }
 
   const parts = [prefix, pName];
   if (ampStr) parts.push(ampStr);
-  parts.push(brand);
+  if (brand) parts.push(brand);
 
-  return parts.join('-').toUpperCase();
+  return parts.filter(Boolean).join('-').replace(/-+/g, '-').toUpperCase();
 }
 
 // ----- Tabs -----
@@ -791,6 +800,20 @@ async function loadStock() {
       saveStockAuditRow(Number(input.dataset.id));
     });
   });
+
+  // Automatically enforce uppercase on CAT code table inputs
+  document.querySelectorAll('.cat-input').forEach(input => {
+    input.addEventListener('input', () => {
+      const start = input.selectionStart;
+      const end = input.selectionEnd;
+      const oldVal = input.value;
+      const newVal = oldVal.toUpperCase();
+      if (oldVal !== newVal) {
+        input.value = newVal;
+        input.setSelectionRange(start, end);
+      }
+    });
+  });
 }
 
 let t2;
@@ -949,28 +972,113 @@ async function suggestSku() {
   }
 }
 
-function autoUpdateCatCode() {
-  if (!$('newCatCode')) return;
+let isSkuManuallyEdited = false;
+
+function autoUpdateSkuAndCat() {
   const make = $('newMake') ? $('newMake').value.trim() : '';
   const pType = $('newProductType') ? $('newProductType').value.trim() : '';
   const desc = $('newDesc') ? $('newDesc').value.trim() : '';
-  const sku = $('newSku') ? $('newSku').value.trim() : '';
-  if (make || pType || desc) {
-    const code = generateCatCode({ make, product_type: pType, description: desc, sku });
-    $('newCatCode').value = code;
+
+  if (!isSkuManuallyEdited && (make || pType || desc) && $('newSku')) {
+    const sku = generateSkuCode({ make, product_type: pType, description: desc });
+    $('newSku').value = sku;
+  }
+
+  if ($('newCatCode')) {
+    const currentSku = $('newSku') ? $('newSku').value.trim() : '';
+    if (make || pType || desc) {
+      const code = generateCatCode({ make, product_type: pType, description: desc, sku: currentSku });
+      $('newCatCode').value = code.toUpperCase();
+    }
   }
 }
 
-['newMake', 'newProductType', 'newDesc', 'newSku'].forEach(id => {
+// Typing listener for #newSku:
+// - Space automatically produces hyphen '-'
+// - Forces all characters to UPPERCASE
+// - Prevents duplicate hyphens '--'
+// - Pre-fills 'ELEC-' on focus if empty
+const newSkuInput = $('newSku');
+if (newSkuInput) {
+  newSkuInput.addEventListener('keydown', (e) => {
+    if (e.key === ' ') {
+      e.preventDefault();
+      const start = newSkuInput.selectionStart;
+      const end = newSkuInput.selectionEnd;
+      const val = newSkuInput.value;
+      const before = val.slice(0, start);
+      const after = val.slice(end);
+      const charToInsert = before.endsWith('-') ? '' : '-';
+      const newVal = (before + charToInsert + after).toUpperCase();
+      newSkuInput.value = newVal;
+      const newPos = start + charToInsert.length;
+      newSkuInput.setSelectionRange(newPos, newPos);
+      isSkuManuallyEdited = true;
+      newSkuInput.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+  });
+
+  newSkuInput.addEventListener('input', () => {
+    isSkuManuallyEdited = true;
+    const start = newSkuInput.selectionStart;
+    const end = newSkuInput.selectionEnd;
+    const oldVal = newSkuInput.value;
+    let newVal = oldVal.toUpperCase().replace(/\s+/g, '-').replace(/-+/g, '-');
+    if (oldVal !== newVal) {
+      newSkuInput.value = newVal;
+      const diff = newVal.length - oldVal.length;
+      const targetPos = Math.max(0, Math.min(newVal.length, (start || 0) + diff));
+      newSkuInput.setSelectionRange(targetPos, targetPos);
+    }
+  });
+
+  newSkuInput.addEventListener('focus', () => {
+    if (!newSkuInput.value.trim()) {
+      newSkuInput.value = 'ELEC-';
+      newSkuInput.setSelectionRange(5, 5);
+    }
+  });
+
+  newSkuInput.addEventListener('blur', () => {
+    let v = newSkuInput.value.trim().toUpperCase().replace(/\s+/g, '-').replace(/-+/g, '-');
+    if (v && v !== 'ELEC-' && !v.startsWith('ELEC-')) {
+      v = 'ELEC-' + v.replace(/^ELEC-?/i, '');
+    }
+    newSkuInput.value = v;
+  });
+}
+
+// Typing listener for #newCatCode: capitalizes all characters
+const newCatInput = $('newCatCode');
+if (newCatInput) {
+  newCatInput.addEventListener('input', () => {
+    const start = newCatInput.selectionStart;
+    const end = newCatInput.selectionEnd;
+    const oldVal = newCatInput.value;
+    const newVal = oldVal.toUpperCase();
+    if (oldVal !== newVal) {
+      newCatInput.value = newVal;
+      newCatInput.setSelectionRange(start, end);
+    }
+  });
+}
+
+['newMake', 'newProductType', 'newDesc'].forEach(id => {
   if ($(id)) {
-    $(id).addEventListener('input', autoUpdateCatCode);
-    $(id).addEventListener('change', autoUpdateCatCode);
+    $(id).addEventListener('input', autoUpdateSkuAndCat);
+    $(id).addEventListener('change', autoUpdateSkuAndCat);
   }
 });
 
-if ($('btnAutoSku')) $('btnAutoSku').onclick = suggestSku;
+if ($('btnAutoSku')) {
+  $('btnAutoSku').onclick = () => {
+    isSkuManuallyEdited = false;
+    suggestSku();
+  };
+}
 if ($('newCatSelect')) $('newCatSelect').onchange = () => {
   $('newLocation').value = $('newCatSelect').value + '-S01';
+  isSkuManuallyEdited = false;
   suggestSku();
 };
 if ($('newBranchParent')) $('newBranchParent').oninput = suggestSku;
@@ -1006,6 +1114,7 @@ if ($('onboardForm')) {
       $('onboardMsg').innerHTML = `<div class="msg ok" style="font-size:15px; padding:12px 16px;"><b>Done, thank you!</b> ${esc(data.message)} <br><small>Refreshed back to original state and opening Stock Master...</small></div>`;
       setTimeout(() => {
         $('onboardForm').reset();
+        isSkuManuallyEdited = false;
         $('onboardMsg').innerHTML = '';
         if ($('skuPatternHint')) $('skuPatternHint').textContent = '';
         switchTab('stock');

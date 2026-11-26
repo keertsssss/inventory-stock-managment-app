@@ -170,16 +170,16 @@
 
         <div class="row">
           <div style="flex:1.5;">
-            <label>SKU Code (Auto-Generated or Custom)</label>
+            <label>SKU Code (Starts with ELEC-, space auto-inserts '-')</label>
             <div style="display:flex; gap:6px;">
-              <input id="newSku" placeholder="e.g. ELEC-CABLE-1.5SQMM-GREEN-SALZER" required style="font-family:monospace;font-weight:bold;">
+              <input id="newSku" placeholder="e.g. ELEC-FUSE-LINK-63A-FTC" required style="font-family:monospace;font-weight:bold;">
               <button type="button" id="btnAutoSku" class="btn" style="padding:9px 12px;font-size:12px;white-space:nowrap;">⚡ Auto SKU</button>
             </div>
             <small id="skuPatternHint" class="muted" style="display:block; margin-top:-6px; font-size:12px;"></small>
           </div>
           <div style="flex:1;">
-            <label>Readable Code / CAT Code (Optional)</label>
-            <input id="newCatCode" placeholder="e.g. CAT-001, B32, 1C X 1.5">
+            <label>Readable Code / CAT Code (CAPITAL)</label>
+            <input id="newCatCode" placeholder="e.g. FTC FL 63A">
           </div>
           <div style="flex:1;">
             <label>Sub-Variant Branch From (Optional)</label>

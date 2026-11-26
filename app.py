@@ -339,6 +339,8 @@ def generate_sku_code(make: str, p_type: str, desc: str, amps: float = None) -> 
     else:
         p_name = '-'.join(re.findall(r'[A-Z0-9]+', p_name))
 
+    p_name = re.sub(r'^ELEC-?', '', p_name, flags=re.I)
+
     amp_str = ''
     if amps is not None and amps > 0:
         amp_str = f"{int(amps) if amps.is_integer() else amps}A"
@@ -356,14 +358,20 @@ def generate_sku_code(make: str, p_type: str, desc: str, amps: float = None) -> 
     if brand in ('L&T', 'L & T', 'LT'):
         brand = 'LT'
     else:
-        brand = re.sub(r'[^A-Z0-9]', '', brand)
+        brand = '-'.join(re.findall(r'[A-Z0-9]+', brand))
+
+    if amp_str and (p_name.endswith(f"-{amp_str}") or f"-{amp_str}-" in p_name):
+        amp_str = ''
+    if brand and (p_name.endswith(f"-{brand}") or f"-{brand}-" in p_name):
+        brand = ''
 
     parts = [prefix, p_name]
     if amp_str:
         parts.append(amp_str)
-    parts.append(brand)
+    if brand:
+        parts.append(brand)
 
-    return '-'.join(parts).upper()
+    return re.sub(r'-+', '-', '-'.join(p for p in parts if p)).upper()
 
 def get_one_item(item_id: int):
     db = get_db()
@@ -506,7 +514,9 @@ def onboard_product():
         if not desc or not raw_sku:
             raise ValueError('Description and SKU are required')
 
-        clean_sku = raw_sku.upper()
+        clean_sku = re.sub(r'-+', '-', re.sub(r'\s+', '-', raw_sku.strip().upper()))
+        if not clean_sku.startswith('ELEC-'):
+            clean_sku = 'ELEC-' + re.sub(r'^ELEC-?', '', clean_sku, flags=re.I)
         db = get_db()
         cur = db.cursor()
 
@@ -521,7 +531,8 @@ def onboard_product():
         clean_uom = raw_uom.upper()
 
         amperes = extract_amperes(desc, clean_sku)
-        final_cat = (cat_code or generate_cat_code(make, p_type, desc, clean_sku, amperes)).upper()
+        clean_cat = str(cat_code).strip().upper() if cat_code else None
+        final_cat = (clean_cat or generate_cat_code(make, p_type, desc, clean_sku, amperes)).upper()
         cur.execute("""
             INSERT INTO items (
                 description, sku, cat_code, make, product_type, rack, location,

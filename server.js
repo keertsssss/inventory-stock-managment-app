@@ -250,6 +250,8 @@ function generateSkuCode({ make, product_type, description, amperes }) {
     pName = pName.replace(/[^A-Z0-9\s]/g, ' ').trim().split(/\s+/).join('-');
   }
 
+  pName = pName.replace(/^ELEC-?/i, '');
+
   let ampStr = '';
   if (amperes != null && !isNaN(amperes) && Number(amperes) > 0) {
     ampStr = `${amperes}A`;
@@ -270,13 +272,20 @@ function generateSkuCode({ make, product_type, description, amperes }) {
 
   let brand = (make || 'GENERIC').toUpperCase().trim();
   if (brand === 'L&T' || brand === 'L & T' || brand === 'LT') brand = 'LT';
-  else brand = brand.replace(/[^A-Z0-9]/g, '');
+  else brand = brand.replace(/[^A-Z0-9\s]/g, '').split(/\s+/).join('-');
+
+  if (ampStr && (pName.endsWith(`-${ampStr}`) || pName.includes(`-${ampStr}-`))) {
+    ampStr = '';
+  }
+  if (brand && (pName.endsWith(`-${brand}`) || pName.includes(`-${brand}-`))) {
+    brand = '';
+  }
 
   const parts = [prefix, pName];
   if (ampStr) parts.push(ampStr);
-  parts.push(brand);
+  if (brand) parts.push(brand);
 
-  return parts.join('-').toUpperCase();
+  return parts.filter(Boolean).join('-').replace(/-+/g, '-').toUpperCase();
 }
 
 // First run only: load the items from items.json
@@ -515,7 +524,10 @@ app.post('/api/products', (req, res) => {
     const { description, sku, cat_code, make, product_type, rack, location, uom, opening_qty } = req.body;
     if (!description || !sku) throw new Error('Description and SKU are required');
 
-    const cleanSku = String(sku).trim().toUpperCase();
+    let cleanSku = String(sku).trim().toUpperCase().replace(/\s+/g, '-').replace(/-+/g, '-');
+    if (!cleanSku.startsWith('ELEC-')) {
+      cleanSku = 'ELEC-' + cleanSku.replace(/^ELEC-?/i, '');
+    }
 
     // Strict Uniqueness check against collision
     const existing = db.prepare('SELECT id, sku FROM items WHERE UPPER(sku) = ?').get(cleanSku);
@@ -529,7 +541,7 @@ app.post('/api/products', (req, res) => {
     const category = RACK_CATEGORY_MAP[cleanRack] || 'Miscellaneous';
     const cleanUom = String(uom || 'NOS').trim().toUpperCase();
     const qty = Number(opening_qty || 0);
-    const cleanCatCode = String(cat_code || '').trim() || null;
+    const cleanCatCode = String(cat_code || '').trim().toUpperCase() || null;
 
     const amperes = extractAmperes(description, cleanSku);
     const finalCatCode = cleanCatCode || generateCatCode({ make, product_type, description, sku: cleanSku, amperes });
