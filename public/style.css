@@ -824,3 +824,56 @@ a.btn:hover, button.btn:hover {
   padding-top: 10px;
   border-top: 1px solid var(--line);
 }
+
+/* ----- Company Subdivider for Fuses (Least to High Amperes) ----- */
+.company-divider-row td {
+  background: #f8fafc !important;
+  border-top: 1px solid #cbd5e1 !important;
+  border-bottom: 1px solid #cbd5e1 !important;
+  border-left: 4px solid var(--power-orange) !important;
+  padding: 6px 14px !important;
+}
+
+.company-divider-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.company-divider-tag {
+  color: var(--golden-pitch-dark);
+  font-size: 13px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.company-divider-tag b {
+  color: var(--power-orange-dark);
+  font-size: 14px;
+}
+
+.company-divider-info {
+  font-size: 12px;
+  color: #475569;
+}
+
+.company-divider-info b {
+  color: var(--golden-pitch-dark);
+}
+
+.amp-tag {
+  background: #e0f2fe;
+  color: #0369a1;
+  border: 1px solid #bae6fd;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-left: 6px;
+  display: inline-block;
+  vertical-align: middle;
+}

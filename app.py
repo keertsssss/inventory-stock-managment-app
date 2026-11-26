@@ -90,7 +90,8 @@ def init_db():
         ('cat_code', 'TEXT'),
         ('cartons', 'REAL'),
         ('boxes', 'REAL'),
-        ('pieces', 'REAL')
+        ('pieces', 'REAL'),
+        ('amperes', 'REAL')
     ]:
         try:
             conn.execute(f"ALTER TABLE items ADD COLUMN {col} {typ}")
@@ -185,11 +186,22 @@ STOCK_SELECT = """
     i.boxes,
     i.pieces,
     i.physical_count,
+    i.amperes,
     COALESCE(i.created_at, datetime('now', '-45 days', 'localtime')) AS created_at,
     CAST(ROUND(julianday('now', 'localtime') - julianday(COALESCE(i.created_at, '2020-01-01'))) AS INTEGER) AS days_old
   FROM items i 
   LEFT JOIN movements m ON m.item_id = i.id
 """
+
+def extract_amperes(desc: str, sku: str):
+    text = f"{desc or ''} {sku or ''}"
+    m = re.search(r'(?:^|[\s\-_/])(\d+(?:\.\d+)?)\s*(?:A|AMP|AMPS)(?:$|[\s\-_/])', text, re.IGNORECASE)
+    if m:
+        return float(m.group(1))
+    m2 = re.search(r'(\d+(?:\.\d+)?)\s*A', text, re.IGNORECASE)
+    if m2:
+        return float(m2.group(1))
+    return None
 
 def get_one_item(item_id: int):
     db = get_db()
@@ -247,6 +259,8 @@ def list_items():
       ROW_NUMBER() OVER (
         ORDER BY 
           COALESCE(location, '') ASC, 
+          CASE WHEN rack = 'R04' OR category LIKE '%Fuse%' THEN make ELSE '' END ASC,
+          CASE WHEN rack = 'R04' OR category LIKE '%Fuse%' THEN COALESCE(amperes, 999999) ELSE 0 END ASC,
           sku ASC, 
           id ASC
       ) AS serial_no,
@@ -328,14 +342,15 @@ def onboard_product():
         category = RACK_CATEGORY_MAP.get(clean_rack, 'Miscellaneous')
         clean_uom = raw_uom.upper()
 
+        amperes = extract_amperes(desc, clean_sku)
         cur.execute("""
             INSERT INTO items (
                 description, sku, cat_code, make, product_type, rack, location,
-                section, category, uom, opening_qty, created_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now', 'localtime'))
+                section, category, uom, opening_qty, amperes, created_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now', 'localtime'))
         """, (
             desc, clean_sku, cat_code, make, p_type, clean_rack, clean_loc,
-            clean_section, category, clean_uom, opening_qty
+            clean_section, category, clean_uom, opening_qty, amperes
         ))
         db.commit()
 
@@ -543,7 +558,14 @@ def export_stock_master_csv():
       GROUP BY i.id
     )
     SELECT 
-      ROW_NUMBER() OVER (ORDER BY COALESCE(location, '') ASC, sku ASC, id ASC) AS dynamic_serial_no,
+      ROW_NUMBER() OVER (
+        ORDER BY 
+          COALESCE(location, '') ASC, 
+          CASE WHEN rack = 'R04' OR category LIKE '%Fuse%' THEN make ELSE '' END ASC,
+          CASE WHEN rack = 'R04' OR category LIKE '%Fuse%' THEN COALESCE(amperes, 999999) ELSE 0 END ASC,
+          sku ASC, 
+          id ASC
+      ) AS dynamic_serial_no,
       id, description, sku, cat_code, make, product_type, rack, location,
       section, category, uom, opening_qty, tally_qty, cartons, boxes, pieces, physical_count
     FROM item_summary

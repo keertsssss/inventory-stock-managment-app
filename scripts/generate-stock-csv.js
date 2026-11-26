@@ -19,7 +19,15 @@ const rackMap = {
   'R09': 'Tapes & Miscellaneous (incl. Raw Material)'
 };
 
-const items = db.prepare('SELECT * FROM items ORDER BY location, id').all();
+const items = db.prepare(`
+  SELECT * FROM items 
+  ORDER BY 
+    COALESCE(location, '') ASC,
+    CASE WHEN rack = 'R04' OR category LIKE '%Fuse%' THEN make ELSE '' END ASC,
+    CASE WHEN rack = 'R04' OR category LIKE '%Fuse%' THEN COALESCE(amperes, 999999) ELSE 0 END ASC,
+    sku ASC, 
+    id ASC
+`).all();
 
 const esc = v => `"${String(v ?? '').replace(/"/g, '""')}"`;
 

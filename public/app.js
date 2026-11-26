@@ -432,14 +432,17 @@ async function loadStock() {
 
   // Group and divide items by Rack with prominent category headings
   let lastRack = null;
+  let lastCompany = null;
   const rows = [];
 
   items.forEach((i, index) => {
     const currentRack = i.rack || (i.location ? i.location.split('-')[0] : 'OTHER');
+    const isFuse = currentRack === 'R04' || (i.category && i.category.toLowerCase().includes('fuse'));
 
     // Section Divider Heading when rack changes
     if (currentRack !== lastRack) {
       lastRack = currentRack;
+      lastCompany = null;
       const rackItems = items.filter(item => (item.rack || (item.location ? item.location.split('-')[0] : 'OTHER')) === currentRack);
       const rackTally = rackItems.reduce((sum, item) => sum + (Number(item.tally_qty) || 0), 0);
       const distinctShelves = new Set(rackItems.map(item => item.location || item.section)).size;
@@ -467,6 +470,36 @@ async function loadStock() {
       `);
     }
 
+    // Company sub-divider for Fuses (grouped by Company, sorted least A to high amperes)
+    if (isFuse && i.make && i.make !== lastCompany) {
+      lastCompany = i.make;
+      const compItems = items.filter(item => (item.rack === currentRack || (item.category && item.category.toLowerCase().includes('fuse'))) && item.make === i.make);
+      const compTally = compItems.reduce((sum, item) => sum + (Number(item.tally_qty) || 0), 0);
+      const ampsList = compItems.map(x => Number(x.amperes)).filter(x => !isNaN(x) && x > 0);
+      const minA = ampsList.length ? Math.min(...ampsList) : null;
+      const maxA = ampsList.length ? Math.max(...ampsList) : null;
+      const rangeText = minA !== null && maxA !== null ? `${minA}A → ${maxA}A` : '';
+
+      rows.push(`
+        <tr class="company-divider-row">
+          <td colspan="18">
+            <div class="company-divider-wrap">
+              <span class="company-divider-tag">
+                Company: <b>${esc(i.make)}</b>
+                ${rangeText ? `<span class="badge" style="background:#f1f5f9; color:#0369a1; font-weight:bold; font-size:11px; margin-left:6px;">${rangeText}</span>` : ''}
+              </span>
+              <span class="company-divider-info">
+                Shelf: <b>${esc(i.section || (i.location ? i.location.split('-')[1] : ''))}</b> (${esc(i.location)}) · 
+                <b>${compItems.length}</b> SKUs · 
+                Tally: <b>${num(compTally)}</b> · 
+                <span style="color:#16a34a; font-weight:600;">Least to High Amperes</span>
+              </span>
+            </div>
+          </td>
+        </tr>
+      `);
+    }
+
     const serialNo = i.serial_no || (index + 1);
     const catCodeVal = i.cat_code || '';
     const cartonVal = i.cartons != null ? i.cartons : '';
@@ -475,6 +508,7 @@ async function loadStock() {
     const physVal = i.physical_count != null ? i.physical_count : '';
     const totalCountVal = Number(i.tally_qty || 0) + Number(i.physical_count || 0);
     const newBadge = i.is_new ? `<span class="badge badge-new" title="Added on ${esc(i.created_at)} (${i.days_old} days ago)" style="margin-left:6px;">NEW • ${i.days_remaining}d left</span>` : '';
+    const ampBadge = i.amperes != null ? `<span class="amp-tag" title="${i.amperes} Amperes">${i.amperes}A</span>` : '';
     const rowClass = i.is_new ? 'row-new-product' : '';
 
     rows.push(`<tr class="${rowClass}">
@@ -485,10 +519,10 @@ async function loadStock() {
       <td class="text-center">${esc(i.rack)}</td>
       <td class="text-center">${esc(i.section || (i.location ? i.location.split('-')[1] : ''))}</td>
       <td><small>${esc(i.category)}</small></td>
-      <td>${esc(i.make)}</td>
+      <td><b>${esc(i.make)}</b></td>
       <td><small>${esc(i.product_type)}</small></td>
       <td class="text-center font-mono text-muted">#${esc(i.id)}</td>
-      <td><b>${esc(i.description)}</b>${newBadge}</td>
+      <td><b>${esc(i.description)}</b>${ampBadge}${newBadge}</td>
       <td>
         <span class="font-mono sku-tag">${esc(i.sku)}</span>
       </td>

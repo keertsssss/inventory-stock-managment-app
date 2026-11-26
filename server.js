@@ -121,10 +121,20 @@ try { db.exec('ALTER TABLE items ADD COLUMN cat_code TEXT'); } catch (_) {}
 try { db.exec('ALTER TABLE items ADD COLUMN cartons REAL'); } catch (_) {}
 try { db.exec('ALTER TABLE items ADD COLUMN boxes REAL'); } catch (_) {}
 try { db.exec('ALTER TABLE items ADD COLUMN pieces REAL'); } catch (_) {}
+try { db.exec('ALTER TABLE items ADD COLUMN amperes REAL'); } catch (_) {}
 try { db.exec('ALTER TABLE movements ADD COLUMN photo TEXT'); } catch (_) {}
 
 // Default older established items to 45 days ago if not set, so they act as mature products
 db.exec("UPDATE items SET created_at = datetime('now', '-45 days', 'localtime') WHERE created_at IS NULL");
+
+function extractAmperes(desc, sku) {
+  const text = `${desc || ''} ${sku || ''}`;
+  const m = text.match(/(?:^|[\s\-_/])(\d+(?:\.\d+)?)\s*(?:A|AMP|AMPS)(?:$|[\s\-_/])/i);
+  if (m) return parseFloat(m[1]);
+  const m2 = text.match(/(\d+(?:\.\d+)?)\s*A/i);
+  if (m2) return parseFloat(m2[1]);
+  return null;
+}
 
 // First run only: load the items from items.json
 if (db.prepare('SELECT COUNT(*) AS c FROM items').get().c === 0) {
@@ -165,6 +175,7 @@ const STOCK_SELECT = `
     i.boxes,
     i.pieces,
     i.physical_count,
+    i.amperes,
     COALESCE(i.created_at, datetime('now', '-45 days', 'localtime')) AS created_at,
     CAST(ROUND(julianday('now', 'localtime') - julianday(COALESCE(i.created_at, '2020-01-01'))) AS INTEGER) AS days_old
   FROM items i 
@@ -272,6 +283,8 @@ app.get('/api/items', (req, res) => {
       ROW_NUMBER() OVER (
         ORDER BY 
           COALESCE(location, '') ASC, 
+          CASE WHEN rack = 'R04' OR category LIKE '%Fuse%' THEN make ELSE '' END ASC,
+          CASE WHEN rack = 'R04' OR category LIKE '%Fuse%' THEN COALESCE(amperes, 999999) ELSE 0 END ASC,
           sku ASC, 
           id ASC
       ) AS serial_no,
@@ -356,9 +369,10 @@ app.post('/api/products', (req, res) => {
     const qty = Number(opening_qty || 0);
     const cleanCatCode = String(cat_code || '').trim() || null;
 
+    const amperes = extractAmperes(description, cleanSku);
     const ins = db.prepare(`
-      INSERT INTO items (description, sku, cat_code, make, product_type, rack, location, section, category, uom, opening_qty, created_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now', 'localtime'))
+      INSERT INTO items (description, sku, cat_code, make, product_type, rack, location, section, category, uom, opening_qty, amperes, created_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now', 'localtime'))
     `);
 
     ins.run(
@@ -372,7 +386,8 @@ app.post('/api/products', (req, res) => {
       cleanSection,
       category,
       cleanUom,
-      qty
+      qty,
+      amperes
     );
 
     const newlyAdded = db.prepare('SELECT * FROM items WHERE sku = ?').get(cleanSku);
@@ -490,7 +505,14 @@ app.get('/api/stock.csv', (req, res) => {
       GROUP BY i.id
     )
     SELECT 
-      ROW_NUMBER() OVER (ORDER BY COALESCE(location, '') ASC, sku ASC, id ASC) AS dynamic_serial_no,
+      ROW_NUMBER() OVER (
+        ORDER BY 
+          COALESCE(location, '') ASC, 
+          CASE WHEN rack = 'R04' OR category LIKE '%Fuse%' THEN make ELSE '' END ASC,
+          CASE WHEN rack = 'R04' OR category LIKE '%Fuse%' THEN COALESCE(amperes, 999999) ELSE 0 END ASC,
+          sku ASC, 
+          id ASC
+      ) AS dynamic_serial_no,
       id, description, sku, cat_code, make, product_type, rack, location,
       section, category, uom, opening_qty, tally_qty, cartons, boxes, pieces, physical_count
     FROM item_summary
