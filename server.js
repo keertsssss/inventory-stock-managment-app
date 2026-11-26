@@ -136,6 +136,29 @@ function extractAmperes(desc, sku) {
   return null;
 }
 
+function extractPorts(desc, sku, pType) {
+  const text = `${desc || ''} ${sku || ''} ${pType || ''}`.toUpperCase();
+  if (/\bSINGLE\s*-?\s*POLE\b/i.test(text)) return '1P';
+  if (/\bDOUBLE\s*-?\s*POLE\b/i.test(text)) return '2P';
+  if (/\bTRIPLE\s*-?\s*POLE\b/i.test(text)) return '3P';
+  if (/\bFOUR\s*-?\s*POLE\b/i.test(text)) return '4P';
+
+  const poleMatch = text.match(/(?:^|[\s\-_/])([1-4])\s*-?\s*POLE(?:$|[\s\-_/])/i);
+  if (poleMatch) return `${poleMatch[1]}P`;
+
+  const m = text.match(/(?:^|[\s\-_/])(1P|2P|3P|4P|TPN|SPN|SP|DP|TP|FP)(?:$|[\s\-_/])/i);
+  if (m) return m[1].toUpperCase();
+
+  const generalMatch = text.match(/(?:^|[\s\-_/])(\d+P|\d+\s*WAY)(?:$|[\s\-_/])/i);
+  if (generalMatch) {
+    let p = generalMatch[1].replace(/\s+/g, '').toUpperCase();
+    if (p.endsWith('WAY')) p = p.replace('WAY', 'P');
+    return p;
+  }
+
+  return null;
+}
+
 const PRODUCT_TYPE_SHORTCUTS = {
   'Fuse Link': 'FL',
   'HRC Fuse': 'FL',
@@ -214,20 +237,28 @@ function generateCatCode({ make, product_type, description, sku, amperes }) {
   const brandCode = getBrandCode(make);
   const typeCode = getProductTypeShortcut(product_type, description);
   const amp = amperes != null ? `${amperes}A` : (extractAmperes(description, sku) ? `${extractAmperes(description, sku)}A` : null);
+  const isBreaker = /MCB|MCCB|RCCB/i.test(typeCode) || /MCB|MCCB|RCCB/i.test(product_type || '') || /MCB|MCCB|RCCB/i.test(description || '');
+  const port = isBreaker ? extractPorts(description, sku, product_type) : null;
 
+  if (amp && port) {
+    return `${brandCode} ${typeCode} ${amp} ${port}`.toUpperCase();
+  }
   if (amp) {
-    return `${brandCode} ${typeCode} ${amp}`;
+    return `${brandCode} ${typeCode} ${amp}`.toUpperCase();
+  }
+  if (port) {
+    return `${brandCode} ${typeCode} ${port}`.toUpperCase();
   }
 
   const sqmmMatch = (description || '').match(/(\d+(?:\.\d+)?)\s*SQMM/i);
   if (sqmmMatch) {
-    return `${brandCode} ${typeCode} ${sqmmMatch[1]}SQ`;
+    return `${brandCode} ${typeCode} ${sqmmMatch[1]}SQ`.toUpperCase();
   }
 
   const words = (description || '').split(/\s+/).filter(Boolean);
   const lastToken = words.length > 2 ? words[words.length - 2] : '';
   if (lastToken && /^[A-Z0-9\-]+$/i.test(lastToken) && lastToken.toUpperCase() !== make?.toUpperCase()) {
-    return `${brandCode} ${typeCode} ${lastToken.toUpperCase()}`;
+    return `${brandCode} ${typeCode} ${lastToken.toUpperCase()}`.toUpperCase();
   }
 
   return `${brandCode} ${typeCode}`.toUpperCase();
@@ -270,6 +301,8 @@ function generateSkuCode({ make, product_type, description, amperes }) {
     if (sqmm) ampStr = `${sqmm[1]}SQMM`;
   }
 
+  const port = extractPorts(description, '', pName);
+
   let brand = (make || 'GENERIC').toUpperCase().trim();
   if (brand === 'L&T' || brand === 'L & T' || brand === 'LT') brand = 'LT';
   else brand = brand.replace(/[^A-Z0-9\s]/g, '').split(/\s+/).join('-');
@@ -283,6 +316,7 @@ function generateSkuCode({ make, product_type, description, amperes }) {
 
   const parts = [prefix, pName];
   if (ampStr) parts.push(ampStr);
+  if (port && !pName.includes(port) && !parts.includes(port)) parts.push(port);
   if (brand) parts.push(brand);
 
   return parts.filter(Boolean).join('-').replace(/-+/g, '-').toUpperCase();

@@ -287,6 +287,34 @@ def get_product_type_shortcut(p_type: str, desc: str) -> str:
         return ''.join(w[0].upper() for w in words[:3])
     return re.sub(r'[^A-Za-z0-9]', '', pt)[:3].upper()
 
+def extract_ports(desc: str, sku: str = '', p_type: str = '') -> str:
+    text = f"{desc or ''} {sku or ''} {p_type or ''}".upper()
+    if re.search(r'\bSINGLE\s*-?\s*POLE\b', text, re.I):
+        return '1P'
+    if re.search(r'\bDOUBLE\s*-?\s*POLE\b', text, re.I):
+        return '2P'
+    if re.search(r'\bTRIPLE\s*-?\s*POLE\b', text, re.I):
+        return '3P'
+    if re.search(r'\bFOUR\s*-?\s*POLE\b', text, re.I):
+        return '4P'
+
+    pole_match = re.search(r'(?:^|[\s\-_/])([1-4])\s*-?\s*POLE(?:$|[\s\-_/])', text, re.I)
+    if pole_match:
+        return f"{pole_match.group(1)}P"
+
+    m = re.search(r'(?:^|[\s\-_/])(1P|2P|3P|4P|TPN|SPN|SP|DP|TP|FP)(?:$|[\s\-_/])', text, re.I)
+    if m:
+        return m.group(1).upper()
+
+    gen_match = re.search(r'(?:^|[\s\-_/])(\d+P|\d+\s*WAY)(?:$|[\s\-_/])', text, re.I)
+    if gen_match:
+        p = re.sub(r'\s+', '', gen_match.group(1).upper())
+        if p.endswith('WAY'):
+            p = p.replace('WAY', 'P')
+        return p
+
+    return None
+
 def generate_cat_code(make: str, p_type: str, desc: str, sku: str, amps: float = None) -> str:
     brand = get_brand_code(make)
     shortcut = get_product_type_shortcut(p_type, desc)
@@ -298,8 +326,15 @@ def generate_cat_code(make: str, p_type: str, desc: str, sku: str, amps: float =
         if amp_val is not None:
             amp_str = f"{int(amp_val) if amp_val.is_integer() else amp_val}A"
 
+    is_breaker = bool(re.search(r'MCB|MCCB|RCCB', f"{shortcut} {p_type or ''} {desc or ''}", re.I))
+    port = extract_ports(desc, sku, p_type) if is_breaker else None
+
+    if amp_str and port:
+        return f"{brand} {shortcut} {amp_str} {port}".upper()
     if amp_str:
-        return f"{brand} {shortcut} {amp_str}"
+        return f"{brand} {shortcut} {amp_str}".upper()
+    if port:
+        return f"{brand} {shortcut} {port}".upper()
 
     sq_match = re.search(r'(\d+(?:\.\d+)?)\s*SQMM', desc or '', re.I)
     if sq_match:
@@ -354,6 +389,8 @@ def generate_sku_code(make: str, p_type: str, desc: str, amps: float = None) -> 
         if sq_match:
             amp_str = f"{sq_match.group(1)}SQMM"
 
+    port = extract_ports(desc, '', p_name)
+
     brand = (make or 'GENERIC').strip().upper()
     if brand in ('L&T', 'L & T', 'LT'):
         brand = 'LT'
@@ -368,6 +405,8 @@ def generate_sku_code(make: str, p_type: str, desc: str, amps: float = None) -> 
     parts = [prefix, p_name]
     if amp_str:
         parts.append(amp_str)
+    if port and port not in parts and f"-{port}" not in p_name:
+        parts.append(port)
     if brand:
         parts.append(brand)
 

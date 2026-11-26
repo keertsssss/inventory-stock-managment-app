@@ -127,29 +127,60 @@ function extractAmperes(desc, sku, itemAmp) {
   return null;
 }
 
+function extractPorts(desc, sku, pType) {
+  const text = `${desc || ''} ${sku || ''} ${pType || ''}`.toUpperCase();
+  if (/\bSINGLE\s*-?\s*POLE\b/i.test(text)) return '1P';
+  if (/\bDOUBLE\s*-?\s*POLE\b/i.test(text)) return '2P';
+  if (/\bTRIPLE\s*-?\s*POLE\b/i.test(text)) return '3P';
+  if (/\bFOUR\s*-?\s*POLE\b/i.test(text)) return '4P';
+
+  const poleMatch = text.match(/(?:^|[\s\-_/])([1-4])\s*-?\s*POLE(?:$|[\s\-_/])/i);
+  if (poleMatch) return `${poleMatch[1]}P`;
+
+  const m = text.match(/(?:^|[\s\-_/])(1P|2P|3P|4P|TPN|SPN|SP|DP|TP|FP)(?:$|[\s\-_/])/i);
+  if (m) return m[1].toUpperCase();
+
+  const generalMatch = text.match(/(?:^|[\s\-_/])(\d+P|\d+\s*WAY)(?:$|[\s\-_/])/i);
+  if (generalMatch) {
+    let p = generalMatch[1].replace(/\s+/g, '').toUpperCase();
+    if (p.endsWith('WAY')) p = p.replace('WAY', 'P');
+    return p;
+  }
+
+  return null;
+}
+
 function generateCatCode(item) {
   const brandCode = getBrandCode(item.make);
   const typeCode = getProductTypeShortcut(item.product_type, item.description);
   const amp = extractAmperes(item.description, item.sku, item.amperes);
+  const isBreaker = /MCB|MCCB|RCCB/i.test(typeCode) || /MCB|MCCB|RCCB/i.test(item.product_type || '') || /MCB|MCCB|RCCB/i.test(item.description || '');
+  const port = isBreaker ? extractPorts(item.description, item.sku, item.product_type) : null;
 
+  if (amp && port) {
+    return `${brandCode} ${typeCode} ${amp} ${port}`.toUpperCase();
+  }
   if (amp) {
-    return `${brandCode} ${typeCode} ${amp}`;
+    return `${brandCode} ${typeCode} ${amp}`.toUpperCase();
+  }
+  if (port) {
+    return `${brandCode} ${typeCode} ${port}`.toUpperCase();
   }
 
   // Cable specification (e.g. 1.5SQ)
   const sqmmMatch = (item.description || '').match(/(\d+(?:\.\d+)?)\s*SQMM/i);
   if (sqmmMatch) {
-    return `${brandCode} ${typeCode} ${sqmmMatch[1]}SQ`;
+    return `${brandCode} ${typeCode} ${sqmmMatch[1]}SQ`.toUpperCase();
   }
 
   // Model/rating specifier
   const words = (item.description || '').split(/\s+/).filter(Boolean);
   const lastToken = words.length > 2 ? words[words.length - 2] : '';
   if (lastToken && /^[A-Z0-9\-]+$/i.test(lastToken) && lastToken.toUpperCase() !== item.make?.toUpperCase()) {
-    return `${brandCode} ${typeCode} ${lastToken.toUpperCase()}`;
+    return `${brandCode} ${typeCode} ${lastToken.toUpperCase()}`.toUpperCase();
   }
 
-  return `${brandCode} ${typeCode}`;
+  return `${brandCode} ${typeCode}`.toUpperCase();
 }
 
 const items = db.prepare('SELECT id, make, product_type, description, sku, amperes, cat_code FROM items').all();
