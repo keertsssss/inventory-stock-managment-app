@@ -79,6 +79,115 @@ const RACK_SHORT_NAMES = {
   'R09': 'Tapes & RM'
 };
 
+const PRODUCT_TYPE_SHORTCUTS = {
+  'Fuse Link': 'FL',
+  'HRC Fuse': 'FL',
+  'Fuse': 'FL',
+  'Fuse Holder': 'FH',
+  'HRC Fuse Base': 'FB',
+  'Kit Kat Fuse': 'KK',
+  'SFU (Switch Fuse Unit)': 'SFU',
+  'MCB': 'MCB',
+  'MCCB': 'MCCB',
+  'RCCB': 'RCCB',
+  'MCCB Accessory': 'ACC',
+  'Contactor': 'CON',
+  'Air Break Contactor': 'ABC',
+  'Add-on Block': 'AB',
+  'Delay Timer': 'TMR',
+  'Undervoltage Relay': 'UVR',
+  'Thermostat': 'THM',
+  'Copper Flexible Cable': 'CBL',
+  'Cable Gland': 'GLD',
+  'Insulation Tape': 'IT',
+  'Terminal Block': 'TB',
+  'Neutral Link': 'NL',
+  'Spider Link': 'SL',
+  'Ammeter': 'AMM',
+  'Voltmeter': 'VOL',
+  'Multifunction Meter': 'MFM',
+  'Prepaid Meter': 'PPM',
+  'Switch Socket Combined': 'SSC',
+  'Toggle Switch': 'TS',
+  'Changeover Switch': 'COS',
+  'Isolator Switch': 'IS',
+  'LED Strip': 'LST',
+  'LED Driver': 'LDR',
+  'LED Fixture': 'LFX',
+  'Tube Light': 'TL'
+};
+
+function getBrandCode(brand) {
+  if (!brand) return 'GEN';
+  const b = brand.trim().toUpperCase();
+  if (b === 'L&T' || b === 'L & T' || b === 'LT') return 'LNT';
+  if (b === '3M') return '3M';
+  if (b === 'GE') return 'GE';
+  if (b === 'AE') return 'AE';
+  if (b === 'TC') return 'TC';
+  if (b === 'C&S' || b === 'CNS') return 'CNS';
+  if (b === 'MF GOLD') return 'MFG';
+  if (b === 'NO MAKE LISTED' || b === 'GENERIC') return 'GEN';
+  const clean = b.replace(/[^A-Z0-9]/g, '');
+  return clean.slice(0, 3);
+}
+
+function getProductTypeShortcut(pType, desc) {
+  if (PRODUCT_TYPE_SHORTCUTS[pType]) return PRODUCT_TYPE_SHORTCUTS[pType];
+  const d = desc || '';
+  if (/\bFUSE\s+LINK\b/i.test(d)) return 'FL';
+  if (/\bFUSE\s+HOLDER\b/i.test(d)) return 'FH';
+  if (/\bKIT\s*KAT\b/i.test(d)) return 'KK';
+  if (/\bHRC\s+FUSE\b/i.test(d)) return 'FL';
+  if (/\bMCB\b/i.test(d)) return 'MCB';
+  if (/\bMCCB\b/i.test(d)) return 'MCCB';
+  if (/\bCABLE\b/i.test(d)) return 'CBL';
+
+  if (!pType) return 'PRD';
+  const pt = pType.trim();
+  if (/^[A-Z]{2,4}$/.test(pt)) return pt;
+  const words = pt.replace(/[^a-zA-Z0-9\s]/g, '').trim().split(/\s+/).filter(Boolean);
+  if (words.length >= 2) {
+    return words.slice(0, 3).map(w => w[0].toUpperCase()).join('');
+  }
+  return pt.replace(/[^A-Za-z0-9]/g, '').slice(0, 3).toUpperCase();
+}
+
+function extractAmperes(desc, sku, itemAmp) {
+  if (itemAmp != null && !isNaN(itemAmp) && itemAmp > 0) {
+    return `${itemAmp}A`;
+  }
+  const text = `${desc || ''} ${sku || ''}`;
+  const m = text.match(/(?:^|[\s\-_/])(\d+(?:\.\d+)?)\s*(?:A|AMP|AMPS)(?:$|[\s\-_/])/i);
+  if (m) return `${parseFloat(m[1])}A`;
+  const m2 = text.match(/(\d+(?:\.\d+)?)\s*A\b/i);
+  if (m2) return `${parseFloat(m2[1])}A`;
+  return null;
+}
+
+function generateCatCode(item) {
+  const brandCode = getBrandCode(item.make);
+  const typeCode = getProductTypeShortcut(item.product_type, item.description);
+  const amp = extractAmperes(item.description, item.sku, item.amperes);
+
+  if (amp) {
+    return `${brandCode} ${typeCode} ${amp}`;
+  }
+
+  const sqmmMatch = (item.description || '').match(/(\d+(?:\.\d+)?)\s*SQMM/i);
+  if (sqmmMatch) {
+    return `${brandCode} ${typeCode} ${sqmmMatch[1]}SQ`;
+  }
+
+  const words = (item.description || '').split(/\s+/).filter(Boolean);
+  const lastToken = words.length > 2 ? words[words.length - 2] : '';
+  if (lastToken && /^[A-Z0-9\-]+$/i.test(lastToken) && lastToken.toUpperCase() !== item.make?.toUpperCase()) {
+    return `${brandCode} ${typeCode} ${lastToken.toUpperCase()}`;
+  }
+
+  return `${brandCode} ${typeCode}`;
+}
+
 // ----- Tabs -----
 function switchTab(tabName) {
   document.querySelectorAll('nav button').forEach(x => x.classList.toggle('active', x.dataset.tab === tabName));
@@ -501,7 +610,7 @@ async function loadStock() {
     }
 
     const serialNo = i.serial_no || (index + 1);
-    const catCodeVal = i.cat_code || '';
+    const catCodeVal = i.cat_code || generateCatCode(i);
     const cartonVal = i.cartons != null ? i.cartons : '';
     const boxVal = i.boxes != null ? i.boxes : '';
     const pieceVal = i.pieces != null ? i.pieces : '';
@@ -741,6 +850,9 @@ if ($('openOnboardModal')) {
 async function suggestSku() {
   const catRack = $('newCatSelect').value;
   const branchParent = $('newBranchParent').value.trim();
+  const make = $('newMake') ? $('newMake').value.trim() : '';
+  const product_type = $('newProductType') ? $('newProductType').value.trim() : '';
+  const description = $('newDesc') ? $('newDesc').value.trim() : '';
   const rackCategoryNames = {
     'R01': 'Cables',
     'R02': 'Cable Accessories, Connectors & Terminals',
@@ -758,7 +870,7 @@ async function suggestSku() {
     const res = await fetch('/api/products/suggest-sku', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ category, branch_parent_sku: branchParent || null })
+      body: JSON.stringify({ category, branch_parent_sku: branchParent || null, make, product_type, description })
     });
     const data = await res.json();
     if (data.ok && data.sku) {
@@ -766,11 +878,33 @@ async function suggestSku() {
       $('skuPatternHint').textContent = branchParent
         ? `Branch variant created from ${branchParent}`
         : `Pattern matched: ${data.pattern?.prefix || ''} (Seq: ${data.pattern?.sequence || 'next'})`;
+      if (data.cat_code && $('newCatCode') && !$('newCatCode').value) {
+        $('newCatCode').value = data.cat_code;
+      }
     }
   } catch (err) {
     console.error('Error suggesting SKU:', err);
   }
 }
+
+function autoUpdateCatCode() {
+  if (!$('newCatCode')) return;
+  const make = $('newMake') ? $('newMake').value.trim() : '';
+  const pType = $('newProductType') ? $('newProductType').value.trim() : '';
+  const desc = $('newDesc') ? $('newDesc').value.trim() : '';
+  const sku = $('newSku') ? $('newSku').value.trim() : '';
+  if (make || pType || desc) {
+    const code = generateCatCode({ make, product_type: pType, description: desc, sku });
+    $('newCatCode').value = code;
+  }
+}
+
+['newMake', 'newProductType', 'newDesc', 'newSku'].forEach(id => {
+  if ($(id)) {
+    $(id).addEventListener('input', autoUpdateCatCode);
+    $(id).addEventListener('change', autoUpdateCatCode);
+  }
+});
 
 if ($('btnAutoSku')) $('btnAutoSku').onclick = suggestSku;
 if ($('newCatSelect')) $('newCatSelect').onchange = () => {

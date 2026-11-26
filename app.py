@@ -198,10 +198,120 @@ def extract_amperes(desc: str, sku: str):
     m = re.search(r'(?:^|[\s\-_/])(\d+(?:\.\d+)?)\s*(?:A|AMP|AMPS)(?:$|[\s\-_/])', text, re.IGNORECASE)
     if m:
         return float(m.group(1))
-    m2 = re.search(r'(\d+(?:\.\d+)?)\s*A', text, re.IGNORECASE)
+    m2 = re.search(r'(\d+(?:\.\d+)?)\s*A\b', text, re.IGNORECASE)
     if m2:
         return float(m2.group(1))
     return None
+
+PRODUCT_TYPE_SHORTCUTS = {
+    'Fuse Link': 'FL',
+    'HRC Fuse': 'FL',
+    'Fuse': 'FL',
+    'Fuse Holder': 'FH',
+    'HRC Fuse Base': 'FB',
+    'Kit Kat Fuse': 'KK',
+    'SFU (Switch Fuse Unit)': 'SFU',
+    'MCB': 'MCB',
+    'MCCB': 'MCCB',
+    'RCCB': 'RCCB',
+    'MCCB Accessory': 'ACC',
+    'Contactor': 'CON',
+    'Air Break Contactor': 'ABC',
+    'Add-on Block': 'AB',
+    'Delay Timer': 'TMR',
+    'Undervoltage Relay': 'UVR',
+    'Thermostat': 'THM',
+    'Copper Flexible Cable': 'CBL',
+    'Cable Gland': 'GLD',
+    'Insulation Tape': 'IT',
+    'Terminal Block': 'TB',
+    'Neutral Link': 'NL',
+    'Spider Link': 'SL',
+    'Ammeter': 'AMM',
+    'Voltmeter': 'VOL',
+    'Multifunction Meter': 'MFM',
+    'Prepaid Meter': 'PPM',
+    'Switch Socket Combined': 'SSC',
+    'Toggle Switch': 'TS',
+    'Changeover Switch': 'COS',
+    'Isolator Switch': 'IS',
+    'LED Strip': 'LST',
+    'LED Driver': 'LDR',
+    'LED Fixture': 'LFX',
+    'Tube Light': 'TL'
+}
+
+def get_brand_code(brand: str) -> str:
+    if not brand:
+        return 'GEN'
+    b = brand.strip().upper()
+    if b in ('L&T', 'L & T', 'LT'):
+        return 'LNT'
+    if b in ('3M', 'GE', 'AE', 'TC'):
+        return b
+    if b in ('C&S', 'CNS'):
+        return 'CNS'
+    if b == 'MF GOLD':
+        return 'MFG'
+    if b in ('NO MAKE LISTED', 'GENERIC'):
+        return 'GEN'
+    clean = re.sub(r'[^A-Z0-9]', '', b)
+    return clean[:3]
+
+def get_product_type_shortcut(p_type: str, desc: str) -> str:
+    if p_type and p_type in PRODUCT_TYPE_SHORTCUTS:
+        return PRODUCT_TYPE_SHORTCUTS[p_type]
+    d = desc or ''
+    if re.search(r'\bFUSE\s+LINK\b', d, re.I):
+        return 'FL'
+    if re.search(r'\bFUSE\s+HOLDER\b', d, re.I):
+        return 'FH'
+    if re.search(r'\bKIT\s*KAT\b', d, re.I):
+        return 'KK'
+    if re.search(r'\bHRC\s+FUSE\b', d, re.I):
+        return 'FL'
+    if re.search(r'\bMCB\b', d, re.I):
+        return 'MCB'
+    if re.search(r'\bMCCB\b', d, re.I):
+        return 'MCCB'
+    if re.search(r'\bCABLE\b', d, re.I):
+        return 'CBL'
+
+    if not p_type:
+        return 'PRD'
+    pt = p_type.strip()
+    if re.match(r'^[A-Z]{2,4}$', pt):
+        return pt
+    words = [w for w in re.split(r'[^a-zA-Z0-9]', pt) if w]
+    if len(words) >= 2:
+        return ''.join(w[0].upper() for w in words[:3])
+    return re.sub(r'[^A-Za-z0-9]', '', pt)[:3].upper()
+
+def generate_cat_code(make: str, p_type: str, desc: str, sku: str, amps: float = None) -> str:
+    brand = get_brand_code(make)
+    shortcut = get_product_type_shortcut(p_type, desc)
+    amp_str = None
+    if amps is not None and amps > 0:
+        amp_str = f"{int(amps) if amps.is_integer() else amps}A"
+    else:
+        amp_val = extract_amperes(desc, sku)
+        if amp_val is not None:
+            amp_str = f"{int(amp_val) if amp_val.is_integer() else amp_val}A"
+
+    if amp_str:
+        return f"{brand} {shortcut} {amp_str}"
+
+    sq_match = re.search(r'(\d+(?:\.\d+)?)\s*SQMM', desc or '', re.I)
+    if sq_match:
+        return f"{brand} {shortcut} {sq_match.group(1)}SQ"
+
+    words = (desc or '').split()
+    if len(words) > 2:
+        last_tok = words[-2]
+        if re.match(r'^[A-Z0-9\-]+$', last_tok, re.I) and last_tok.upper() != (make or '').upper():
+            return f"{brand} {shortcut} {last_tok.upper()}"
+
+    return f"{brand} {shortcut}"
 
 def get_one_item(item_id: int):
     db = get_db()
@@ -307,7 +417,12 @@ def suggest_sku():
         else:
             result = SkuPatternEngine.generate_next(existing_skus, prefix)
 
-        return jsonify({'ok': True, **result})
+        make = data.get('make') or ''
+        p_type = data.get('product_type') or ''
+        desc = data.get('description') or ''
+        suggested_cat = generate_cat_code(make, p_type, desc, result.get('sku', ''))
+
+        return jsonify({'ok': True, **result, 'cat_code': suggested_cat})
     except Exception as e:
         return jsonify({'ok': False, 'error': str(e)}), 400
 
@@ -343,13 +458,14 @@ def onboard_product():
         clean_uom = raw_uom.upper()
 
         amperes = extract_amperes(desc, clean_sku)
+        final_cat = cat_code or generate_cat_code(make, p_type, desc, clean_sku, amperes)
         cur.execute("""
             INSERT INTO items (
                 description, sku, cat_code, make, product_type, rack, location,
                 section, category, uom, opening_qty, amperes, created_at
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now', 'localtime'))
         """, (
-            desc, clean_sku, cat_code, make, p_type, clean_rack, clean_loc,
+            desc, clean_sku, final_cat, make, p_type, clean_rack, clean_loc,
             clean_section, category, clean_uom, opening_qty, amperes
         ))
         db.commit()

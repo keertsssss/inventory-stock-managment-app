@@ -131,9 +131,106 @@ function extractAmperes(desc, sku) {
   const text = `${desc || ''} ${sku || ''}`;
   const m = text.match(/(?:^|[\s\-_/])(\d+(?:\.\d+)?)\s*(?:A|AMP|AMPS)(?:$|[\s\-_/])/i);
   if (m) return parseFloat(m[1]);
-  const m2 = text.match(/(\d+(?:\.\d+)?)\s*A/i);
+  const m2 = text.match(/(\d+(?:\.\d+)?)\s*A\b/i);
   if (m2) return parseFloat(m2[1]);
   return null;
+}
+
+const PRODUCT_TYPE_SHORTCUTS = {
+  'Fuse Link': 'FL',
+  'HRC Fuse': 'FL',
+  'Fuse': 'FL',
+  'Fuse Holder': 'FH',
+  'HRC Fuse Base': 'FB',
+  'Kit Kat Fuse': 'KK',
+  'SFU (Switch Fuse Unit)': 'SFU',
+  'MCB': 'MCB',
+  'MCCB': 'MCCB',
+  'RCCB': 'RCCB',
+  'MCCB Accessory': 'ACC',
+  'Contactor': 'CON',
+  'Air Break Contactor': 'ABC',
+  'Add-on Block': 'AB',
+  'Delay Timer': 'TMR',
+  'Undervoltage Relay': 'UVR',
+  'Thermostat': 'THM',
+  'Copper Flexible Cable': 'CBL',
+  'Cable Gland': 'GLD',
+  'Insulation Tape': 'IT',
+  'Terminal Block': 'TB',
+  'Neutral Link': 'NL',
+  'Spider Link': 'SL',
+  'Ammeter': 'AMM',
+  'Voltmeter': 'VOL',
+  'Multifunction Meter': 'MFM',
+  'Prepaid Meter': 'PPM',
+  'Switch Socket Combined': 'SSC',
+  'Toggle Switch': 'TS',
+  'Changeover Switch': 'COS',
+  'Isolator Switch': 'IS',
+  'LED Strip': 'LST',
+  'LED Driver': 'LDR',
+  'LED Fixture': 'LFX',
+  'Tube Light': 'TL'
+};
+
+function getBrandCode(brand) {
+  if (!brand) return 'GEN';
+  const b = brand.trim().toUpperCase();
+  if (b === 'L&T' || b === 'L & T' || b === 'LT') return 'LNT';
+  if (b === '3M') return '3M';
+  if (b === 'GE') return 'GE';
+  if (b === 'AE') return 'AE';
+  if (b === 'TC') return 'TC';
+  if (b === 'C&S' || b === 'CNS') return 'CNS';
+  if (b === 'MF GOLD') return 'MFG';
+  if (b === 'NO MAKE LISTED' || b === 'GENERIC') return 'GEN';
+  const clean = b.replace(/[^A-Z0-9]/g, '');
+  return clean.slice(0, 3);
+}
+
+function getProductTypeShortcut(pType, desc) {
+  if (PRODUCT_TYPE_SHORTCUTS[pType]) return PRODUCT_TYPE_SHORTCUTS[pType];
+  const d = desc || '';
+  if (/\bFUSE\s+LINK\b/i.test(d)) return 'FL';
+  if (/\bFUSE\s+HOLDER\b/i.test(d)) return 'FH';
+  if (/\bKIT\s*KAT\b/i.test(d)) return 'KK';
+  if (/\bHRC\s+FUSE\b/i.test(d)) return 'FL';
+  if (/\bMCB\b/i.test(d)) return 'MCB';
+  if (/\bMCCB\b/i.test(d)) return 'MCCB';
+  if (/\bCABLE\b/i.test(d)) return 'CBL';
+
+  if (!pType) return 'PRD';
+  const pt = pType.trim();
+  if (/^[A-Z]{2,4}$/.test(pt)) return pt;
+  const words = pt.replace(/[^a-zA-Z0-9\s]/g, '').trim().split(/\s+/).filter(Boolean);
+  if (words.length >= 2) {
+    return words.slice(0, 3).map(w => w[0].toUpperCase()).join('');
+  }
+  return pt.replace(/[^A-Za-z0-9]/g, '').slice(0, 3).toUpperCase();
+}
+
+function generateCatCode({ make, product_type, description, sku, amperes }) {
+  const brandCode = getBrandCode(make);
+  const typeCode = getProductTypeShortcut(product_type, description);
+  const amp = amperes != null ? `${amperes}A` : (extractAmperes(description, sku) ? `${extractAmperes(description, sku)}A` : null);
+
+  if (amp) {
+    return `${brandCode} ${typeCode} ${amp}`;
+  }
+
+  const sqmmMatch = (description || '').match(/(\d+(?:\.\d+)?)\s*SQMM/i);
+  if (sqmmMatch) {
+    return `${brandCode} ${typeCode} ${sqmmMatch[1]}SQ`;
+  }
+
+  const words = (description || '').split(/\s+/).filter(Boolean);
+  const lastToken = words.length > 2 ? words[words.length - 2] : '';
+  if (lastToken && /^[A-Z0-9\-]+$/i.test(lastToken) && lastToken.toUpperCase() !== make?.toUpperCase()) {
+    return `${brandCode} ${typeCode} ${lastToken.toUpperCase()}`;
+  }
+
+  return `${brandCode} ${typeCode}`;
 }
 
 // First run only: load the items from items.json
@@ -313,7 +410,7 @@ app.get('/api/items', (req, res) => {
  */
 app.post('/api/products/suggest-sku', (req, res) => {
   try {
-    const { category, prefix, branch_parent_sku } = req.body;
+    const { category, prefix, branch_parent_sku, make, product_type, description } = req.body;
     let query = 'SELECT sku FROM items';
     const params = [];
     if (category) {
@@ -335,7 +432,14 @@ app.post('/api/products/suggest-sku', (req, res) => {
       });
     }
 
-    res.json({ ok: true, ...result });
+    const suggestedCatCode = generateCatCode({
+      make,
+      product_type,
+      description,
+      sku: result.sku
+    });
+
+    res.json({ ok: true, ...result, cat_code: suggestedCatCode });
   } catch (err) {
     res.status(400).json({ ok: false, error: err.message });
   }
@@ -370,6 +474,8 @@ app.post('/api/products', (req, res) => {
     const cleanCatCode = String(cat_code || '').trim() || null;
 
     const amperes = extractAmperes(description, cleanSku);
+    const finalCatCode = cleanCatCode || generateCatCode({ make, product_type, description, sku: cleanSku, amperes });
+
     const ins = db.prepare(`
       INSERT INTO items (description, sku, cat_code, make, product_type, rack, location, section, category, uom, opening_qty, amperes, created_at)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now', 'localtime'))
@@ -378,7 +484,7 @@ app.post('/api/products', (req, res) => {
     ins.run(
       description.trim(),
       cleanSku,
-      cleanCatCode,
+      finalCatCode,
       (make || '').trim(),
       (product_type || '').trim(),
       cleanRack,
