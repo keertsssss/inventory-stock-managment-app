@@ -1,0 +1,600 @@
+"""
+Stock Management Web Application (Python / Flask Edition for PythonAnywhere)
+Srinivasa Enterprises — NOVUM Energy Infra
+"""
+import os
+import re
+import csv
+import io
+import json
+import base64
+import time
+import random
+import sqlite3
+from datetime import datetime
+from flask import Flask, request, jsonify, send_from_directory, Response, g
+
+from lib.sku_generator import SkuPatternEngine
+from lib.excel_sync import (
+    parse_csv_stock_master,
+    parse_xlsx_stock_master,
+    sync_rows_to_db,
+    RACK_CATEGORY_MAP
+)
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DATA_DIR = os.path.join(BASE_DIR, 'data')
+PUBLIC_DIR = os.path.join(BASE_DIR, 'public')
+UPLOADS_DIR = os.path.join(DATA_DIR, 'uploads')
+DB_PATH = os.path.join(DATA_DIR, 'stock.db')
+
+os.makedirs(DATA_DIR, exist_ok=True)
+os.makedirs(UPLOADS_DIR, exist_ok=True)
+
+# Units of measurement allowed to have decimal values
+DECIMAL_UOMS = {'KGS', 'MTR', 'LTR'}
+
+# Retention window for "NEW" product status (days)
+NEW_PRODUCT_RETENTION_DAYS = 30
+
+app = Flask(__name__, static_folder=PUBLIC_DIR, static_url_path='')
+app.config['MAX_CONTENT_LENGTH'] = 30 * 1024 * 1024  # 30 MB upload limit for photos / excel
+
+# ---------- Database Initialization ----------
+def init_db():
+    conn = sqlite3.connect(DB_PATH)
+    conn.execute("PRAGMA journal_mode = WAL")
+    conn.executescript("""
+    CREATE TABLE IF NOT EXISTS items (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      serial_no INTEGER,
+      description TEXT NOT NULL,
+      sku TEXT NOT NULL UNIQUE,
+      make TEXT,
+      product_type TEXT,
+      rack TEXT,
+      location TEXT,
+      section TEXT,
+      category TEXT,
+      uom TEXT NOT NULL,
+      opening_qty REAL NOT NULL DEFAULT 0,
+      physical_count REAL DEFAULT NULL,
+      created_at TEXT DEFAULT (datetime('now', 'localtime'))
+    );
+    CREATE TABLE IF NOT EXISTS movements (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      ts TEXT NOT NULL DEFAULT (datetime('now', 'localtime')),
+      item_id INTEGER NOT NULL REFERENCES items(id),
+      type TEXT NOT NULL CHECK (type IN ('ISSUE', 'RECEIVE', 'ADJUST')),
+      qty REAL NOT NULL,
+      person TEXT NOT NULL,
+      note TEXT,
+      photo TEXT
+    );
+    CREATE INDEX IF NOT EXISTS idx_mov_ts ON movements(ts);
+    CREATE INDEX IF NOT EXISTS idx_items_sku ON items(sku);
+    CREATE INDEX IF NOT EXISTS idx_items_loc ON items(location);
+    """)
+
+    # Schema migrations for existing databases
+    for col, typ in [
+        ('category', 'TEXT'),
+        ('section', 'TEXT'),
+        ('physical_count', 'REAL'),
+        ('serial_no', 'INTEGER'),
+        ('created_at', 'TEXT')
+    ]:
+        try:
+            conn.execute(f"ALTER TABLE items ADD COLUMN {col} {typ}")
+        except sqlite3.OperationalError:
+            pass
+
+    try:
+        conn.execute("ALTER TABLE movements ADD COLUMN photo TEXT")
+    except sqlite3.OperationalError:
+        pass
+
+    conn.execute("UPDATE items SET created_at = datetime('now', '-45 days', 'localtime') WHERE created_at IS NULL")
+
+    # Seed from items.json if items table is empty
+    cur = conn.cursor()
+    cur.execute("SELECT COUNT(*) FROM items")
+    if cur.fetchone()[0] == 0:
+        seed_path = os.path.join(DATA_DIR, 'items.json')
+        if not os.path.exists(seed_path):
+            seed_path = os.path.join(BASE_DIR, 'items.json')
+        if os.path.exists(seed_path):
+            with open(seed_path, 'r', encoding='utf-8') as f:
+                seed_items = json.load(f)
+            for idx, i in enumerate(seed_items):
+                loc = i.get('location', '')
+                rack = i.get('rack', '')
+                section = ''
+                if loc and '-' in loc:
+                    rack, section = loc.split('-', 1)
+                elif rack:
+                    section = ''
+                cat = RACK_CATEGORY_MAP.get(rack, i.get('category', 'Miscellaneous'))
+
+                cur.execute("""
+                    INSERT INTO items (
+                        serial_no, description, sku, make, product_type,
+                        rack, location, section, category, uom, opening_qty, created_at
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now', '-45 days', 'localtime'))
+                """, (
+                    idx + 1,
+                    i.get('description', ''),
+                    i.get('sku', ''),
+                    i.get('make', ''),
+                    i.get('product_type', ''),
+                    rack,
+                    loc or f"{rack}-{section}".strip('-'),
+                    section,
+                    cat,
+                    i.get('uom', 'NOS'),
+                    float(i.get('qty', 0) or 0)
+                ))
+            conn.commit()
+    conn.close()
+
+# Initialize tables on load
+init_db()
+
+def get_db():
+    db = getattr(g, '_database', None)
+    if db is None:
+        db = g._database = sqlite3.connect(DB_PATH, check_same_thread=False)
+        db.row_factory = sqlite3.Row
+        db.execute("PRAGMA journal_mode = WAL")
+    return db
+
+@app.teardown_appcontext
+def close_connection(exception):
+    db = getattr(g, '_database', None)
+    if db is not None:
+        db.close()
+
+# Stock aggregation SQL query
+STOCK_SELECT = """
+  SELECT 
+    i.id,
+    i.sku,
+    i.description,
+    i.make,
+    i.product_type,
+    i.rack,
+    i.location,
+    i.section,
+    i.category,
+    i.uom,
+    i.opening_qty,
+    ROUND(i.opening_qty + COALESCE(SUM(CASE m.type WHEN 'ISSUE' THEN -m.qty ELSE m.qty END), 0), 2) AS tally_qty,
+    ROUND(i.opening_qty + COALESCE(SUM(CASE m.type WHEN 'ISSUE' THEN -m.qty ELSE m.qty END), 0), 2) AS stock,
+    COALESCE(SUM(CASE m.type WHEN 'RECEIVE' THEN m.qty ELSE 0 END), 0) AS total_received,
+    COALESCE(SUM(CASE m.type WHEN 'ISSUE' THEN m.qty ELSE 0 END), 0) AS total_issued,
+    i.physical_count,
+    COALESCE(i.created_at, datetime('now', '-45 days', 'localtime')) AS created_at,
+    CAST(ROUND(julianday('now', 'localtime') - julianday(COALESCE(i.created_at, '2020-01-01'))) AS INTEGER) AS days_old
+  FROM items i 
+  LEFT JOIN movements m ON m.item_id = i.id
+"""
+
+def get_one_item(item_id: int):
+    db = get_db()
+    cur = db.cursor()
+    cur.execute(f"{STOCK_SELECT} WHERE i.id = ? GROUP BY i.id", (item_id,))
+    row = cur.fetchone()
+    return dict(row) if row else None
+
+# ---------- Static File Routes ----------
+@app.route('/')
+def index():
+    return send_from_directory(PUBLIC_DIR, 'index.html')
+
+@app.route('/<path:filename>')
+def serve_public(filename):
+    file_path = os.path.join(PUBLIC_DIR, filename)
+    if os.path.exists(file_path):
+        return send_from_directory(PUBLIC_DIR, filename)
+    return send_from_directory(PUBLIC_DIR, 'index.html')
+
+@app.route('/uploads/<path:filename>')
+def serve_upload(filename):
+    return send_from_directory(UPLOADS_DIR, filename)
+
+# ---------- API Endpoints ----------
+@app.route('/api/items', methods=['GET'])
+def list_items():
+    q = request.args.get('q', '').strip()
+    rack_filter = request.args.get('rack', '').strip()
+
+    where_clauses = []
+    params = []
+
+    if rack_filter:
+        where_clauses.append("i.rack = ?")
+        params.append(rack_filter)
+
+    words = [w for w in re.split(r'\s+', q) if w]
+    for w in words:
+        like_pattern = f"%{w}%"
+        where_clauses.append(
+            "(i.description LIKE ? OR i.sku LIKE ? OR i.make LIKE ? OR i.location LIKE ? OR i.category LIKE ? OR i.product_type LIKE ? OR CAST(i.id AS TEXT) LIKE ?)"
+        )
+        params.extend([like_pattern] * 7)
+
+    where_sql = f" WHERE {' AND '.join(where_clauses)}" if where_clauses else ""
+
+    sql = f"""
+    WITH item_summary AS (
+      {STOCK_SELECT}
+      {where_sql}
+      GROUP BY i.id
+    )
+    SELECT 
+      ROW_NUMBER() OVER (
+        ORDER BY 
+          COALESCE(location, '') ASC, 
+          sku ASC, 
+          id ASC
+      ) AS serial_no,
+      *,
+      CASE 
+        WHEN days_old <= {NEW_PRODUCT_RETENTION_DAYS} THEN 1 
+        ELSE 0 
+      END AS is_new,
+      MAX(0, {NEW_PRODUCT_RETENTION_DAYS} - days_old) AS days_remaining
+    FROM item_summary
+    ORDER BY serial_no ASC;
+    """
+
+    db = get_db()
+    cur = db.cursor()
+    cur.execute(sql, params)
+    rows = [dict(r) for r in cur.fetchall()]
+
+    for r in rows:
+        phys = r.get('physical_count')
+        tally = r.get('tally_qty', 0.0)
+        r['variance'] = round(float(phys) - float(tally), 2) if phys is not None else None
+
+    return jsonify(rows)
+
+@app.route('/api/products/suggest-sku', methods=['POST'])
+def suggest_sku():
+    try:
+        data = request.get_json(force=True, silent=True) or {}
+        category = data.get('category', '').strip()
+        prefix = data.get('prefix', '').strip()
+        branch_parent_sku = data.get('branch_parent_sku', '').strip()
+
+        db = get_db()
+        cur = db.cursor()
+        if category:
+            cur.execute("SELECT sku FROM items WHERE category = ?", (category,))
+        else:
+            cur.execute("SELECT sku FROM items")
+        existing_skus = [r['sku'] for r in cur.fetchall()]
+
+        if branch_parent_sku:
+            result = SkuPatternEngine.generate_sub_variant(branch_parent_sku, existing_skus)
+        else:
+            result = SkuPatternEngine.generate_next(existing_skus, prefix)
+
+        return jsonify({'ok': True, **result})
+    except Exception as e:
+        return jsonify({'ok': False, 'error': str(e)}), 400
+
+@app.route('/api/products', methods=['POST'])
+def onboard_product():
+    try:
+        data = request.get_json(force=True, silent=True) or {}
+        desc = (data.get('description') or '').strip()
+        raw_sku = (data.get('sku') or '').strip()
+        make = (data.get('make') or '').strip()
+        p_type = (data.get('product_type') or '').strip()
+        raw_rack = (data.get('rack') or '').strip()
+        raw_loc = (data.get('location') or '').strip()
+        raw_uom = (data.get('uom') or 'NOS').strip()
+        opening_qty = float(data.get('opening_qty') or 0)
+
+        if not desc or not raw_sku:
+            raise ValueError('Description and SKU are required')
+
+        clean_sku = raw_sku.upper()
+        db = get_db()
+        cur = db.cursor()
+
+        cur.execute("SELECT id FROM items WHERE UPPER(sku) = ?", (clean_sku,))
+        if cur.fetchone():
+            raise ValueError(f'SKU collision: "{clean_sku}" already exists in the catalog.')
+
+        clean_loc = raw_loc.upper()
+        clean_rack = (raw_rack or (clean_loc.split('-')[0] if '-' in clean_loc else 'R01')).upper()
+        clean_section = clean_loc.split('-')[1] if '-' in clean_loc else ''
+        category = RACK_CATEGORY_MAP.get(clean_rack, 'Miscellaneous')
+        clean_uom = raw_uom.upper()
+
+        cur.execute("""
+            INSERT INTO items (
+                description, sku, make, product_type, rack, location,
+                section, category, uom, opening_qty, created_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now', 'localtime'))
+        """, (
+            desc, clean_sku, make, p_type, clean_rack, clean_loc,
+            clean_section, category, clean_uom, opening_qty
+        ))
+        db.commit()
+
+        cur.execute("SELECT * FROM items WHERE sku = ?", (clean_sku,))
+        new_row = dict(cur.fetchone())
+        new_row['is_new'] = 1
+        new_row['days_old'] = 0
+        new_row['days_remaining'] = NEW_PRODUCT_RETENTION_DAYS
+
+        return jsonify({
+            'ok': True,
+            'message': f"Product {clean_sku} successfully onboarded!",
+            'product': new_row
+        })
+    except Exception as e:
+        return jsonify({'ok': False, 'error': str(e)}), 400
+
+@app.route('/api/physical-count', methods=['POST'])
+def update_physical_count():
+    try:
+        data = request.get_json(force=True, silent=True) or {}
+        item_id = int(data.get('id', 0))
+        raw_val = data.get('physical_count')
+
+        count_val = None
+        if raw_val not in (None, ''):
+            count_val = float(raw_val)
+
+        db = get_db()
+        cur = db.cursor()
+        cur.execute("UPDATE items SET physical_count = ? WHERE id = ?", (count_val, item_id))
+        db.commit()
+
+        item = get_one_item(item_id)
+        if not item:
+            raise ValueError('Item not found')
+
+        variance = round(count_val - item['tally_qty'], 2) if count_val is not None else None
+        return jsonify({'ok': True, 'id': item_id, 'physical_count': count_val, 'variance': variance})
+    except Exception as e:
+        return jsonify({'ok': False, 'error': str(e)}), 400
+
+@app.route('/api/move', methods=['POST'])
+def record_move():
+    try:
+        data = request.get_json(force=True, silent=True) or {}
+        m_type = data.get('type')
+        item_id = int(data.get('item_id', 0))
+        raw_qty = data.get('qty')
+        person = (data.get('person') or '').strip()[:50]
+        note = (data.get('note') or '').strip()[:200]
+        photo = data.get('photo')
+
+        if m_type not in ('ISSUE', 'RECEIVE'):
+            raise ValueError('Type must be ISSUE or RECEIVE')
+        if not person:
+            raise ValueError('Please enter your name')
+        if raw_qty is None:
+            raise ValueError('Please specify quantity')
+
+        qty = float(raw_qty)
+        if qty <= 0:
+            raise ValueError('Quantity must be more than 0')
+
+        item = get_one_item(item_id)
+        if not item:
+            raise ValueError('Item not found')
+
+        if item['uom'] not in DECIMAL_UOMS and not qty.is_integer():
+            raise ValueError(f"{item['uom']} must be a whole number")
+
+        if m_type == 'ISSUE' and qty > float(item['stock']):
+            raise ValueError(f"Only {item['stock']} {item['uom']} in stock — cannot issue {qty}.")
+
+        photo_url = None
+        if photo and isinstance(photo, str) and photo.startswith('data:image/'):
+            match = re.match(r'^data:image/([a-zA-Z0-9+]+);base64,(.+)$', photo)
+            if match:
+                raw_ext = match.group(1).lower()
+                ext = 'jpg' if raw_ext in ('jpeg', 'jpg') else ('png' if raw_ext == 'png' else 'webp')
+                rand_id = ''.join(random.choices('abcdefghijklmnopqrstuvwxyz0123456789', k=6))
+                filename = f"{m_type.lower()}_{int(time.time()*1000)}_{rand_id}.{ext}"
+                filepath = os.path.join(UPLOADS_DIR, filename)
+                with open(filepath, 'wb') as img_f:
+                    img_f.write(base64.b64decode(match.group(2)))
+                photo_url = f"/uploads/{filename}"
+        elif photo and isinstance(photo, str) and photo.startswith('/uploads/'):
+            photo_url = photo
+
+        db = get_db()
+        cur = db.cursor()
+        cur.execute("""
+            INSERT INTO movements (item_id, type, qty, person, note, photo)
+            VALUES (?, ?, ?, ?, ?, ?)
+        """, (item_id, m_type, qty, person, note or None, photo_url))
+        db.commit()
+
+        updated_item = get_one_item(item_id)
+        return jsonify({'ok': True, 'item': updated_item, 'photo': photo_url})
+    except Exception as e:
+        return jsonify({'ok': False, 'error': str(e)}), 400
+
+@app.route('/api/report', methods=['GET'])
+def get_daily_report():
+    date_str = request.args.get('date', '').strip()
+    if not re.match(r'^\d{4}-\d{2}-\d{2}$', date_str):
+        date_str = datetime.now().strftime('%Y-%m-%d')
+
+    db = get_db()
+    cur = db.cursor()
+    cur.execute("""
+        SELECT m.id, m.ts, m.type, i.location, i.description, i.sku, i.uom, m.qty, m.person, m.note, m.photo
+        FROM movements m 
+        JOIN items i ON i.id = m.item_id
+        WHERE substr(m.ts, 1, 10) = ? 
+        ORDER BY m.ts DESC, m.id DESC
+    """, (date_str,))
+    rows = [dict(r) for r in cur.fetchall()]
+    return jsonify({'date': date_str, 'rows': rows})
+
+@app.route('/api/report.csv', methods=['GET'])
+def export_daily_report_csv():
+    date_str = request.args.get('date', '').strip()
+    if not re.match(r'^\d{4}-\d{2}-\d{2}$', date_str):
+        date_str = datetime.now().strftime('%Y-%m-%d')
+
+    db = get_db()
+    cur = db.cursor()
+    cur.execute("""
+        SELECT m.id, m.ts, m.type, i.location, i.description, i.sku, i.uom, m.qty, m.person, m.note, m.photo
+        FROM movements m 
+        JOIN items i ON i.id = m.item_id
+        WHERE substr(m.ts, 1, 10) = ? 
+        ORDER BY m.ts DESC, m.id DESC
+    """, (date_str,))
+    rows = [dict(r) for r in cur.fetchall()]
+
+    output = io.StringIO()
+    writer = csv.writer(output)
+    writer.writerow(['Time', 'Type', 'Location', 'Description', 'SKU', 'UOM', 'Qty', 'Person', 'Note', 'Photo Proof URL'])
+
+    host_url = request.host_url.rstrip('/')
+    for r in rows:
+        photo_link = f"{host_url}{r['photo']}" if r.get('photo') else ''
+        writer.writerow([
+            r['ts'], r['type'], r.get('location', ''), r.get('description', ''),
+            r.get('sku', ''), r.get('uom', ''), r['qty'], r.get('person', ''),
+            r.get('note', ''), photo_link
+        ])
+
+    csv_data = '\ufeff' + output.getvalue()
+    return Response(
+        csv_data,
+        mimetype='text/csv; charset=utf-8',
+        headers={'Content-Disposition': f'attachment; filename="stock-report-{date_str}.csv"'}
+    )
+
+@app.route('/api/stock.csv', methods=['GET'])
+def export_stock_master_csv():
+    db = get_db()
+    cur = db.cursor()
+    sql = f"""
+    WITH item_summary AS (
+      {STOCK_SELECT}
+      GROUP BY i.id
+    )
+    SELECT 
+      ROW_NUMBER() OVER (ORDER BY COALESCE(location, '') ASC, sku ASC, id ASC) AS dynamic_serial_no,
+      id, description, sku, make, product_type, rack, location,
+      section, category, uom, opening_qty, tally_qty, physical_count
+    FROM item_summary
+    ORDER BY dynamic_serial_no ASC
+    """
+    cur.execute(sql)
+    items = [dict(r) for r in cur.fetchall()]
+
+    output = io.StringIO()
+    writer = csv.writer(output)
+    writer.writerow([
+        'Serial No', 'Rack Location', 'Rack', 'Section', 'Category',
+        'Make', 'Product Type', 'S.No (orig.)', 'Description', 'SKU Code',
+        'UOM', 'Tally Qty', 'Physical Count', 'Variance (Physical − Tally)'
+    ])
+
+    for idx, item in enumerate(items):
+        row_num = idx + 2
+        loc = item.get('location') or ''
+        rack = item.get('rack') or (loc.split('-')[0] if '-' in loc else '')
+        section = item.get('section') or (loc.split('-')[1] if '-' in loc else '')
+        phys = item.get('physical_count')
+        phys_str = phys if phys is not None else ''
+
+        if phys is not None:
+            variance_val = round(float(phys) - float(item['tally_qty']), 2)
+        else:
+            variance_val = f'=IF(ISBLANK(M{row_num}),"",M{row_num}-L{row_num})'
+
+        writer.writerow([
+            '=ROW()-1',
+            loc,
+            rack,
+            section,
+            item.get('category') or RACK_CATEGORY_MAP.get(rack, ''),
+            item.get('make', ''),
+            item.get('product_type', ''),
+            item['id'],
+            item.get('description', ''),
+            item.get('sku', ''),
+            item.get('uom', ''),
+            item.get('tally_qty', 0),
+            phys_str,
+            variance_val
+        ])
+
+    csv_data = '\ufeff' + output.getvalue()
+    return Response(
+        csv_data,
+        mimetype='text/csv; charset=utf-8',
+        headers={'Content-Disposition': 'attachment; filename="stock-master.csv"'}
+    )
+
+@app.route('/api/sync-excel', methods=['POST'])
+def sync_excel():
+    try:
+        data = request.get_json(force=True, silent=True) or {}
+        csv_content = data.get('csvContent')
+        base64_data = data.get('base64Data')
+
+        rows = []
+        if csv_content:
+            rows = parse_csv_stock_master(csv_content)
+        elif base64_data:
+            temp_path = os.path.join(BASE_DIR, f'.temp_upload_{int(time.time()*1000)}.xlsx')
+            with open(temp_path, 'wb') as temp_f:
+                temp_f.write(base64.b64decode(base64_data))
+            try:
+                rows = parse_xlsx_stock_master(temp_path)
+            finally:
+                if os.path.exists(temp_path):
+                    try:
+                        os.remove(temp_path)
+                    except OSError:
+                        pass
+        else:
+            xlsx_path = os.path.join(DATA_DIR, 'Srinivasa_Stock_Rack_Plan.xlsx')
+            if not os.path.exists(xlsx_path):
+                xlsx_path = os.path.join(BASE_DIR, 'Srinivasa_Stock_Rack_Plan.xlsx')
+            if not os.path.exists(xlsx_path):
+                raise ValueError('Srinivasa_Stock_Rack_Plan.xlsx not found in project.')
+            rows = parse_xlsx_stock_master(xlsx_path)
+
+        if not rows:
+            raise ValueError('No valid stock items found in Excel/CSV file.')
+
+        db = get_db()
+        cur = db.cursor()
+        sync_result = sync_rows_to_db(cur, rows)
+        db.commit()
+
+        return jsonify({
+            'ok': True,
+            'message': f"Successfully synchronized {sync_result['updatedCount']} items with Tally counts from Excel!",
+            **sync_result
+        })
+    except Exception as e:
+        return jsonify({'ok': False, 'error': str(e)}), 400
+
+# WSGI Application reference for PythonAnywhere
+application = app
+
+if __name__ == '__main__':
+    port = int(os.environ.get('PORT', 3000))
+    print(f"\nStock app (Python / Flask) is running.")
+    print(f"  Access locally: http://localhost:{port}")
+    app.run(host='0.0.0.0', port=port, debug=False)
