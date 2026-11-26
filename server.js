@@ -81,6 +81,7 @@ CREATE TABLE IF NOT EXISTS items (
   serial_no INTEGER,                    -- optional legacy serial number
   description TEXT NOT NULL,
   sku TEXT NOT NULL UNIQUE,
+  cat_code TEXT,                        -- readable code / CAT code
   make TEXT,
   product_type TEXT,
   rack TEXT,
@@ -89,6 +90,9 @@ CREATE TABLE IF NOT EXISTS items (
   category TEXT,                        -- e.g. Cables
   uom TEXT NOT NULL,
   opening_qty REAL NOT NULL DEFAULT 0,
+  cartons REAL DEFAULT NULL,
+  boxes REAL DEFAULT NULL,
+  pieces REAL DEFAULT NULL,
   physical_count REAL DEFAULT NULL,
   created_at TEXT DEFAULT (datetime('now', 'localtime'))
 );
@@ -113,6 +117,10 @@ try { db.exec('ALTER TABLE items ADD COLUMN section TEXT'); } catch (_) {}
 try { db.exec('ALTER TABLE items ADD COLUMN physical_count REAL'); } catch (_) {}
 try { db.exec('ALTER TABLE items ADD COLUMN serial_no INTEGER'); } catch (_) {}
 try { db.exec('ALTER TABLE items ADD COLUMN created_at TEXT'); } catch (_) {}
+try { db.exec('ALTER TABLE items ADD COLUMN cat_code TEXT'); } catch (_) {}
+try { db.exec('ALTER TABLE items ADD COLUMN cartons REAL'); } catch (_) {}
+try { db.exec('ALTER TABLE items ADD COLUMN boxes REAL'); } catch (_) {}
+try { db.exec('ALTER TABLE items ADD COLUMN pieces REAL'); } catch (_) {}
 try { db.exec('ALTER TABLE movements ADD COLUMN photo TEXT'); } catch (_) {}
 
 // Default older established items to 45 days ago if not set, so they act as mature products
@@ -139,6 +147,7 @@ const STOCK_SELECT = `
   SELECT 
     i.id,
     i.sku,
+    i.cat_code,
     i.description,
     i.make,
     i.product_type,
@@ -152,6 +161,9 @@ const STOCK_SELECT = `
     ROUND(i.opening_qty + COALESCE(SUM(CASE m.type WHEN 'ISSUE' THEN -m.qty ELSE m.qty END), 0), 2) AS stock,
     COALESCE(SUM(CASE m.type WHEN 'RECEIVE' THEN m.qty ELSE 0 END), 0) AS total_received,
     COALESCE(SUM(CASE m.type WHEN 'ISSUE' THEN m.qty ELSE 0 END), 0) AS total_issued,
+    i.cartons,
+    i.boxes,
+    i.pieces,
     i.physical_count,
     COALESCE(i.created_at, datetime('now', '-45 days', 'localtime')) AS created_at,
     CAST(ROUND(julianday('now', 'localtime') - julianday(COALESCE(i.created_at, '2020-01-01'))) AS INTEGER) AS days_old
@@ -242,8 +254,8 @@ app.get('/api/items', (req, res) => {
 
   if (words.length) {
     words.forEach(w => {
-      whereClauses.push('(i.description LIKE ? OR i.sku LIKE ? OR i.make LIKE ? OR i.location LIKE ? OR i.category LIKE ? OR i.product_type LIKE ? OR CAST(i.id AS TEXT) LIKE ?)');
-      params.push(`%${w}%`, `%${w}%`, `%${w}%`, `%${w}%`, `%${w}%`, `%${w}%`, `%${w}%`);
+      whereClauses.push('(i.description LIKE ? OR i.sku LIKE ? OR i.cat_code LIKE ? OR i.make LIKE ? OR i.location LIKE ? OR i.category LIKE ? OR i.product_type LIKE ? OR CAST(i.id AS TEXT) LIKE ?)');
+      params.push(`%${w}%`, `%${w}%`, `%${w}%`, `%${w}%`, `%${w}%`, `%${w}%`, `%${w}%`, `%${w}%`);
     });
   }
 
@@ -325,7 +337,7 @@ app.post('/api/products/suggest-sku', (req, res) => {
  */
 app.post('/api/products', (req, res) => {
   try {
-    const { description, sku, make, product_type, rack, location, uom, opening_qty } = req.body;
+    const { description, sku, cat_code, make, product_type, rack, location, uom, opening_qty } = req.body;
     if (!description || !sku) throw new Error('Description and SKU are required');
 
     const cleanSku = String(sku).trim().toUpperCase();
@@ -342,15 +354,17 @@ app.post('/api/products', (req, res) => {
     const category = RACK_CATEGORY_MAP[cleanRack] || 'Miscellaneous';
     const cleanUom = String(uom || 'NOS').trim().toUpperCase();
     const qty = Number(opening_qty || 0);
+    const cleanCatCode = String(cat_code || '').trim() || null;
 
     const ins = db.prepare(`
-      INSERT INTO items (description, sku, make, product_type, rack, location, section, category, uom, opening_qty, created_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now', 'localtime'))
+      INSERT INTO items (description, sku, cat_code, make, product_type, rack, location, section, category, uom, opening_qty, created_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now', 'localtime'))
     `);
 
     ins.run(
       description.trim(),
       cleanSku,
+      cleanCatCode,
       (make || '').trim(),
       (product_type || '').trim(),
       cleanRack,
@@ -378,21 +392,53 @@ app.post('/api/products', (req, res) => {
   }
 });
 
-// Update physical count for an item (for physical stock audit)
+// Update physical count, cartons, boxes, pieces, and CAT code for an item
 app.post('/api/physical-count', (req, res) => {
   try {
     const id = Number(req.body.id);
-    const countVal = req.body.physical_count === '' || req.body.physical_count === null || req.body.physical_count === undefined
-      ? null
-      : Number(req.body.physical_count);
-
     if (!Number.isInteger(id)) throw new Error('Invalid item ID');
-    if (countVal !== null && !Number.isFinite(countVal)) throw new Error('Physical count must be a valid number');
 
-    db.prepare('UPDATE items SET physical_count = ? WHERE id = ?').run(countVal, id);
+    const parseNumOrNull = v => (v === '' || v === null || v === undefined) ? null : Number(v);
+
+    const countVal = parseNumOrNull(req.body.physical_count);
+    const cartonsVal = parseNumOrNull(req.body.cartons);
+    const boxesVal = parseNumOrNull(req.body.boxes);
+    const piecesVal = parseNumOrNull(req.body.pieces);
+    const catCodeVal = req.body.cat_code !== undefined ? (String(req.body.cat_code || '').trim() || null) : undefined;
+
+    if (countVal !== null && !Number.isFinite(countVal)) throw new Error('Total quantity must be a valid number');
+    if (cartonsVal !== null && !Number.isFinite(cartonsVal)) throw new Error('Cartons must be a valid number');
+    if (boxesVal !== null && !Number.isFinite(boxesVal)) throw new Error('Boxes must be a valid number');
+    if (piecesVal !== null && !Number.isFinite(piecesVal)) throw new Error('Pieces must be a valid number');
+
+    const updates = [];
+    const params = [];
+    if (req.body.physical_count !== undefined) { updates.push('physical_count = ?'); params.push(countVal); }
+    if (req.body.cartons !== undefined) { updates.push('cartons = ?'); params.push(cartonsVal); }
+    if (req.body.boxes !== undefined) { updates.push('boxes = ?'); params.push(boxesVal); }
+    if (req.body.pieces !== undefined) { updates.push('pieces = ?'); params.push(piecesVal); }
+    if (catCodeVal !== undefined) { updates.push('cat_code = ?'); params.push(catCodeVal); }
+
+    if (updates.length) {
+      params.push(id);
+      db.prepare(`UPDATE items SET ${updates.join(', ')} WHERE id = ?`).run(...params);
+    }
+
     const item = getOne.get(id);
-    const variance = countVal !== null ? Math.round((countVal - item.tally_qty) * 100) / 100 : null;
-    res.json({ ok: true, id, physical_count: countVal, variance });
+    const variance = item.physical_count !== null && item.physical_count !== undefined
+      ? Math.round((Number(item.physical_count) - Number(item.tally_qty)) * 100) / 100
+      : null;
+
+    res.json({
+      ok: true,
+      id,
+      cat_code: item.cat_code,
+      cartons: item.cartons,
+      boxes: item.boxes,
+      pieces: item.pieces,
+      physical_count: item.physical_count,
+      variance
+    });
   } catch (e) {
     res.status(400).json({ ok: false, error: e.message });
   }
@@ -445,8 +491,8 @@ app.get('/api/stock.csv', (req, res) => {
     )
     SELECT 
       ROW_NUMBER() OVER (ORDER BY COALESCE(location, '') ASC, sku ASC, id ASC) AS dynamic_serial_no,
-      id, description, sku, make, product_type, rack, location,
-      section, category, uom, opening_qty, tally_qty, physical_count
+      id, description, sku, cat_code, make, product_type, rack, location,
+      section, category, uom, opening_qty, tally_qty, cartons, boxes, pieces, physical_count
     FROM item_summary
     ORDER BY dynamic_serial_no ASC`;
   const items = db.prepare(sql).all();
@@ -462,9 +508,13 @@ app.get('/api/stock.csv', (req, res) => {
     'S.No (orig.)',
     'Description',
     'SKU Code',
+    'Readable Code / CAT Code',
     'UOM',
     'Tally Qty',
-    'Physical Count',
+    'Cartons',
+    'Boxes',
+    'Pieces',
+    'Total Quantity',
     'Variance (Physical − Tally)'
   ];
   const lines = [headers.map(esc).join(',')];
@@ -472,7 +522,7 @@ app.get('/api/stock.csv', (req, res) => {
     const rowNum = idx + 2;
     const [rack, section] = item.location ? item.location.split('-') : ['', ''];
     const phys = item.physical_count != null ? item.physical_count : '';
-    const varianceFormula = phys !== '' ? (Number(phys) - Number(item.tally_qty)) : `=IF(ISBLANK(M${rowNum}),"",M${rowNum}-L${rowNum})`;
+    const varianceFormula = phys !== '' ? (Number(phys) - Number(item.tally_qty)) : `=IF(ISBLANK(Q${rowNum}),"",Q${rowNum}-M${rowNum})`;
     lines.push([
       `=ROW()-1`,
       item.location || '',
@@ -484,8 +534,12 @@ app.get('/api/stock.csv', (req, res) => {
       item.id,
       item.description || '',
       item.sku || '',
+      item.cat_code || '',
       item.uom || '',
       item.tally_qty,
+      item.cartons != null ? item.cartons : '',
+      item.boxes != null ? item.boxes : '',
+      item.pieces != null ? item.pieces : '',
       phys,
       varianceFormula
     ].map(esc).join(','));

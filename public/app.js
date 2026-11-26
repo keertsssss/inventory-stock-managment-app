@@ -420,9 +420,13 @@ async function loadStock() {
     <th>S.No (Orig.)</th>
     <th>Description</th>
     <th>SKU Code</th>
+    <th>Readable Code / CAT Code</th>
     <th>UOM</th>
     <th>Tally Qty</th>
-    <th>Physical Count</th>
+    <th style="min-width:70px;">Cartons</th>
+    <th style="min-width:70px;">Boxes</th>
+    <th style="min-width:70px;">Pieces</th>
+    <th style="min-width:85px;">Total Quantity</th>
     <th>Variance (Physical − Tally)</th>
   </tr>`;
 
@@ -445,7 +449,7 @@ async function loadStock() {
 
       rows.push(`
         <tr class="rack-divider-row" id="section-${currentRack}">
-          <td colspan="14">
+          <td colspan="18">
             <div class="rack-divider-wrap">
               <div class="rack-divider-main">
                 <span class="rack-divider-tag">${esc(currentRack)}</span>
@@ -464,6 +468,10 @@ async function loadStock() {
     }
 
     const serialNo = i.serial_no || (index + 1);
+    const catCodeVal = i.cat_code || '';
+    const cartonVal = i.cartons != null ? i.cartons : '';
+    const boxVal = i.boxes != null ? i.boxes : '';
+    const pieceVal = i.pieces != null ? i.pieces : '';
     const physVal = i.physical_count != null ? i.physical_count : '';
     const newBadge = i.is_new ? `<span class="badge badge-new" title="Added on ${esc(i.created_at)} (${i.days_old} days ago)" style="margin-left:6px;">NEW • ${i.days_remaining}d left</span>` : '';
     const rowClass = i.is_new ? 'row-new-product' : '';
@@ -483,6 +491,9 @@ async function loadStock() {
       <td>
         <span class="font-mono sku-tag">${esc(i.sku)}</span>
       </td>
+      <td>
+        <input type="text" class="cat-input" data-id="${i.id}" value="${esc(catCodeVal)}" placeholder="CAT Code…">
+      </td>
       <td class="text-center">${esc(i.uom)}</td>
       <td class="text-right font-mono">
         <b style="font-size:14px;">${num(i.tally_qty)}</b>
@@ -492,7 +503,16 @@ async function loadStock() {
           </div>` : ''}
       </td>
       <td>
-        <input type="number" step="any" min="0" class="phys-input" data-id="${i.id}" data-tally="${i.tally_qty}" value="${physVal}" placeholder="Count…">
+        <input type="number" step="any" min="0" class="count-input carton-input" data-id="${i.id}" value="${cartonVal}" placeholder="Ctn">
+      </td>
+      <td>
+        <input type="number" step="any" min="0" class="count-input box-input" data-id="${i.id}" value="${boxVal}" placeholder="Box">
+      </td>
+      <td>
+        <input type="number" step="any" min="0" class="count-input piece-input" data-id="${i.id}" value="${pieceVal}" placeholder="Pcs">
+      </td>
+      <td>
+        <input type="number" step="any" min="0" class="count-input total-input" data-id="${i.id}" data-tally="${i.tally_qty}" value="${physVal}" placeholder="Total">
       </td>
       <td class="text-center" id="var-cell-${i.id}">${formatVariance(i.variance)}</td>
     </tr>`);
@@ -500,43 +520,66 @@ async function loadStock() {
 
   $('stockTable').innerHTML = thead + rows.join('');
 
-  // Attach event handlers to physical count inputs
-  document.querySelectorAll('.phys-input').forEach(input => {
-    input.addEventListener('change', async () => {
-      const id = Number(input.dataset.id);
-      const tally = Number(input.dataset.tally);
-      const val = input.value.trim();
-      const countVal = val === '' ? null : Number(val);
-      const cell = $(`var-cell-${id}`);
+  // Save changes to Cat Code, Cartons, Boxes, Pieces, or Total Quantity
+  async function saveStockAuditRow(id) {
+    const catInput = document.querySelector(`.cat-input[data-id="${id}"]`);
+    const cartonInput = document.querySelector(`.carton-input[data-id="${id}"]`);
+    const boxInput = document.querySelector(`.box-input[data-id="${id}"]`);
+    const pieceInput = document.querySelector(`.piece-input[data-id="${id}"]`);
+    const totalInput = document.querySelector(`.total-input[data-id="${id}"]`);
+    const cell = $(`var-cell-${id}`);
+    if (!totalInput) return;
 
-      // Optimistic UI update for variance
-      if (countVal === null) {
-        cell.innerHTML = formatVariance(null);
-      } else {
-        const v = Math.round((countVal - tally) * 100) / 100;
-        cell.innerHTML = formatVariance(v);
-      }
+    const tally = Number(totalInput.dataset.tally || 0);
 
-      input.classList.add('saving');
-      try {
-        const res = await fetch('/api/physical-count', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ id, physical_count: countVal })
-        });
-        const data = await res.json();
-        if (data.ok) {
-          input.classList.remove('saving');
-          input.classList.add('saved');
-          setTimeout(() => input.classList.remove('saved'), 1200);
-        } else {
-          throw new Error(data.error);
-        }
-      } catch (err) {
-        input.classList.remove('saving');
-        input.classList.add('save-err');
-        alert('Failed to save physical count: ' + err.message);
-      }
+    const catCode = catInput ? catInput.value.trim() : null;
+    const cartons = cartonInput && cartonInput.value.trim() !== '' ? Number(cartonInput.value) : null;
+    const boxes = boxInput && boxInput.value.trim() !== '' ? Number(boxInput.value) : null;
+    const pieces = pieceInput && pieceInput.value.trim() !== '' ? Number(pieceInput.value) : null;
+    let totalVal = totalInput.value.trim() !== '' ? Number(totalInput.value) : null;
+
+    // Optimistic variance update
+    if (cell) {
+      cell.innerHTML = formatVariance(totalVal !== null ? Math.round((totalVal - tally) * 100) / 100 : null);
+    }
+
+    const rowInputs = [catInput, cartonInput, boxInput, pieceInput, totalInput].filter(Boolean);
+    rowInputs.forEach(inp => inp.classList.add('saving'));
+
+    try {
+      const res = await fetch('/api/physical-count', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id,
+          cat_code: catCode,
+          cartons,
+          boxes,
+          pieces,
+          physical_count: totalVal
+        })
+      });
+      const data = await res.json();
+      if (!data.ok) throw new Error(data.error);
+
+      rowInputs.forEach(inp => {
+        inp.classList.remove('saving');
+        inp.classList.add('saved');
+        setTimeout(() => inp.classList.remove('saved'), 1200);
+      });
+    } catch (err) {
+      rowInputs.forEach(inp => {
+        inp.classList.remove('saving');
+        inp.classList.add('save-err');
+      });
+      alert('Failed to save count: ' + err.message);
+    }
+  }
+
+  // Attach change listeners to all audit inputs
+  document.querySelectorAll('.cat-input, .carton-input, .box-input, .piece-input, .total-input').forEach(input => {
+    input.addEventListener('change', () => {
+      saveStockAuditRow(Number(input.dataset.id));
     });
   });
 }
@@ -712,6 +755,7 @@ if ($('onboardForm')) {
       product_type: $('newProductType').value.trim(),
       description: $('newDesc').value.trim(),
       sku: $('newSku').value.trim(),
+      cat_code: $('newCatCode') ? $('newCatCode').value.trim() : '',
       uom: $('newUom').value,
       opening_qty: Number($('newQty').value) || 0
     };

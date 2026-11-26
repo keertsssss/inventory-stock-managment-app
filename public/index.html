@@ -76,7 +76,7 @@
   <section id="tab-stock" class="hidden">
     <div class="card">
       <div class="row">
-        <input id="sq" placeholder="Search by name, SKU, make, location (R01-S01), category, S.No..." autocomplete="off">
+        <input id="sq" placeholder="Search by name, SKU, CAT code, make, location (R01-S01), category, S.No..." autocomplete="off">
         <select id="rackFilter" style="max-width:270px">
           <option value="">All Racks / Categories</option>
           <option value="R01">R01 — Cables</option>
@@ -176,6 +176,10 @@
               <button type="button" id="btnAutoSku" class="btn" style="padding:9px 12px;font-size:12px;white-space:nowrap;">⚡ Auto SKU</button>
             </div>
             <small id="skuPatternHint" class="muted" style="display:block; margin-top:-6px; font-size:12px;"></small>
+          </div>
+          <div style="flex:1;">
+            <label>Readable Code / CAT Code (Optional)</label>
+            <input id="newCatCode" placeholder="e.g. CAT-001, B32, 1C X 1.5">
           </div>
           <div style="flex:1;">
             <label>Sub-Variant Branch From (Optional)</label>

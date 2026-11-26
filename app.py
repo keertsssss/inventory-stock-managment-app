@@ -50,6 +50,7 @@ def init_db():
       serial_no INTEGER,
       description TEXT NOT NULL,
       sku TEXT NOT NULL UNIQUE,
+      cat_code TEXT,
       make TEXT,
       product_type TEXT,
       rack TEXT,
@@ -58,6 +59,9 @@ def init_db():
       category TEXT,
       uom TEXT NOT NULL,
       opening_qty REAL NOT NULL DEFAULT 0,
+      cartons REAL DEFAULT NULL,
+      boxes REAL DEFAULT NULL,
+      pieces REAL DEFAULT NULL,
       physical_count REAL DEFAULT NULL,
       created_at TEXT DEFAULT (datetime('now', 'localtime'))
     );
@@ -82,7 +86,11 @@ def init_db():
         ('section', 'TEXT'),
         ('physical_count', 'REAL'),
         ('serial_no', 'INTEGER'),
-        ('created_at', 'TEXT')
+        ('created_at', 'TEXT'),
+        ('cat_code', 'TEXT'),
+        ('cartons', 'REAL'),
+        ('boxes', 'REAL'),
+        ('pieces', 'REAL')
     ]:
         try:
             conn.execute(f"ALTER TABLE items ADD COLUMN {col} {typ}")
@@ -159,6 +167,7 @@ STOCK_SELECT = """
   SELECT 
     i.id,
     i.sku,
+    i.cat_code,
     i.description,
     i.make,
     i.product_type,
@@ -172,6 +181,9 @@ STOCK_SELECT = """
     ROUND(i.opening_qty + COALESCE(SUM(CASE m.type WHEN 'ISSUE' THEN -m.qty ELSE m.qty END), 0), 2) AS stock,
     COALESCE(SUM(CASE m.type WHEN 'RECEIVE' THEN m.qty ELSE 0 END), 0) AS total_received,
     COALESCE(SUM(CASE m.type WHEN 'ISSUE' THEN m.qty ELSE 0 END), 0) AS total_issued,
+    i.cartons,
+    i.boxes,
+    i.pieces,
     i.physical_count,
     COALESCE(i.created_at, datetime('now', '-45 days', 'localtime')) AS created_at,
     CAST(ROUND(julianday('now', 'localtime') - julianday(COALESCE(i.created_at, '2020-01-01'))) AS INTEGER) AS days_old
@@ -219,9 +231,9 @@ def list_items():
     for w in words:
         like_pattern = f"%{w}%"
         where_clauses.append(
-            "(i.description LIKE ? OR i.sku LIKE ? OR i.make LIKE ? OR i.location LIKE ? OR i.category LIKE ? OR i.product_type LIKE ? OR CAST(i.id AS TEXT) LIKE ?)"
+            "(i.description LIKE ? OR i.sku LIKE ? OR i.cat_code LIKE ? OR i.make LIKE ? OR i.location LIKE ? OR i.category LIKE ? OR i.product_type LIKE ? OR CAST(i.id AS TEXT) LIKE ?)"
         )
-        params.extend([like_pattern] * 7)
+        params.extend([like_pattern] * 8)
 
     where_sql = f" WHERE {' AND '.join(where_clauses)}" if where_clauses else ""
 
@@ -291,6 +303,7 @@ def onboard_product():
         data = request.get_json(force=True, silent=True) or {}
         desc = (data.get('description') or '').strip()
         raw_sku = (data.get('sku') or '').strip()
+        cat_code = (data.get('cat_code') or '').strip() or None
         make = (data.get('make') or '').strip()
         p_type = (data.get('product_type') or '').strip()
         raw_rack = (data.get('rack') or '').strip()
@@ -317,11 +330,11 @@ def onboard_product():
 
         cur.execute("""
             INSERT INTO items (
-                description, sku, make, product_type, rack, location,
+                description, sku, cat_code, make, product_type, rack, location,
                 section, category, uom, opening_qty, created_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now', 'localtime'))
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now', 'localtime'))
         """, (
-            desc, clean_sku, make, p_type, clean_rack, clean_loc,
+            desc, clean_sku, cat_code, make, p_type, clean_rack, clean_loc,
             clean_section, category, clean_uom, opening_qty
         ))
         db.commit()
@@ -345,23 +358,63 @@ def update_physical_count():
     try:
         data = request.get_json(force=True, silent=True) or {}
         item_id = int(data.get('id', 0))
-        raw_val = data.get('physical_count')
+        if item_id <= 0:
+            raise ValueError('Invalid item ID')
 
-        count_val = None
-        if raw_val not in (None, ''):
-            count_val = float(raw_val)
+        def parse_float(val):
+            if val in (None, ''):
+                return None
+            return float(val)
 
-        db = get_db()
-        cur = db.cursor()
-        cur.execute("UPDATE items SET physical_count = ? WHERE id = ?", (count_val, item_id))
-        db.commit()
+        count_val = parse_float(data.get('physical_count'))
+        cartons_val = parse_float(data.get('cartons'))
+        boxes_val = parse_float(data.get('boxes'))
+        pieces_val = parse_float(data.get('pieces'))
+        cat_code_val = data.get('cat_code')
+
+        updates = []
+        params = []
+        if 'physical_count' in data:
+            updates.append("physical_count = ?")
+            params.append(count_val)
+        if 'cartons' in data:
+            updates.append("cartons = ?")
+            params.append(cartons_val)
+        if 'boxes' in data:
+            updates.append("boxes = ?")
+            params.append(boxes_val)
+        if 'pieces' in data:
+            updates.append("pieces = ?")
+            params.append(pieces_val)
+        if 'cat_code' in data:
+            updates.append("cat_code = ?")
+            params.append(cat_code_val.strip() if cat_code_val else None)
+
+        if updates:
+            params.append(item_id)
+            db = get_db()
+            cur = db.cursor()
+            cur.execute(f"UPDATE items SET {', '.join(updates)} WHERE id = ?", params)
+            db.commit()
 
         item = get_one_item(item_id)
         if not item:
             raise ValueError('Item not found')
 
-        variance = round(count_val - item['tally_qty'], 2) if count_val is not None else None
-        return jsonify({'ok': True, 'id': item_id, 'physical_count': count_val, 'variance': variance})
+        variance = None
+        if item.get('physical_count') is not None:
+            variance = round(float(item['physical_count']) - float(item['tally_qty']), 2)
+
+        return jsonify({
+            'ok': True,
+            'id': item_id,
+            'cat_code': item.get('cat_code'),
+            'cartons': item.get('cartons'),
+            'boxes': item.get('boxes'),
+            'pieces': item.get('pieces'),
+            'physical_count': item.get('physical_count'),
+            'variance': variance
+        })
     except Exception as e:
         return jsonify({'ok': False, 'error': str(e)}), 400
 
@@ -491,8 +544,8 @@ def export_stock_master_csv():
     )
     SELECT 
       ROW_NUMBER() OVER (ORDER BY COALESCE(location, '') ASC, sku ASC, id ASC) AS dynamic_serial_no,
-      id, description, sku, make, product_type, rack, location,
-      section, category, uom, opening_qty, tally_qty, physical_count
+      id, description, sku, cat_code, make, product_type, rack, location,
+      section, category, uom, opening_qty, tally_qty, cartons, boxes, pieces, physical_count
     FROM item_summary
     ORDER BY dynamic_serial_no ASC
     """
@@ -504,7 +557,8 @@ def export_stock_master_csv():
     writer.writerow([
         'Serial No', 'Rack Location', 'Rack', 'Section', 'Category',
         'Make', 'Product Type', 'S.No (orig.)', 'Description', 'SKU Code',
-        'UOM', 'Tally Qty', 'Physical Count', 'Variance (Physical − Tally)'
+        'Readable Code / CAT Code', 'UOM', 'Tally Qty', 'Cartons', 'Boxes', 'Pieces',
+        'Total Quantity', 'Variance (Physical − Tally)'
     ])
 
     for idx, item in enumerate(items):
@@ -516,9 +570,9 @@ def export_stock_master_csv():
         phys_str = phys if phys is not None else ''
 
         if phys is not None:
-            variance_val = round(float(phys) - float(item['tally_qty']), 2)
+            variance_val = round(float(phys) - float(item.get('tally_qty', 0)), 2)
         else:
-            variance_val = f'=IF(ISBLANK(M{row_num}),"",M{row_num}-L{row_num})'
+            variance_val = f'=IF(ISBLANK(Q{row_num}),"",Q{row_num}-M{row_num})'
 
         writer.writerow([
             '=ROW()-1',
@@ -531,8 +585,12 @@ def export_stock_master_csv():
             item['id'],
             item.get('description', ''),
             item.get('sku', ''),
+            item.get('cat_code') or '',
             item.get('uom', ''),
             item.get('tally_qty', 0),
+            item.get('cartons') if item.get('cartons') is not None else '',
+            item.get('boxes') if item.get('boxes') is not None else '',
+            item.get('pieces') if item.get('pieces') is not None else '',
             phys_str,
             variance_val
         ])

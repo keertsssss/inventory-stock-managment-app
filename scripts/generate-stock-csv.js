@@ -34,9 +34,13 @@ const headers = [
   'S.No (orig.)',
   'Description',
   'SKU Code',
+  'Readable Code / CAT Code',
   'UOM',
   'Tally Qty',
-  'Physical Count',
+  'Cartons',
+  'Boxes',
+  'Pieces',
+  'Total Quantity',
   'Variance (Physical − Tally)'
 ];
 
@@ -49,11 +53,10 @@ items.forEach((item, idx) => {
   const phys = item.physical_count != null ? item.physical_count : '';
   
   // Excel formula for automatic serial numbering: =ROW()-1
-  // If row moves or changes in Excel, serial number updates automatically!
   const autoSerialFormula = `=ROW()-1`;
   
-  // Excel formula for Variance: =IF(ISBLANK(M2),"",M2-L2)
-  const varianceFormula = phys !== '' ? (Number(phys) - Number(item.opening_qty)) : `=IF(ISBLANK(M${rowNum}),"",M${rowNum}-L${rowNum})`;
+  // Excel formula for Variance: Q (Total Qty) - M (Tally Qty)
+  const varianceFormula = phys !== '' ? (Number(phys) - Number(item.opening_qty)) : `=IF(ISBLANK(Q${rowNum}),"",Q${rowNum}-M${rowNum})`;
   
   lines.push([
     autoSerialFormula,
@@ -66,8 +69,12 @@ items.forEach((item, idx) => {
     item.id,
     item.description || '',
     item.sku || '',
+    item.cat_code || '',
     item.uom || '',
     item.opening_qty,
+    item.cartons != null ? item.cartons : '',
+    item.boxes != null ? item.boxes : '',
+    item.pieces != null ? item.pieces : '',
     phys,
     varianceFormula
   ].map(esc).join(','));
@@ -75,4 +82,4 @@ items.forEach((item, idx) => {
 
 const outputPath = path.join(__dirname, '..', 'data', 'stock-master.csv');
 fs.writeFileSync(outputPath, '\ufeff' + lines.join('\r\n'), 'utf8');
-console.log(`Successfully generated ${outputPath} with dynamic Excel formulas for Serial No and Variance.`);
+console.log(`Successfully generated ${outputPath} with 18 columns including CAT code, Cartons, Boxes, Pieces, Total Qty.`);
