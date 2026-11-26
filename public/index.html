@@ -156,17 +156,21 @@
 
         <div class="row">
           <div>
-            <label>Make / Brand</label>
-            <input id="newMake" placeholder="e.g. Polycab, Salzer, Havells" required>
+            <label>Make / Brand (Company Name)</label>
+            <input id="newMake" placeholder="e.g. FTC, Havells, Salzer, Polycab" required>
           </div>
           <div>
             <label>Product Type / Group</label>
-            <input id="newProductType" placeholder="e.g. Copper Flexible Cable" required>
+            <input id="newProductType" placeholder="e.g. Fuse Link, MCB, Contactor" required>
+          </div>
+          <div>
+            <label>Electrical Initials / Rating (e.g. 63A, 16A, 1.5SQMM)</label>
+            <input id="newRating" placeholder="e.g. 63A, 32A, 1.5SQMM, 415V">
           </div>
         </div>
 
-        <label>Product Description</label>
-        <input id="newDesc" placeholder="e.g. COPPER FLEXIBLE CABLE 1C X 1.5SQMM GREEN SALZER" required>
+        <label>Product Description (Auto: Product Type + Electrical Initials + Company Name)</label>
+        <input id="newDesc" placeholder="e.g. FUSE LINK 63A FTC" required style="text-transform:uppercase;">
 
         <div class="row">
           <div style="flex:1.5;">

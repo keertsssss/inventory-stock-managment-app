@@ -530,7 +530,8 @@ def onboard_product():
         category = RACK_CATEGORY_MAP.get(clean_rack, 'Miscellaneous')
         clean_uom = raw_uom.upper()
 
-        amperes = extract_amperes(desc, clean_sku)
+        req_amp = data.get('amperes') or (extract_amperes(data.get('rating') or '', '') if data.get('rating') else None)
+        amperes = req_amp if req_amp is not None else extract_amperes(desc, clean_sku)
         clean_cat = str(cat_code).strip().upper() if cat_code else None
         final_cat = (clean_cat or generate_cat_code(make, p_type, desc, clean_sku, amperes)).upper()
         cur.execute("""

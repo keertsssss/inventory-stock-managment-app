@@ -521,7 +521,7 @@ app.post('/api/products/suggest-sku', (req, res) => {
  */
 app.post('/api/products', (req, res) => {
   try {
-    const { description, sku, cat_code, make, product_type, rack, location, uom, opening_qty } = req.body;
+    const { description, sku, cat_code, make, product_type, rack, location, uom, opening_qty, rating } = req.body;
     if (!description || !sku) throw new Error('Description and SKU are required');
 
     let cleanSku = String(sku).trim().toUpperCase().replace(/\s+/g, '-').replace(/-+/g, '-');
@@ -543,7 +543,8 @@ app.post('/api/products', (req, res) => {
     const qty = Number(opening_qty || 0);
     const cleanCatCode = String(cat_code || '').trim().toUpperCase() || null;
 
-    const amperes = extractAmperes(description, cleanSku);
+    const reqAmp = req.body.amperes != null ? Number(req.body.amperes) : (rating ? extractAmperes(String(rating), '') : null);
+    const amperes = reqAmp && !isNaN(reqAmp) ? reqAmp : extractAmperes(description, cleanSku);
     const finalCatCode = cleanCatCode || generateCatCode({ make, product_type, description, sku: cleanSku, amperes });
 
     const ins = db.prepare(`

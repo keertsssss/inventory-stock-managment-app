@@ -973,24 +973,94 @@ async function suggestSku() {
 }
 
 let isSkuManuallyEdited = false;
+let isDescManuallyEdited = false;
 
-function autoUpdateSkuAndCat() {
+function generateDescription({ make, product_type, initials }) {
+  let p = (product_type || '').trim();
+  let m = (make || '').trim();
+  let init = (initials || '').trim();
+
+  // If initials not explicitly provided, see if p contains rating (e.g. 63A, 10SQMM)
+  if (!init && p) {
+    const ampMatch = p.match(/(?:^|[\s\-_/])(\d+(?:\.\d+)?\s*(?:A|AMP|AMPS|SQMM|V|KV|W|HP|POLE|P|WAY))(?:$|[\s\-_/])/i);
+    if (ampMatch) {
+      init = ampMatch[1].trim();
+      p = p.replace(ampMatch[0], ' ').replace(/\s+/g, ' ').trim();
+    }
+  }
+
+  const parts = [];
+  if (p) parts.push(p.toUpperCase());
+  if (init) parts.push(init.toUpperCase());
+  if (m) parts.push(m.toUpperCase());
+
+  return parts.join(' ');
+}
+
+function autoUpdateDescSkuAndCat() {
   const make = $('newMake') ? $('newMake').value.trim() : '';
   const pType = $('newProductType') ? $('newProductType').value.trim() : '';
-  const desc = $('newDesc') ? $('newDesc').value.trim() : '';
+  const initials = $('newRating') ? $('newRating').value.trim() : '';
 
-  if (!isSkuManuallyEdited && (make || pType || desc) && $('newSku')) {
-    const sku = generateSkuCode({ make, product_type: pType, description: desc });
+  // 1. Auto-generate Product Description: [Product Type] [Electrical Initials] [Company Name]
+  if (!isDescManuallyEdited && $('newDesc') && (make || pType || initials)) {
+    $('newDesc').value = generateDescription({ make, product_type: pType, initials });
+  }
+
+  const currentDesc = $('newDesc') ? $('newDesc').value.trim() : '';
+
+  // 2. Auto-generate SKU Code: ELEC-[PRODUCT]-[AMP]-[BRAND]
+  if (!isSkuManuallyEdited && (make || pType || currentDesc) && $('newSku')) {
+    const sku = generateSkuCode({ make, product_type: pType, description: currentDesc });
     $('newSku').value = sku;
   }
 
+  // 3. Auto-generate CAT Code: [BRAND] [TYPE] [AMP]
   if ($('newCatCode')) {
     const currentSku = $('newSku') ? $('newSku').value.trim() : '';
-    if (make || pType || desc) {
-      const code = generateCatCode({ make, product_type: pType, description: desc, sku: currentSku });
+    if (make || pType || currentDesc) {
+      const code = generateCatCode({ make, product_type: pType, description: currentDesc, sku: currentSku });
       $('newCatCode').value = code.toUpperCase();
     }
   }
+}
+
+// Typing listener for #newDesc:
+// - Converts all text to UPPERCASE
+// - Preserves user manual editing
+// - If cleared, resumes auto-generation
+const newDescInput = $('newDesc');
+if (newDescInput) {
+  newDescInput.addEventListener('input', () => {
+    isDescManuallyEdited = true;
+    const start = newDescInput.selectionStart;
+    const end = newDescInput.selectionEnd;
+    const oldVal = newDescInput.value;
+    const newVal = oldVal.toUpperCase();
+    if (oldVal !== newVal) {
+      newDescInput.value = newVal;
+      newDescInput.setSelectionRange(start, end);
+    }
+    // Update SKU and CAT code if SKU wasn't manually edited
+    if (!isSkuManuallyEdited && $('newSku')) {
+      const make = $('newMake') ? $('newMake').value.trim() : '';
+      const pType = $('newProductType') ? $('newProductType').value.trim() : '';
+      $('newSku').value = generateSkuCode({ make, product_type: pType, description: newVal });
+    }
+    if ($('newCatCode')) {
+      const make = $('newMake') ? $('newMake').value.trim() : '';
+      const pType = $('newProductType') ? $('newProductType').value.trim() : '';
+      const currentSku = $('newSku') ? $('newSku').value.trim() : '';
+      $('newCatCode').value = generateCatCode({ make, product_type: pType, description: newVal, sku: currentSku }).toUpperCase();
+    }
+  });
+
+  newDescInput.addEventListener('change', () => {
+    if (!newDescInput.value.trim()) {
+      isDescManuallyEdited = false;
+      autoUpdateDescSkuAndCat();
+    }
+  });
 }
 
 // Typing listener for #newSku:
@@ -1063,16 +1133,18 @@ if (newCatInput) {
   });
 }
 
-['newMake', 'newProductType', 'newDesc'].forEach(id => {
+['newMake', 'newProductType', 'newRating'].forEach(id => {
   if ($(id)) {
-    $(id).addEventListener('input', autoUpdateSkuAndCat);
-    $(id).addEventListener('change', autoUpdateSkuAndCat);
+    $(id).addEventListener('input', autoUpdateDescSkuAndCat);
+    $(id).addEventListener('change', autoUpdateDescSkuAndCat);
   }
 });
 
 if ($('btnAutoSku')) {
   $('btnAutoSku').onclick = () => {
     isSkuManuallyEdited = false;
+    isDescManuallyEdited = false;
+    autoUpdateDescSkuAndCat();
     suggestSku();
   };
 }
@@ -1096,6 +1168,7 @@ if ($('onboardForm')) {
       make: $('newMake').value.trim(),
       product_type: $('newProductType').value.trim(),
       description: $('newDesc').value.trim(),
+      rating: $('newRating') ? $('newRating').value.trim() : '',
       sku: $('newSku').value.trim(),
       cat_code: $('newCatCode') ? $('newCatCode').value.trim() : '',
       uom: $('newUom').value,
@@ -1115,6 +1188,7 @@ if ($('onboardForm')) {
       setTimeout(() => {
         $('onboardForm').reset();
         isSkuManuallyEdited = false;
+        isDescManuallyEdited = false;
         $('onboardMsg').innerHTML = '';
         if ($('skuPatternHint')) $('skuPatternHint').textContent = '';
         switchTab('stock');
