@@ -559,6 +559,35 @@ def onboard_product():
     except Exception as e:
         return jsonify({'ok': False, 'error': str(e)}), 400
 
+def delete_product_from_db(item_id: int):
+    db = get_db()
+    cur = db.cursor()
+    cur.execute("SELECT id, description, sku, location FROM items WHERE id = ?", (item_id,))
+    row = cur.fetchone()
+    if not row:
+        raise ValueError('Product not found in stock')
+    item = dict(row)
+    cur.execute("DELETE FROM movements WHERE item_id = ?", (item_id,))
+    cur.execute("DELETE FROM items WHERE id = ?", (item_id,))
+    db.commit()
+    return item
+
+@app.route('/api/products/<int:item_id>', methods=['DELETE'])
+@app.route('/api/products/delete', methods=['POST'])
+def delete_product_endpoint(item_id: int = None):
+    try:
+        if item_id is None:
+            data = request.get_json(force=True, silent=True) or {}
+            item_id = int(data.get('id') or 0)
+        deleted = delete_product_from_db(item_id)
+        return jsonify({
+            'ok': True,
+            'message': f'Product "{deleted["description"]}" ({deleted.get("sku") or "ID: " + str(item_id)}) successfully removed from stock.',
+            'product': deleted
+        })
+    except Exception as e:
+        return jsonify({'ok': False, 'error': str(e)}), 400
+
 @app.route('/api/physical-count', methods=['POST'])
 def update_physical_count():
     try:

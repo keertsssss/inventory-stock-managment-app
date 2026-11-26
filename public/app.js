@@ -1201,6 +1201,141 @@ if ($('onboardForm')) {
   };
 }
 
+// ----- Reset Onboarding Form Button -----
+if ($('btnResetOnboardForm')) {
+  $('btnResetOnboardForm').onclick = () => {
+    $('onboardForm').reset();
+    isSkuManuallyEdited = false;
+    isDescManuallyEdited = false;
+    if ($('newLocation')) $('newLocation').value = $('newCatSelect').value + '-S01';
+    if ($('newQty')) $('newQty').value = '0';
+    if ($('skuPatternHint')) $('skuPatternHint').textContent = '';
+    if ($('onboardMsg')) $('onboardMsg').innerHTML = '';
+  };
+}
+
+// ----- Remove Product from Stock Feature -----
+let selectedProductToRemove = null;
+let removeSearchTimer = null;
+
+const removeSearchInput = $('removeSearchInput');
+if (removeSearchInput) {
+  removeSearchInput.addEventListener('input', () => {
+    clearTimeout(removeSearchTimer);
+    removeSearchTimer = setTimeout(async () => {
+      const q = removeSearchInput.value.trim();
+      const resultsEl = $('removeSearchResults');
+      if (!q) {
+        resultsEl.innerHTML = '';
+        return;
+      }
+      try {
+        const items = await (await fetch('/api/items?q=' + encodeURIComponent(q))).json();
+        if (!items || items.length === 0) {
+          resultsEl.innerHTML = '<div class="muted" style="padding:10px; font-size:13px;">No matching products found in stock.</div>';
+          return;
+        }
+        resultsEl.innerHTML = items.slice(0, 8).map(i => `
+          <div class="remove-pick-item" data-id="${i.id}">
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+              <div style="font-weight:700; font-size:13px; color:var(--ink);">
+                <span class="badge font-mono" style="background:#fee2e2; color:#991b1b; font-size:10px; margin-right:4px;">#${i.serial_no || i.id}</span>
+                ${esc(i.description)}
+              </div>
+              <span class="badge loc" style="font-size:10px;">${esc(i.location)}</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; font-size:12px; margin-top:4px;">
+              <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
+                <span class="sku-tag font-mono" style="font-size:10px;">${esc(i.sku)}</span>
+                ${i.cat_code ? `<span class="font-mono" style="font-size:10px; background:#eff6ff; color:#1d4ed8; padding:1px 5px; border-radius:3px;">CAT: ${esc(i.cat_code)}</span>` : ''}
+                ${i.make ? `<span class="muted" style="font-size:11px;">Make: ${esc(i.make)}</span>` : ''}
+              </div>
+              <div>
+                <span class="muted">Tally:</span> <b style="color:#b91c1c;">${num(i.tally_qty)} ${esc(i.uom)}</b>
+              </div>
+            </div>
+          </div>
+        `).join('');
+
+        resultsEl.querySelectorAll('.remove-pick-item').forEach(el => {
+          el.onclick = () => {
+            const item = items.find(x => x.id == el.dataset.id);
+            if (item) selectProductToRemove(item);
+          };
+        });
+      } catch (err) {
+        resultsEl.innerHTML = `<div class="msg err" style="font-size:12px;">Search failed: ${esc(err.message)}</div>`;
+      }
+    }, 200);
+  });
+}
+
+function selectProductToRemove(item) {
+  selectedProductToRemove = item;
+  $('removeSearchResults').innerHTML = '';
+  $('removeSearchInput').value = '';
+  $('removeSelectedCard').classList.remove('hidden');
+  $('removeSelectedTitle').textContent = item.description;
+  $('removeSelectedMeta').innerHTML = `
+    <span class="sku-tag font-mono" style="font-size:11px;">${esc(item.sku)}</span>
+    ${item.cat_code ? `<span class="font-mono" style="font-size:11px; background:#eff6ff; color:#1d4ed8; padding:2px 6px; border-radius:4px;">CAT: ${esc(item.cat_code)}</span>` : ''}
+    <span class="badge loc" style="font-size:11px;">${esc(item.location)}</span>
+    <span class="muted">Current Tally Stock: <b style="color:var(--brand-dark);">${num(item.tally_qty)} ${esc(item.uom)}</b></span>
+    ${item.make ? `<span class="muted">Make: <b>${esc(item.make)}</b></span>` : ''}
+  `;
+  $('removeProductMsg').innerHTML = '';
+}
+
+if ($('btnCancelRemoveSelection')) {
+  $('btnCancelRemoveSelection').onclick = () => {
+    selectedProductToRemove = null;
+    $('removeSelectedCard').classList.add('hidden');
+    $('removeProductMsg').innerHTML = '';
+  };
+}
+
+if ($('btnConfirmDeleteProduct')) {
+  $('btnConfirmDeleteProduct').onclick = async () => {
+    if (!selectedProductToRemove) return;
+    const desc = selectedProductToRemove.description;
+    const sku = selectedProductToRemove.sku || `ID #${selectedProductToRemove.id}`;
+    const confirmed = confirm(`Are you sure you want to permanently remove "${desc}" (${sku}) from stock?\n\nThis cannot be undone.`);
+    if (!confirmed) return;
+
+    const btn = $('btnConfirmDeleteProduct');
+    btn.disabled = true;
+    btn.textContent = 'Removing...';
+    try {
+      const res = await fetch('/api/products/' + selectedProductToRemove.id, {
+        method: 'DELETE'
+      });
+      const data = await res.json();
+      if (!data.ok) throw new Error(data.error);
+
+      $('removeSelectedCard').classList.add('hidden');
+      selectedProductToRemove = null;
+      $('removeProductMsg').innerHTML = `
+        <div class="msg ok" style="font-size:14px; padding:12px 16px;">
+          <b>Product Removed!</b> ${esc(data.message)}
+        </div>
+      `;
+
+      // Refresh stock view and new products shelf
+      loadStock();
+      loadNewProductsShelf();
+
+      setTimeout(() => {
+        if ($('removeProductMsg')) $('removeProductMsg').innerHTML = '';
+      }, 5000);
+    } catch (err) {
+      $('removeProductMsg').innerHTML = `<div class="msg err">Failed to remove product: ${esc(err.message)}</div>`;
+    } finally {
+      btn.disabled = false;
+      btn.textContent = '🗑️ Permanently Remove from Stock';
+    }
+  };
+}
+
 // ----- Excel Sync & Upload Integration -----
 if ($('syncExcelBtn')) {
   $('syncExcelBtn').onclick = async () => {

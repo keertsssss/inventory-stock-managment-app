@@ -584,6 +584,52 @@ app.post('/api/products', (req, res) => {
   }
 });
 
+/**
+ * Remove a Product permanently from Stock:
+ * Deletes associated movements and removes item from catalog
+ */
+function deleteProductFromDb(id) {
+  const item = db.prepare('SELECT id, description, sku, location FROM items WHERE id = ?').get(id);
+  if (!item) throw new Error('Product not found in stock');
+
+  const delTx = db.transaction(() => {
+    db.prepare('DELETE FROM movements WHERE item_id = ?').run(id);
+    db.prepare('DELETE FROM items WHERE id = ?').run(id);
+  });
+  delTx();
+  return item;
+}
+
+app.delete('/api/products/:id', (req, res) => {
+  try {
+    const id = Number(req.params.id);
+    if (!Number.isInteger(id)) throw new Error('Invalid product ID');
+    const deleted = deleteProductFromDb(id);
+    res.json({
+      ok: true,
+      message: `Product "${deleted.description}" (${deleted.sku || 'ID: ' + id}) successfully removed from stock.`,
+      product: deleted
+    });
+  } catch (err) {
+    res.status(400).json({ ok: false, error: err.message });
+  }
+});
+
+app.post('/api/products/delete', (req, res) => {
+  try {
+    const id = Number(req.body.id);
+    if (!Number.isInteger(id)) throw new Error('Invalid product ID');
+    const deleted = deleteProductFromDb(id);
+    res.json({
+      ok: true,
+      message: `Product "${deleted.description}" (${deleted.sku || 'ID: ' + id}) successfully removed from stock.`,
+      product: deleted
+    });
+  } catch (err) {
+    res.status(400).json({ ok: false, error: err.message });
+  }
+});
+
 // Update physical count, cartons, boxes, pieces, and CAT code for an item
 app.post('/api/physical-count', (req, res) => {
   try {

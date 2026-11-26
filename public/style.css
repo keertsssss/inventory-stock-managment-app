@@ -572,6 +572,23 @@ a.btn:hover, button.btn:hover {
   box-shadow: 0 4px 10px rgba(255, 78, 8, 0.16);
 }
 
+.remove-pick-item {
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  margin-bottom: 6px;
+  background: #FFFFFF;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.remove-pick-item:hover {
+  border-color: #dc2626;
+  background: #fff5f5;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(220, 38, 38, 0.16);
+}
+
 /* ----- Excel Rack Section Dividers & Headings with Swatch Theme ----- */
 .rack-divider-row td {
   background: linear-gradient(90deg, #F5F4EC 0%, #FFF3EE 50%, #F5F4EC 100%) !important;
