@@ -10,7 +10,7 @@
     "description": "COPPER FLEXIBLE CABLE 1C X 1.5SQMM BLACK SALZER",
     "sku": "ELEC-CABLE-1.5SQMM-BLACK-SALZER",
     "uom": "ROLLS",
-    "qty": 3
+    "qty": 0
   },
   {
     "id": 2,
@@ -23,7 +23,7 @@
     "description": "COPPER FLEXIBLE CABLE 1C X 1.5SQMM GREY SALZER",
     "sku": "ELEC-CABLE-1.5SQMM-GREY-SALZER",
     "uom": "ROLLS",
-    "qty": 6
+    "qty": 0
   },
   {
     "id": 3,
@@ -36,7 +36,7 @@
     "description": "COPPER FLEXIBLE CABLE 1C X 10SQMM BLACK SALZER",
     "sku": "ELEC-CABLE-10SQMM-BLACK-SALZER",
     "uom": "ROLLS",
-    "qty": 3
+    "qty": 0
   },
   {
     "id": 4,
@@ -49,7 +49,7 @@
     "description": "COPPER FLEXIBLE CABLE 1C X 10SQMM BLUE SALZER",
     "sku": "ELEC-CABLE-10SQMM-BLUE-SALZER",
     "uom": "ROLLS",
-    "qty": 4
+    "qty": 0
   },
   {
     "id": 5,
@@ -62,7 +62,7 @@
     "description": "COPPER FLEXIBLE CABLE 1C X 10SQMM RED SALZER",
     "sku": "ELEC-CABLE-10SQMM-RED-SALZER",
     "uom": "ROLLS",
-    "qty": 4
+    "qty": 0
   },
   {
     "id": 6,
@@ -75,7 +75,7 @@
     "description": "COPPER FLEXIBLE CABLE 1C X 10SQMM YELLOW SALZER",
     "sku": "ELEC-CABLE-10SQMM-YELLOW-SALZER",
     "uom": "ROLLS",
-    "qty": 4
+    "qty": 0
   },
   {
     "id": 7,
@@ -88,7 +88,7 @@
     "description": "COPPER FLEXIBLE CABLE 1C X 16SQMM SALZER",
     "sku": "ELEC-CABLE-16SQMM-SALZER",
     "uom": "ROLLS",
-    "qty": 6
+    "qty": 0
   },
   {
     "id": 8,
@@ -114,7 +114,7 @@
     "description": "COPPER FLEXIBLE CABLE 1C X 1SQMM GREY POLYCAB",
     "sku": "ELEC-CABLE-1SQMM-GREY-POLYCAB",
     "uom": "ROLLS",
-    "qty": 3
+    "qty": 0
   },
   {
     "id": 10,
@@ -127,7 +127,7 @@
     "description": "COPPER FLEXIBLE CABLE 1C X 1SQMM GREY SALZER",
     "sku": "ELEC-CABLE-1SQMM-GREY-SALZER",
     "uom": "ROLLS",
-    "qty": 9
+    "qty": 0
   },
   {
     "id": 11,
@@ -153,7 +153,7 @@
     "description": "COPPER FLEXIBLE CABLE 1C X 2.5SQMM BLACK SALZER",
     "sku": "ELEC-CABLE-2.5SQMM-BLACK-SALZER",
     "uom": "ROLLS",
-    "qty": 20
+    "qty": 0
   },
   {
     "id": 13,
@@ -166,7 +166,7 @@
     "description": "COPPER FLEXIBLE CABLE 1C X 2.5SQMM BLUE POLYCAB",
     "sku": "ELEC-CABLE-2.5SQMM-BLUE-POLYCAB",
     "uom": "ROLLS",
-    "qty": 12
+    "qty": 0
   },
   {
     "id": 14,
@@ -179,7 +179,7 @@
     "description": "COPPER FLEXIBLE CABLE 1C X 2.5SQMM BLUE SALZER",
     "sku": "ELEC-CABLE-2.5SQMM-BLUE-SALZER",
     "uom": "ROLLS",
-    "qty": 38
+    "qty": 0
   },
   {
     "id": 15,
@@ -192,7 +192,7 @@
     "description": "COPPER FLEXIBLE CABLE 1C X 2.5SQMM GREEN SALZER",
     "sku": "ELEC-CABLE-2.5SQMM-GREEN-SALZER",
     "uom": "ROLLS",
-    "qty": 7
+    "qty": 0
   },
   {
     "id": 16,
@@ -218,7 +218,7 @@
     "description": "COPPER FLEXIBLE CABLE 1C X 2.5SQMM RED SALZER",
     "sku": "ELEC-CABLE-2.5SQMM-RED-SALZER",
     "uom": "ROLLS",
-    "qty": 33
+    "qty": 0
   },
   {
     "id": 18,
@@ -244,7 +244,7 @@
     "description": "COPPER FLEXIBLE CABLE 1C X 2.5SQMM YELLOW SALZER",
     "sku": "ELEC-CABLE-2.5SQMM-YELLOW-SALZER",
     "uom": "ROLLS",
-    "qty": 37
+    "qty": 0
   },
   {
     "id": 20,
@@ -257,7 +257,7 @@
     "description": "COPPER FLEXIBLE CABLE 1C X 25SQMM SALZER",
     "sku": "ELEC-CABLE-25SQMM-SALZER",
     "uom": "ROLLS",
-    "qty": 2
+    "qty": 0
   },
   {
     "id": 21,
@@ -270,7 +270,7 @@
     "description": "COPPER FLEXIBLE CABLE 1C X 35SQMM SALZER",
     "sku": "ELEC-CABLE-35SQMM-SALZER",
     "uom": "ROLLS",
-    "qty": 3
+    "qty": 0
   },
   {
     "id": 22,
@@ -283,7 +283,7 @@
     "description": "COPPER FLEXIBLE CABLE 1C X 4SQMM BLACK SALZER",
     "sku": "ELEC-CABLE-4SQMM-BLACK-SALZER",
     "uom": "ROLLS",
-    "qty": 9
+    "qty": 0
   },
   {
     "id": 23,
@@ -296,7 +296,7 @@
     "description": "COPPER FLEXIBLE CABLE 1C X 4SQMM BLUE SALZER",
     "sku": "ELEC-CABLE-4SQMM-BLUE-SALZER",
     "uom": "ROLLS",
-    "qty": 17
+    "qty": 0
   },
   {
     "id": 24,
@@ -309,7 +309,7 @@
     "description": "COPPER FLEXIBLE CABLE 1C X 4SQMM RED SALZER",
     "sku": "ELEC-CABLE-4SQMM-RED-SALZER",
     "uom": "ROLLS",
-    "qty": 16
+    "qty": 0
   },
   {
     "id": 25,
@@ -322,7 +322,7 @@
     "description": "COPPER FLEXIBLE CABLE 1C X 4SQMM YELLOW SALZER",
     "sku": "ELEC-CABLE-4SQMM-YELLOW-SALZER",
     "uom": "ROLLS",
-    "qty": 17
+    "qty": 0
   },
   {
     "id": 26,
@@ -335,7 +335,7 @@
     "description": "COPPER FLEXIBLE CABLE 1C X 4SQMM GREEN SALZER",
     "sku": "ELEC-CABLE-4SQMM-YELLOWGREEN-SALZER",
     "uom": "ROLLS",
-    "qty": 1
+    "qty": 0
   },
   {
     "id": 27,
@@ -348,7 +348,7 @@
     "description": "COPPER FLEXIBLE CABLE 1C X 50SQMM SALZER",
     "sku": "ELEC-CABLE-50SQMM-SALZER",
     "uom": "ROLLS",
-    "qty": 3
+    "qty": 0
   },
   {
     "id": 28,
@@ -374,7 +374,7 @@
     "description": "COPPER FLEXIBLE CABLE 1C X 6SQMM BLACK SALZER",
     "sku": "ELEC-CABLE-6SQMM-BLACK-SALZER",
     "uom": "ROLLS",
-    "qty": 10
+    "qty": 0
   },
   {
     "id": 30,
@@ -387,7 +387,7 @@
     "description": "COPPER FLEXIBLE CABLE 1C X 6SQMM BLUE POLYCAB",
     "sku": "ELEC-CABLE-6SQMM-BLUE-POLYCAB",
     "uom": "ROLLS",
-    "qty": 20
+    "qty": 0
   },
   {
     "id": 31,
@@ -400,7 +400,7 @@
     "description": "COPPER FLEXIBLE CABLE 1C X 6SQMM BLUE SALZER",
     "sku": "ELEC-CABLE-6SQMM-BLUE-SALZER",
     "uom": "ROLLS",
-    "qty": 5
+    "qty": 0
   },
   {
     "id": 32,
@@ -426,7 +426,7 @@
     "description": "COPPER FLEXIBLE CABLE 1C X 6SQMM RED SALZER",
     "sku": "ELEC-CABLE-6SQMM-RED-SALZER",
     "uom": "ROLLS",
-    "qty": 5
+    "qty": 0
   },
   {
     "id": 34,
@@ -452,7 +452,7 @@
     "description": "COPPER FLEXIBLE CABLE 1C X 6SQMM YELLOW SALZER",
     "sku": "ELEC-CABLE-6SQMM-YELLOW-SALZER",
     "uom": "ROLLS",
-    "qty": 5
+    "qty": 0
   },
   {
     "id": 36,
@@ -478,7 +478,7 @@
     "description": "CABLE BUNCHING STICKERS 3M",
     "sku": "ELEC-CABLEACC-BUNCHINGSTICKER-3M",
     "uom": "PAC",
-    "qty": 6
+    "qty": 0
   },
   {
     "id": 38,
@@ -491,7 +491,7 @@
     "description": "FERRULE PRINTING TUBE 4.2MM INDOMAX",
     "sku": "ELEC-CABLEACC-FERRULETUBE-4.2MM-INDOMAX",
     "uom": "NOS",
-    "qty": 2
+    "qty": 0
   },
   {
     "id": 39,
@@ -504,7 +504,7 @@
     "description": "FERRULE PRINTING TUBE 4.5MM INDOMAX",
     "sku": "ELEC-CABLEACC-FERRULETUBE-4.5MM-INDOMAX",
     "uom": "NOS",
-    "qty": 20
+    "qty": 0
   },
   {
     "id": 40,
@@ -517,7 +517,7 @@
     "description": "FERRULE PRINTING TUBE 4MM INDOMAX",
     "sku": "ELEC-CABLEACC-FERRULETUBE-4MM-INDOMAX",
     "uom": "NOS",
-    "qty": 3
+    "qty": 0
   },
   {
     "id": 41,
@@ -530,7 +530,7 @@
     "description": "FERRULE PRINTING TUBE 5MM INDOMAX",
     "sku": "ELEC-CABLEACC-FERRULETUBE-5MM-INDOMAX",
     "uom": "NOS",
-    "qty": 1
+    "qty": 0
   },
   {
     "id": 42,
@@ -543,7 +543,7 @@
     "description": "FERRULE PRINTING TUBE 8MM INDOMAX",
     "sku": "ELEC-CABLEACC-FERRULETUBE-8MM-INDOMAX",
     "uom": "NOS",
-    "qty": 2
+    "qty": 0
   },
   {
     "id": 43,
@@ -556,7 +556,7 @@
     "description": "TUBE PRINTER INK RIBBON SUPVAN",
     "sku": "ELEC-CABLEACC-TUBEPRINTERINKRIBBON-SUPVAN",
     "uom": "NOS",
-    "qty": 5
+    "qty": 0
   },
   {
     "id": 44,
@@ -569,7 +569,7 @@
     "description": "TUBE PRINTER LABELS SUPVAN",
     "sku": "ELEC-CABLEACC-TUBEPRINTERLABELS-SUPVAN",
     "uom": "NOS",
-    "qty": 14
+    "qty": 0
   },
   {
     "id": 45,
@@ -582,7 +582,7 @@
     "description": "BUSBAR SUPPORT INSULATOR 30X6 PEX",
     "sku": "ELEC-CONNECTOR-BUSBARINSULATOR-30X6-PEX",
     "uom": "NOS",
-    "qty": 42
+    "qty": 0
   },
   {
     "id": 46,
@@ -595,7 +595,7 @@
     "description": "BUSBAR SUPPORT INSULATOR 40X8 PEX",
     "sku": "ELEC-CONNECTOR-BUSBARINSULATOR-40X8-PEX",
     "uom": "NOS",
-    "qty": 195
+    "qty": 0
   },
   {
     "id": 47,
@@ -608,7 +608,7 @@
     "description": "BUSBAR SUPPORT INSULATOR 40X8 PROCOM",
     "sku": "ELEC-CONNECTOR-BUSBARINSULATOR-40X8-PROCOM",
     "uom": "NOS",
-    "qty": 100
+    "qty": 0
   },
   {
     "id": 48,
@@ -621,7 +621,7 @@
     "description": "CABLE GLAND SINGLE COMPRESSION 12MM GENERIC",
     "sku": "ELEC-CONNECTOR-CABLEGLAND-12MM-SC-GENERIC",
     "uom": "NOS",
-    "qty": 499
+    "qty": 0
   },
   {
     "id": 49,
@@ -634,7 +634,7 @@
     "description": "CABLE GLAND SINGLE COMPRESSION 19MM GENERIC",
     "sku": "ELEC-CONNECTOR-CABLEGLAND-19MM-SC-GENERIC",
     "uom": "NOS",
-    "qty": 390
+    "qty": 0
   },
   {
     "id": 50,
@@ -647,7 +647,7 @@
     "description": "CABLE GLAND SINGLE COMPRESSION 25MM GENERIC",
     "sku": "ELEC-CONNECTOR-CABLEGLAND-25MM-SC-GENERIC",
     "uom": "NOS",
-    "qty": 60
+    "qty": 0
   },
   {
     "id": 51,
@@ -660,7 +660,7 @@
     "description": "CABLE GLAND SINGLE COMPRESSION 32MM GENERIC",
     "sku": "ELEC-CONNECTOR-CABLEGLAND-32MM-SC-GENERIC",
     "uom": "NOS",
-    "qty": 108
+    "qty": 0
   },
   {
     "id": 52,
@@ -673,7 +673,7 @@
     "description": "CST CONNECTOR KHAKI FSTS-B4 FTC",
     "sku": "ELEC-CONNECTOR-CST-KHAKI-FSTS-B4-FTC",
     "uom": "NOS",
-    "qty": 2750
+    "qty": 0
   },
   {
     "id": 53,
@@ -686,7 +686,7 @@
     "description": "INSULATOR 30X6 GENERIC",
     "sku": "ELEC-CONNECTOR-INSULATOR-30X6-GENERIC",
     "uom": "NOS",
-    "qty": 25
+    "qty": 0
   },
   {
     "id": 54,
@@ -699,7 +699,7 @@
     "description": "INSULATOR 40X10 GENERIC",
     "sku": "ELEC-CONNECTOR-INSULATOR-40X10-GENERIC",
     "uom": "NOS",
-    "qty": 30
+    "qty": 0
   },
   {
     "id": 55,
@@ -712,7 +712,7 @@
     "description": "INSULATOR 40X8 GENERIC",
     "sku": "ELEC-CONNECTOR-INSULATOR-40X8-GENERIC",
     "uom": "NOS",
-    "qty": 63
+    "qty": 0
   },
   {
     "id": 56,
@@ -725,7 +725,7 @@
     "description": "OPEN TYPE CONNECTOR 30A 12WAY LOTUS",
     "sku": "ELEC-CONNECTOR-OPENTYPE-30A-12WAY-LOTUS",
     "uom": "NOS",
-    "qty": 5
+    "qty": 0
   },
   {
     "id": 57,
@@ -738,7 +738,7 @@
     "description": "OPEN TYPE CONNECTOR 30A 4WAY LOTUS",
     "sku": "ELEC-CONNECTOR-OPENTYPE-30A-4WAY-LOTUS",
     "uom": "NOS",
-    "qty": 40
+    "qty": 0
   },
   {
     "id": 58,
@@ -751,7 +751,7 @@
     "description": "OPEN TYPE CONNECTOR 30A 6WAY LOTUS",
     "sku": "ELEC-CONNECTOR-OPENTYPE-30A-6WAY-LOTUS",
     "uom": "NOS",
-    "qty": 4
+    "qty": 0
   },
   {
     "id": 59,
@@ -764,7 +764,7 @@
     "description": "SPIDER LINK 250A SET OF 6 ELMEASURE",
     "sku": "ELEC-CONNECTOR-SPIDERLINK-250A-ELMEASURE",
     "uom": "SET",
-    "qty": 4
+    "qty": 0
   },
   {
     "id": 60,
@@ -777,7 +777,7 @@
     "description": "SPIDER LINK 250A SET OF 6 LT",
     "sku": "ELEC-CONNECTOR-SPIDERLINK-250A-LT",
     "uom": "SET",
-    "qty": 2
+    "qty": 0
   },
   {
     "id": 61,
@@ -790,7 +790,7 @@
     "description": "SPIDER LINK 500A SET OF 3 CNS",
     "sku": "ELEC-CONNECTOR-SPIDERLINK-500A-CNS",
     "uom": "SET",
-    "qty": 30
+    "qty": 0
   },
   {
     "id": 62,
@@ -803,7 +803,7 @@
     "description": "SPIDER LINK 500A SET OF 6 HAVELLS",
     "sku": "ELEC-CONNECTOR-SPIDERLINK-500A-HAVELLS",
     "uom": "SET",
-    "qty": 34
+    "qty": 0
   },
   {
     "id": 63,
@@ -816,7 +816,7 @@
     "description": "CONTACTOR 12A E3MX12 ELMEASURE",
     "sku": "ELEC-CONTACTOR-12A-E3MX12-ELMEASURE",
     "uom": "NOS",
-    "qty": 5
+    "qty": 0
   },
   {
     "id": 64,
@@ -829,7 +829,7 @@
     "description": "CONTACTOR 16A E4MX16 ELMEASURE",
     "sku": "ELEC-CONTACTOR-16A-E4MX16-ELMEASURE",
     "uom": "NOS",
-    "qty": 5
+    "qty": 0
   },
   {
     "id": 65,
@@ -842,7 +842,7 @@
     "description": "CONTACTOR 18A E3MX18 ELMEASURE",
     "sku": "ELEC-CONTACTOR-18A-E3MX18-ELMEASURE",
     "uom": "NOS",
-    "qty": 3
+    "qty": 0
   },
   {
     "id": 66,
@@ -855,7 +855,7 @@
     "description": "CONTACTOR 25A E3MX25 ELMEASURE",
     "sku": "ELEC-CONTACTOR-25A-E3MX25-ELMEASURE",
     "uom": "NOS",
-    "qty": 7
+    "qty": 0
   },
   {
     "id": 67,
@@ -868,7 +868,7 @@
     "description": "CONTACTOR 32A E3MX32 ELMEASURE",
     "sku": "ELEC-CONTACTOR-32A-E3MX32-ELMEASURE",
     "uom": "NOS",
-    "qty": 8
+    "qty": 0
   },
   {
     "id": 68,
@@ -881,7 +881,7 @@
     "description": "CONTACTOR 32A E4MX32 ELMEASURE",
     "sku": "ELEC-CONTACTOR-32A-E4MX32-ELMEASURE",
     "uom": "NOS",
-    "qty": 3
+    "qty": 0
   },
   {
     "id": 69,
@@ -894,7 +894,7 @@
     "description": "CONTACTOR 40A E3MX40 ELMEASURE",
     "sku": "ELEC-CONTACTOR-40A-E3MX40-ELMEASURE",
     "uom": "NOS",
-    "qty": 4
+    "qty": 0
   },
   {
     "id": 70,
@@ -907,7 +907,7 @@
     "description": "CONTACTOR 40A E4MX40 ELMEASURE",
     "sku": "ELEC-CONTACTOR-40A-E4MX40-ELMEASURE",
     "uom": "NOS",
-    "qty": 5
+    "qty": 0
   },
   {
     "id": 71,
@@ -920,7 +920,7 @@
     "description": "CONTACTOR 63A E4MX63 ELMEASURE",
     "sku": "ELEC-CONTACTOR-63A-E4MX63-ELMEASURE",
     "uom": "NOS",
-    "qty": 3
+    "qty": 0
   },
   {
     "id": 72,
@@ -933,7 +933,7 @@
     "description": "CONTACTOR 80A E4MX80 ELMEASURE",
     "sku": "ELEC-CONTACTOR-80A-E4MX80-ELMEASURE",
     "uom": "NOS",
-    "qty": 5
+    "qty": 0
   },
   {
     "id": 73,
@@ -946,7 +946,7 @@
     "description": "CONTACTOR 9A E3MX09 ELMEASURE",
     "sku": "ELEC-CONTACTOR-9A-E3MX09-ELMEASURE",
     "uom": "NOS",
-    "qty": 10
+    "qty": 0
   },
   {
     "id": 74,
@@ -959,7 +959,7 @@
     "description": "AIR BREAK CONTACTOR 110VDC SIEMENS",
     "sku": "ELEC-CONTACTOR-AIRBREAK-110VDC-SIEMENS",
     "uom": "NOS",
-    "qty": 1
+    "qty": 0
   },
   {
     "id": 75,
@@ -972,7 +972,7 @@
     "description": "DELAY TIMER CLOCK TYPE CONTACTOR MOUNTING TC",
     "sku": "ELEC-CONTACTOR-DELAYTIMER-CLOCKTYPE-TC",
     "uom": "NOS",
-    "qty": 1
+    "qty": 0
   },
   {
     "id": 76,
@@ -985,7 +985,7 @@
     "description": "DEMAND CONTROLLER 14KG LED EN8400P11009 ELMEASURE",
     "sku": "ELEC-CONTROLLER-DEMAND-14KG-EN8400P11009-ELMEASURE",
     "uom": "NOS",
-    "qty": 2
+    "qty": 0
   },
   {
     "id": 77,
@@ -998,7 +998,7 @@
     "description": "GATEWAY GW15000XG1XX0000 ELMEASURE",
     "sku": "ELEC-CONTROLLER-GATEWAY-GW15000XG1XX0000-ELMEASURE",
     "uom": "NOS",
-    "qty": 1
+    "qty": 0
   },
   {
     "id": 78,
@@ -1011,7 +1011,7 @@
     "description": "GATEWAY GW3000DXBXX0000 ELMEASURE",
     "sku": "ELEC-CONTROLLER-GATEWAY-GW3000DXBXX0000-ELMEASURE",
     "uom": "NOS",
-    "qty": 1
+    "qty": 0
   },
   {
     "id": 79,
@@ -1024,7 +1024,7 @@
     "description": "THERMOSTAT 85DEG GENERIC",
     "sku": "ELEC-CONTROLLER-THERMOSTAT-85DEG-GENERIC",
     "uom": "NOS",
-    "qty": 79
+    "qty": 0
   },
   {
     "id": 80,
@@ -1037,7 +1037,7 @@
     "description": "FUSE 63A CTISE63 CNS",
     "sku": "ELEC-FUSE-63A-CTISE63-CNS",
     "uom": "NOS",
-    "qty": 378
+    "qty": 0
   },
   {
     "id": 81,
@@ -1050,7 +1050,7 @@
     "description": "FUSE HOLDER 20A 20HN CNS",
     "sku": "ELEC-FUSE-HOLDER-20A-20HN-CNS",
     "uom": "NOS",
-    "qty": 750
+    "qty": 0
   },
   {
     "id": 82,
@@ -1063,7 +1063,7 @@
     "description": "FUSE HOLDER 20A FHB20 FTC",
     "sku": "ELEC-FUSE-HOLDER-20A-FHB20-FTC",
     "uom": "NOS",
-    "qty": 430
+    "qty": 0
   },
   {
     "id": 83,
@@ -1076,7 +1076,7 @@
     "description": "FUSE HOLDER 32A 32HN CNS",
     "sku": "ELEC-FUSE-HOLDER-32A-32HN-CNS",
     "uom": "NOS",
-    "qty": 20
+    "qty": 0
   },
   {
     "id": 84,
@@ -1089,7 +1089,7 @@
     "description": "FUSE HRC 630A FTC",
     "sku": "ELEC-FUSE-HRC-630A-FTC",
     "uom": "NOS",
-    "qty": 24
+    "qty": 0
   },
   {
     "id": 85,
@@ -1102,7 +1102,7 @@
     "description": "FUSE HRC 630A HAVELLS",
     "sku": "ELEC-FUSE-HRC-630A-HAVELLS",
     "uom": "NOS",
-    "qty": 25
+    "qty": 0
   },
   {
     "id": 86,
@@ -1115,7 +1115,7 @@
     "description": "HRC FUSE BASE 630A FBD-630 FTC",
     "sku": "ELEC-FUSE-HRCBASE-630A-FBD630-FTC",
     "uom": "NOS",
-    "qty": 13
+    "qty": 0
   },
   {
     "id": 87,
@@ -1128,7 +1128,7 @@
     "description": "KIT KAT FUSE 20A FHB FTC",
     "sku": "ELEC-FUSE-KITKAT-20A-FHB-FTC",
     "uom": "NOS",
-    "qty": 2000
+    "qty": 0
   },
   {
     "id": 88,
@@ -1141,7 +1141,7 @@
     "description": "FUSE LINK 16A FTC",
     "sku": "ELEC-FUSE-LINK-16A-FTC",
     "uom": "NOS",
-    "qty": 238
+    "qty": 0
   },
   {
     "id": 89,
@@ -1154,7 +1154,7 @@
     "description": "FUSE LINK 16A GE",
     "sku": "ELEC-FUSE-LINK-16A-GE",
     "uom": "NOS",
-    "qty": 6
+    "qty": 0
   },
   {
     "id": 90,
@@ -1167,7 +1167,7 @@
     "description": "FUSE LINK 200A CNS",
     "sku": "ELEC-FUSE-LINK-200A-CNS",
     "uom": "NOS",
-    "qty": 75
+    "qty": 0
   },
   {
     "id": 91,
@@ -1180,7 +1180,7 @@
     "description": "FUSE LINK 2A FTC",
     "sku": "ELEC-FUSE-LINK-2A-FTC",
     "uom": "NOS",
-    "qty": 176
+    "qty": 0
   },
   {
     "id": 92,
@@ -1193,7 +1193,7 @@
     "description": "FUSE LINK 2A GE",
     "sku": "ELEC-FUSE-LINK-2A-GE",
     "uom": "NOS",
-    "qty": 43
+    "qty": 0
   },
   {
     "id": 93,
@@ -1206,7 +1206,7 @@
     "description": "FUSE LINK 32A LT",
     "sku": "ELEC-FUSE-LINK-32A-LT",
     "uom": "NOS",
-    "qty": 19
+    "qty": 0
   },
   {
     "id": 94,
@@ -1219,7 +1219,7 @@
     "description": "FUSE LINK 4A CNS",
     "sku": "ELEC-FUSE-LINK-4A-CNS",
     "uom": "NOS",
-    "qty": 48
+    "qty": 0
   },
   {
     "id": 95,
@@ -1245,7 +1245,7 @@
     "description": "FUSE LINK 4A GE",
     "sku": "ELEC-FUSE-LINK-4A-GE",
     "uom": "NOS",
-    "qty": 44
+    "qty": 0
   },
   {
     "id": 97,
@@ -1258,7 +1258,7 @@
     "description": "FUSE LINK 6A FTC",
     "sku": "ELEC-FUSE-LINK-6A-FTC",
     "uom": "NOS",
-    "qty": 311
+    "qty": 0
   },
   {
     "id": 98,
@@ -1271,7 +1271,7 @@
     "description": "FUSE LINK 6A HAVELLS",
     "sku": "ELEC-FUSE-LINK-6A-HAVELLS",
     "uom": "NOS",
-    "qty": 88
+    "qty": 0
   },
   {
     "id": 99,
@@ -1284,7 +1284,7 @@
     "description": "FUSE LINK 6A LT",
     "sku": "ELEC-FUSE-LINK-6A-LT",
     "uom": "NOS",
-    "qty": 13
+    "qty": 0
   },
   {
     "id": 100,
@@ -1297,7 +1297,7 @@
     "description": "FUSE LINK 6A NS6A GE",
     "sku": "ELEC-FUSE-LINK-6A-NS6A-GE",
     "uom": "NOS",
-    "qty": 60
+    "qty": 0
   },
   {
     "id": 101,
@@ -1310,7 +1310,7 @@
     "description": "FUSE LINK FL20-4A FTC",
     "sku": "ELEC-FUSE-LINK-FL20-4A-FTC",
     "uom": "NOS",
-    "qty": 1000
+    "qty": 0
   },
   {
     "id": 102,
@@ -1323,7 +1323,7 @@
     "description": "BATTEN HOLDER 6A-240V ANCHOR",
     "sku": "ELEC-LIGHTING-BATTENHOLDER-6A-240V-ANCHOR",
     "uom": "NOS",
-    "qty": 60
+    "qty": 0
   },
   {
     "id": 103,
@@ -1336,7 +1336,7 @@
     "description": "LED DRIVER CONSTANT VOLTAGE 120W",
     "sku": "ELEC-LIGHTING-DRIVER-CV-120W-12V-HAVELLS",
     "uom": "NOS",
-    "qty": 2
+    "qty": 0
   },
   {
     "id": 104,
@@ -1349,7 +1349,7 @@
     "description": "INDICATION LAMP 110VAC BLUE KAYCEE",
     "sku": "ELEC-LIGHTING-INDICATIONLAMP-110VAC-BLUE-KAYCEE",
     "uom": "NOS",
-    "qty": 120
+    "qty": 0
   },
   {
     "id": 105,
@@ -1362,7 +1362,7 @@
     "description": "INDICATION LAMP 110VAC BLUE LT",
     "sku": "ELEC-LIGHTING-INDICATIONLAMP-110VAC-BLUE-LT",
     "uom": "NOS",
-    "qty": 6
+    "qty": 0
   },
   {
     "id": 106,
@@ -1375,7 +1375,7 @@
     "description": "INDICATION LAMP 110VAC RED KAYCEE",
     "sku": "ELEC-LIGHTING-INDICATIONLAMP-110VAC-RED-KAYCEE",
     "uom": "NOS",
-    "qty": 118
+    "qty": 0
   },
   {
     "id": 107,
@@ -1388,7 +1388,7 @@
     "description": "INDICATION LAMP 110VAC RED LT",
     "sku": "ELEC-LIGHTING-INDICATIONLAMP-110VAC-RED-LT",
     "uom": "NOS",
-    "qty": 6
+    "qty": 0
   },
   {
     "id": 108,
@@ -1401,7 +1401,7 @@
     "description": "INDICATION LAMP 110VAC YELLOW KAYCEE",
     "sku": "ELEC-LIGHTING-INDICATIONLAMP-110VAC-YELLOW-KAYCEE",
     "uom": "NOS",
-    "qty": 121
+    "qty": 0
   },
   {
     "id": 109,
@@ -1414,7 +1414,7 @@
     "description": "INDICATION LAMP 110VAC YELLOW LT",
     "sku": "ELEC-LIGHTING-INDICATIONLAMP-110VAC-YELLOW-LT",
     "uom": "NOS",
-    "qty": 6
+    "qty": 0
   },
   {
     "id": 110,
@@ -1427,7 +1427,7 @@
     "description": "INDICATION LAMP 220VAC BLUE FTC",
     "sku": "ELEC-LIGHTING-INDICATIONLAMP-220VAC-BLUE-FTC",
     "uom": "NOS",
-    "qty": 31
+    "qty": 0
   },
   {
     "id": 111,
@@ -1440,7 +1440,7 @@
     "description": "INDICATION LAMP 220VAC BLUE KAYCEE",
     "sku": "ELEC-LIGHTING-INDICATIONLAMP-220VAC-BLUE-KAYCEE",
     "uom": "NOS",
-    "qty": 217
+    "qty": 0
   },
   {
     "id": 112,
@@ -1453,7 +1453,7 @@
     "description": "INDICATION LAMP 220VAC BLUE LT",
     "sku": "ELEC-LIGHTING-INDICATIONLAMP-220VAC-BLUE-LT",
     "uom": "NOS",
-    "qty": 5
+    "qty": 0
   },
   {
     "id": 113,
@@ -1466,7 +1466,7 @@
     "description": "INDICATION LAMP 220VAC RED FTC",
     "sku": "ELEC-LIGHTING-INDICATIONLAMP-220VAC-RED-FTC",
     "uom": "NOS",
-    "qty": 1
+    "qty": 0
   },
   {
     "id": 114,
@@ -1479,7 +1479,7 @@
     "description": "INDICATION LAMP 220VAC RED JIGO",
     "sku": "ELEC-LIGHTING-INDICATIONLAMP-220VAC-RED-JIGO",
     "uom": "NOS",
-    "qty": 10
+    "qty": 0
   },
   {
     "id": 115,
@@ -1492,7 +1492,7 @@
     "description": "INDICATION LAMP 220VAC RED KAYCEE",
     "sku": "ELEC-LIGHTING-INDICATIONLAMP-220VAC-RED-KAYCEE",
     "uom": "NOS",
-    "qty": 196
+    "qty": 0
   },
   {
     "id": 116,
@@ -1505,7 +1505,7 @@
     "description": "INDICATION LAMP 220VAC RED LT",
     "sku": "ELEC-LIGHTING-INDICATIONLAMP-220VAC-RED-LT",
     "uom": "NOS",
-    "qty": 6
+    "qty": 0
   },
   {
     "id": 117,
@@ -1518,7 +1518,7 @@
     "description": "INDICATION LAMP 220VAC YELLOW FTC",
     "sku": "ELEC-LIGHTING-INDICATIONLAMP-220VAC-YELLOW-FTC",
     "uom": "NOS",
-    "qty": 2
+    "qty": 0
   },
   {
     "id": 118,
@@ -1531,7 +1531,7 @@
     "description": "INDICATION LAMP 220VAC YELLOW KAYCEE",
     "sku": "ELEC-LIGHTING-INDICATIONLAMP-220VAC-YELLOW-KAYCEE",
     "uom": "NOS",
-    "qty": 203
+    "qty": 0
   },
   {
     "id": 119,
@@ -1544,7 +1544,7 @@
     "description": "INDICATION LAMP 220VAC YELLOW LT",
     "sku": "ELEC-LIGHTING-INDICATIONLAMP-220VAC-YELLOW-LT",
     "uom": "NOS",
-    "qty": 5
+    "qty": 0
   },
   {
     "id": 120,
@@ -1557,7 +1557,7 @@
     "description": "INDICATION LAMP 220VDC BLUE LT",
     "sku": "ELEC-LIGHTING-INDICATIONLAMP-220VDC-BLUE-LT",
     "uom": "NOS",
-    "qty": 2
+    "qty": 0
   },
   {
     "id": 121,
@@ -1570,7 +1570,7 @@
     "description": "INDICATION LAMP 220VDC GREEN LT",
     "sku": "ELEC-LIGHTING-INDICATIONLAMP-220VDC-GREEN-LT",
     "uom": "NOS",
-    "qty": 2
+    "qty": 0
   },
   {
     "id": 122,
@@ -1583,7 +1583,7 @@
     "description": "INDICATION LAMP 220VDC ORANGE LT",
     "sku": "ELEC-LIGHTING-INDICATIONLAMP-220VDC-ORANGE-LT",
     "uom": "NOS",
-    "qty": 2
+    "qty": 0
   },
   {
     "id": 123,
@@ -1596,7 +1596,7 @@
     "description": "INDICATION LAMP 220VDC RED LT",
     "sku": "ELEC-LIGHTING-INDICATIONLAMP-220VDC-RED-LT",
     "uom": "NOS",
-    "qty": 12
+    "qty": 0
   },
   {
     "id": 124,
@@ -1609,7 +1609,7 @@
     "description": "INDICATION LAMP 220VDC WHITE LT",
     "sku": "ELEC-LIGHTING-INDICATIONLAMP-220VDC-WHITE-LT",
     "uom": "NOS",
-    "qty": 2
+    "qty": 0
   },
   {
     "id": 125,
@@ -1622,7 +1622,7 @@
     "description": "INDICATION LAMP 220VDC YELLOW LT",
     "sku": "ELEC-LIGHTING-INDICATIONLAMP-220VDC-YELLOW-LT",
     "uom": "NOS",
-    "qty": 2
+    "qty": 0
   },
   {
     "id": 126,
@@ -1635,7 +1635,7 @@
     "description": "LED FIXTURES 120W",
     "sku": "ELEC-LIGHTING-LED-FIXTURE-120W",
     "uom": "NOS",
-    "qty": -3
+    "qty": 0
   },
   {
     "id": 127,
@@ -1648,7 +1648,7 @@
     "description": "LED STRIP 60W NEOFLEX HAVELLS",
     "sku": "ELEC-LIGHTING-LEDSTRIP-60W-NEOFLEX-HAVELLS",
     "uom": "NOS",
-    "qty": 3
+    "qty": 0
   },
   {
     "id": 128,
@@ -1661,7 +1661,7 @@
     "description": "LED TRIM PANEL LIGHT ROUND 15W 6500K",
     "sku": "ELEC-LIGHTING-LEDTRIM-15W-RD-6500K-HAVELLS",
     "uom": "NOS",
-    "qty": 42
+    "qty": 0
   },
   {
     "id": 129,
@@ -1674,7 +1674,7 @@
     "description": "LED MOUNTING PROFILE STRIP 17MM",
     "sku": "ELEC-LIGHTING-PROFILE-17MM-HAVELLS",
     "uom": "MTR",
-    "qty": 12
+    "qty": 0
   },
   {
     "id": 130,
@@ -1687,7 +1687,7 @@
     "description": "AC ROPE LIGHT ACCESSORIES",
     "sku": "ELEC-LIGHTING-ROPELIGHT-ACCESSORIES-HAVELLS",
     "uom": "NOS",
-    "qty": 12
+    "qty": 0
   },
   {
     "id": 131,
@@ -1700,7 +1700,7 @@
     "description": "ROPE LIGHT STRIP IP65 FLEXION HAVELLS",
     "sku": "ELEC-LIGHTING-ROPELIGHT-IP65-FLEXION-HAVELLS",
     "uom": "MTR",
-    "qty": 2
+    "qty": 0
   },
   {
     "id": 132,
@@ -1713,7 +1713,7 @@
     "description": "TUBE LIGHT 1FT 10W SURYA",
     "sku": "ELEC-LIGHTING-TUBELIGHT-1FT-10W-SURYA",
     "uom": "NOS",
-    "qty": 15
+    "qty": 0
   },
   {
     "id": 133,
@@ -1726,7 +1726,7 @@
     "description": "TUBE LIGHT 1FT 5W CROMPTON",
     "sku": "ELEC-LIGHTING-TUBELIGHT-1FT-5W-CROMPTON",
     "uom": "NOS",
-    "qty": 11
+    "qty": 0
   },
   {
     "id": 134,
@@ -1739,7 +1739,7 @@
     "description": "TUBE LIGHT 1FT 5W PHILIPS",
     "sku": "ELEC-LIGHTING-TUBELIGHT-1FT-5W-PHILIPS",
     "uom": "NOS",
-    "qty": 50
+    "qty": 0
   },
   {
     "id": 135,
@@ -1752,7 +1752,7 @@
     "description": "MCB 10A-1P CNS",
     "sku": "ELEC-MCB-10A-1P-CNS",
     "uom": "NOS",
-    "qty": 62
+    "qty": 0
   },
   {
     "id": 136,
@@ -1765,7 +1765,7 @@
     "description": "MCB 10A-1P EATON",
     "sku": "ELEC-MCB-10A-1P-EATON",
     "uom": "NOS",
-    "qty": 1
+    "qty": 0
   },
   {
     "id": 137,
@@ -1778,7 +1778,7 @@
     "description": "MCB 10A-1P ELMEASURE",
     "sku": "ELEC-MCB-10A-1P-ELMEASURE",
     "uom": "NOS",
-    "qty": 360
+    "qty": 0
   },
   {
     "id": 138,
@@ -1791,7 +1791,7 @@
     "description": "MCB 10A-1P HAVELLS",
     "sku": "ELEC-MCB-10A-1P-HAVELLS",
     "uom": "NOS",
-    "qty": 2
+    "qty": 0
   },
   {
     "id": 139,
@@ -1804,7 +1804,7 @@
     "description": "MCB 10A-1P LT",
     "sku": "ELEC-MCB-10A-1P-LT",
     "uom": "NOS",
-    "qty": 1
+    "qty": 0
   },
   {
     "id": 140,
@@ -1817,7 +1817,7 @@
     "description": "MCB 10A-2P CNS",
     "sku": "ELEC-MCB-10A-2P-CNS",
     "uom": "NOS",
-    "qty": 27
+    "qty": 0
   },
   {
     "id": 141,
@@ -1830,7 +1830,7 @@
     "description": "MCB 10A-2P-DC CNS",
     "sku": "ELEC-MCB-10A-2P-DC-CNS",
     "uom": "NOS",
-    "qty": 1
+    "qty": 0
   },
   {
     "id": 142,
@@ -1843,7 +1843,7 @@
     "description": "MCB 10A-2P EATON",
     "sku": "ELEC-MCB-10A-2P-EATON",
     "uom": "NOS",
-    "qty": 44
+    "qty": 0
   },
   {
     "id": 143,
@@ -1856,7 +1856,7 @@
     "description": "MCB 10A-2P HAVELLS",
     "sku": "ELEC-MCB-10A-2P-HAVELLS",
     "uom": "NOS",
-    "qty": 2
+    "qty": 0
   },
   {
     "id": 144,
@@ -1869,7 +1869,7 @@
     "description": "MCB 10A-2P LT",
     "sku": "ELEC-MCB-10A-2P-LT",
     "uom": "NOS",
-    "qty": 6
+    "qty": 0
   },
   {
     "id": 145,
@@ -1882,7 +1882,7 @@
     "description": "MCB 10A-3P CNS",
     "sku": "ELEC-MCB-10A-3P-CNS",
     "uom": "NOS",
-    "qty": 4
+    "qty": 0
   },
   {
     "id": 146,
@@ -1895,7 +1895,7 @@
     "description": "MCB 10A-3P HAVELLS",
     "sku": "ELEC-MCB-10A-3P-HAVELLS",
     "uom": "NOS",
-    "qty": 8
+    "qty": 0
   },
   {
     "id": 147,
@@ -1908,7 +1908,7 @@
     "description": "MCB 10A-3P LT",
     "sku": "ELEC-MCB-10A-3P-LT",
     "uom": "NOS",
-    "qty": 7
+    "qty": 0
   },
   {
     "id": 148,
@@ -1921,7 +1921,7 @@
     "description": "MCB 16A-1P CNS",
     "sku": "ELEC-MCB-16A-1P-CNS",
     "uom": "NOS",
-    "qty": 102
+    "qty": 0
   },
   {
     "id": 149,
@@ -1934,7 +1934,7 @@
     "description": "MCB 16A-1P LT",
     "sku": "ELEC-MCB-16A-1P-LT",
     "uom": "NOS",
-    "qty": 1
+    "qty": 0
   },
   {
     "id": 150,
@@ -1947,7 +1947,7 @@
     "description": "MCB 16A-2P HAVELLS",
     "sku": "ELEC-MCB-16A-2P-HAVELLS",
     "uom": "NOS",
-    "qty": 20
+    "qty": 0
   },
   {
     "id": 151,
@@ -1960,7 +1960,7 @@
     "description": "MCB 16A-3P CNS",
     "sku": "ELEC-MCB-16A-3P-CNS",
     "uom": "NOS",
-    "qty": 165
+    "qty": 0
   },
   {
     "id": 152,
@@ -1973,7 +1973,7 @@
     "description": "MCB 16A-3P HAVELLS",
     "sku": "ELEC-MCB-16A-3P-HAVELLS",
     "uom": "NOS",
-    "qty": 1
+    "qty": 0
   },
   {
     "id": 153,
@@ -1986,7 +1986,7 @@
     "description": "MCB 16A-4P LT",
     "sku": "ELEC-MCB-16A-4P-LT",
     "uom": "NOS",
-    "qty": 3
+    "qty": 0
   },
   {
     "id": 154,
@@ -1999,7 +1999,7 @@
     "description": "MCB 20A-1P CNS",
     "sku": "ELEC-MCB-20A-1P-CNS",
     "uom": "NOS",
-    "qty": 126
+    "qty": 0
   },
   {
     "id": 155,
@@ -2012,7 +2012,7 @@
     "description": "MCB 20A-1P ELMEASURE",
     "sku": "ELEC-MCB-20A-1P-ELMEASURE",
     "uom": "NOS",
-    "qty": 504
+    "qty": 0
   },
   {
     "id": 156,
@@ -2025,7 +2025,7 @@
     "description": "MCB 20A-1P HAVELLS",
     "sku": "ELEC-MCB-20A-1P-HAVELLS",
     "uom": "NOS",
-    "qty": 3
+    "qty": 0
   },
   {
     "id": 157,
@@ -2038,7 +2038,7 @@
     "description": "MCB 20A-1P LT",
     "sku": "ELEC-MCB-20A-1P-LT",
     "uom": "NOS",
-    "qty": 99
+    "qty": 0
   },
   {
     "id": 158,
@@ -2051,7 +2051,7 @@
     "description": "MCB 25A-1P HAVELLS",
     "sku": "ELEC-MCB-25A-1P-HAVELLS",
     "uom": "NOS",
-    "qty": 17
+    "qty": 0
   },
   {
     "id": 159,
@@ -2064,7 +2064,7 @@
     "description": "MCB 2A-1P CNS",
     "sku": "ELEC-MCB-2A-1P-CNS",
     "uom": "NOS",
-    "qty": 7
+    "qty": 0
   },
   {
     "id": 160,
@@ -2077,7 +2077,7 @@
     "description": "MCB 2A-1P LT",
     "sku": "ELEC-MCB-2A-1P-LT",
     "uom": "NOS",
-    "qty": 1
+    "qty": 0
   },
   {
     "id": 161,
@@ -2090,7 +2090,7 @@
     "description": "MCB 32A-1P LT",
     "sku": "ELEC-MCB-32A-1P-LT",
     "uom": "NOS",
-    "qty": 7
+    "qty": 0
   },
   {
     "id": 162,
@@ -2103,7 +2103,7 @@
     "description": "MCB 32A-2P EATON",
     "sku": "ELEC-MCB-32A-2P-EATON",
     "uom": "NOS",
-    "qty": 1
+    "qty": 0
   },
   {
     "id": 163,
@@ -2116,7 +2116,7 @@
     "description": "MCB 32A-3P CNS",
     "sku": "ELEC-MCB-32A-3P-CNS",
     "uom": "NOS",
-    "qty": 7
+    "qty": 0
   },
   {
     "id": 164,
@@ -2129,7 +2129,7 @@
     "description": "MCB 32A-3P LT",
     "sku": "ELEC-MCB-32A-3P-LT",
     "uom": "NOS",
-    "qty": 3
+    "qty": 0
   },
   {
     "id": 165,
@@ -2142,7 +2142,7 @@
     "description": "MCB 32A-4P LT",
     "sku": "ELEC-MCB-32A-4P-LT",
     "uom": "NOS",
-    "qty": 2
+    "qty": 0
   },
   {
     "id": 166,
@@ -2155,7 +2155,7 @@
     "description": "MCB 63A-1P LT",
     "sku": "ELEC-MCB-63A-1P-LT",
     "uom": "NOS",
-    "qty": 4
+    "qty": 0
   },
   {
     "id": 167,
@@ -2168,7 +2168,7 @@
     "description": "MCB 63A-3P CNS",
     "sku": "ELEC-MCB-63A-3P-CNS",
     "uom": "NOS",
-    "qty": 4
+    "qty": 0
   },
   {
     "id": 168,
@@ -2181,7 +2181,7 @@
     "description": "MCB 63A-3P EATON",
     "sku": "ELEC-MCB-63A-3P-EATON",
     "uom": "NOS",
-    "qty": 36
+    "qty": 0
   },
   {
     "id": 169,
@@ -2194,7 +2194,7 @@
     "description": "MCB 6A-2P CNS",
     "sku": "ELEC-MCB-6A-2P-CNS",
     "uom": "NOS",
-    "qty": 8
+    "qty": 0
   },
   {
     "id": 170,
@@ -2207,7 +2207,7 @@
     "description": "RCCB 40A-4P LT",
     "sku": "ELEC-MCB-RCCB-40A-4P-LT",
     "uom": "NOS",
-    "qty": 1
+    "qty": 0
   },
   {
     "id": 171,
@@ -2220,7 +2220,7 @@
     "description": "MCCB 100A-10KA CNS",
     "sku": "ELEC-MCCB-100A-10KA-CNS",
     "uom": "NOS",
-    "qty": 1
+    "qty": 0
   },
   {
     "id": 172,
@@ -2233,7 +2233,7 @@
     "description": "MCCB 100A-10KA E3M125D100 ELMEASURE",
     "sku": "ELEC-MCCB-100A-10KA-E3M125D100-ELMEASURE",
     "uom": "NOS",
-    "qty": 9
+    "qty": 0
   },
   {
     "id": 173,
@@ -2246,7 +2246,7 @@
     "description": "MCCB 100A-10KA HAVELLS",
     "sku": "ELEC-MCCB-100A-10KA-HAVELLS",
     "uom": "NOS",
-    "qty": 5
+    "qty": 0
   },
   {
     "id": 174,
@@ -2259,7 +2259,7 @@
     "description": "MCCB 100A-10KA LT",
     "sku": "ELEC-MCCB-100A-10KA-LT",
     "uom": "NOS",
-    "qty": 4
+    "qty": 0
   },
   {
     "id": 175,
@@ -2272,7 +2272,7 @@
     "description": "MCCB 200A-10KA ELMEASURE",
     "sku": "ELEC-MCCB-200A-10KA-ELMEASURE",
     "uom": "NOS",
-    "qty": 1
+    "qty": 0
   },
   {
     "id": 176,
@@ -2285,7 +2285,7 @@
     "description": "MCCB 200A IHLANDC30200 HAVELLS",
     "sku": "ELEC-MCCB-200A-IHLANDC30200-HAVELLS",
     "uom": "NOS",
-    "qty": 2
+    "qty": 0
   },
   {
     "id": 177,
@@ -2298,7 +2298,7 @@
     "description": "MCCB 500A CENTRIC COIL HAVELLS",
     "sku": "ELEC-MCCB-500A-CENTRICCOIL-HAVELLS",
     "uom": "NOS",
-    "qty": 3
+    "qty": 0
   },
   {
     "id": 178,
@@ -2311,7 +2311,7 @@
     "description": "MCCB 500A CNS",
     "sku": "ELEC-MCCB-500A-CNS",
     "uom": "NOS",
-    "qty": 14
+    "qty": 0
   },
   {
     "id": 179,
@@ -2324,7 +2324,7 @@
     "description": "MCCB 630A 4POLE 50KA TAMF HAVELLS",
     "sku": "ELEC-MCCB-630A-FP-50KA-TAMF-HAVELLS",
     "uom": "NOS",
-    "qty": 10
+    "qty": 0
   },
   {
     "id": 180,
@@ -2337,7 +2337,7 @@
     "description": "MCCB ROTARY HANDLE FRAME A IHLARN30 HAVELLS",
     "sku": "ELEC-MCCB-ACC-ROTARYHANDLE-FRAMEA-IHLARN30-HAVELLS",
     "uom": "NOS",
-    "qty": 2
+    "qty": 0
   },
   {
     "id": 181,
@@ -2363,7 +2363,7 @@
     "description": "MCCB SPREADER TERMINAL FRAME A HAVELLS",
     "sku": "ELEC-MCCB-ACC-SPREADER-FRAMEA-HAVELLS",
     "uom": "NOS",
-    "qty": 4
+    "qty": 0
   },
   {
     "id": 183,
@@ -2376,7 +2376,7 @@
     "description": "MCCB SPREADER TERMINAL FRAME L 500-630A HAVELLS",
     "sku": "ELEC-MCCB-ACC-SPREADER-FRAMEL-HAVELLS",
     "uom": "NOS",
-    "qty": 30
+    "qty": 0
   },
   {
     "id": 184,
@@ -2389,7 +2389,7 @@
     "description": "AMMETER SINGLE PHASE",
     "sku": "ELEC-METER-AMMETER-1PH-GENERIC",
     "uom": "NOS",
-    "qty": 1
+    "qty": 0
   },
   {
     "id": 185,
@@ -2402,7 +2402,7 @@
     "description": "AMMETER ANALOG WL1310 LT",
     "sku": "ELEC-METER-AMMETER-ANALOG-WL1310-LT",
     "uom": "NOS",
-    "qty": 1
+    "qty": 0
   },
   {
     "id": 186,
@@ -2415,7 +2415,7 @@
     "description": "DIGITAL AMMETER WL1110 LT",
     "sku": "ELEC-METER-AMMETER-DIGITAL-WL1110-LT",
     "uom": "NOS",
-    "qty": 2
+    "qty": 0
   },
   {
     "id": 187,
@@ -2428,7 +2428,7 @@
     "description": "AMMETER EM WL4000 LT",
     "sku": "ELEC-METER-AMMETER-EM-WL4000-LT",
     "uom": "NOS",
-    "qty": 1
+    "qty": 0
   },
   {
     "id": 188,
@@ -2441,7 +2441,7 @@
     "description": "AMMETER LG2519P11000 ELMEASURE",
     "sku": "ELEC-METER-AMMETER-LG2519P11000-ELMEASURE",
     "uom": "NOS",
-    "qty": 7
+    "qty": 0
   },
   {
     "id": 189,
@@ -2454,7 +2454,7 @@
     "description": "ANALOG METER 132KV AE",
     "sku": "ELEC-METER-ANALOG-132KV-AE",
     "uom": "NOS",
-    "qty": 14
+    "qty": 0
   },
   {
     "id": 190,
@@ -2467,7 +2467,7 @@
     "description": "ANALOG METER 220KV AE",
     "sku": "ELEC-METER-ANALOG-220KV-AE",
     "uom": "NOS",
-    "qty": 44
+    "qty": 0
   },
   {
     "id": 191,
@@ -2493,7 +2493,7 @@
     "description": "DUAL SOURCE MFM 100A LG2599P11A10 ELMEASURE",
     "sku": "ELEC-METER-MULTIFUNCTION-100A-LG2599P11A10-ELMEASURE",
     "uom": "NOS",
-    "qty": 1
+    "qty": 0
   },
   {
     "id": 193,
@@ -2506,7 +2506,7 @@
     "description": "MULTI-FUNCTION METER RS485 LG6400P11000 ELMEASURE",
     "sku": "ELEC-METER-MULTIFUNCTION-RS485-LG6400P11000-ELMEASURE",
     "uom": "NOS",
-    "qty": 6
+    "qty": 0
   },
   {
     "id": 194,
@@ -2519,7 +2519,7 @@
     "description": "PREPAID METER PE5120P110TE ELMEASURE",
     "sku": "ELEC-METER-PREPAID-PE5120P110TE-ELMEASURE",
     "uom": "NOS",
-    "qty": -1
+    "qty": 0
   },
   {
     "id": 195,
@@ -2532,7 +2532,7 @@
     "description": "PREPAID METER PE5120P11600 ELMEASURE",
     "sku": "ELEC-METER-PREPAID-PE5120P11600-ELMEASURE",
     "uom": "NOS",
-    "qty": 6
+    "qty": 0
   },
   {
     "id": 196,
@@ -2545,7 +2545,7 @@
     "description": "PREPAID METER PE5120P1160E ELMEASURE",
     "sku": "ELEC-METER-PREPAID-PE5120P1160E-ELMEASURE",
     "uom": "NOS",
-    "qty": 15
+    "qty": 0
   },
   {
     "id": 197,
@@ -2571,7 +2571,7 @@
     "description": "SHUNT 250A RISHABH",
     "sku": "ELEC-METER-SHUNT-250A-RISHABH",
     "uom": "NOS",
-    "qty": 1
+    "qty": 0
   },
   {
     "id": 199,
@@ -2584,7 +2584,7 @@
     "description": "SLA SL0AS10000 ELMEASURE",
     "sku": "ELEC-METER-SLA-SL0AS10000-ELMEASURE",
     "uom": "NOS",
-    "qty": 1
+    "qty": 0
   },
   {
     "id": 200,
@@ -2597,7 +2597,7 @@
     "description": "SURGE MONITOR GENERIC",
     "sku": "ELEC-METER-SURGEMONITOR-GENERIC",
     "uom": "NOS",
-    "qty": 1
+    "qty": 0
   },
   {
     "id": 201,
@@ -2610,7 +2610,7 @@
     "description": "DIGITAL TIME SWITCH GIC",
     "sku": "ELEC-METER-TIMESWITCH-DIGITAL-GIC",
     "uom": "NOS",
-    "qty": 1
+    "qty": 0
   },
   {
     "id": 202,
@@ -2623,7 +2623,7 @@
     "description": "VOLTMETER SINGLE PHASE",
     "sku": "ELEC-METER-VOLTMETER-1PH-GENERIC",
     "uom": "NOS",
-    "qty": 1
+    "qty": 0
   },
   {
     "id": 203,
@@ -2636,7 +2636,7 @@
     "description": "DIGITAL VOLTMETER WL1120100000 LT",
     "sku": "ELEC-METER-VOLTMETER-DIGITAL-WL1120100000-LT",
     "uom": "NOS",
-    "qty": 1
+    "qty": 0
   },
   {
     "id": 204,
@@ -2649,7 +2649,7 @@
     "description": "PANEL HEATER GENERIC",
     "sku": "ELEC-PANELHW-HEATER-GENERIC",
     "uom": "NOS",
-    "qty": 50
+    "qty": 0
   },
   {
     "id": 205,
@@ -2662,7 +2662,7 @@
     "description": "PANEL THERMOSTAT GENERIC",
     "sku": "ELEC-PANELHW-THERMOSTAT-GENERIC",
     "uom": "NOS",
-    "qty": 50
+    "qty": 0
   },
   {
     "id": 206,
@@ -2675,7 +2675,7 @@
     "description": "UNDERVOLTAGE RELAY AC/DC 300V RISHABH",
     "sku": "ELEC-RELAY-UNDERVOLTAGE-300V-RISHABH",
     "uom": "NOS",
-    "qty": 1
+    "qty": 0
   },
   {
     "id": 207,
@@ -2688,7 +2688,7 @@
     "description": "AMMETER SELECTOR SWITCH 10A KAYCEE",
     "sku": "ELEC-SWITCH-ASS-10A-KAYCEE",
     "uom": "NOS",
-    "qty": 301
+    "qty": 0
   },
   {
     "id": 208,
@@ -2701,7 +2701,7 @@
     "description": "AMMETER SELECTOR SWITCH 6A KAYCEE",
     "sku": "ELEC-SWITCH-ASS-6A-KAYCEE",
     "uom": "NOS",
-    "qty": 2
+    "qty": 0
   },
   {
     "id": 209,
@@ -2714,7 +2714,7 @@
     "description": "AMMETER SELECTOR SWITCH 6A LT",
     "sku": "ELEC-SWITCH-ASS-6A-LT",
     "uom": "NOS",
-    "qty": 3
+    "qty": 0
   },
   {
     "id": 210,
@@ -2727,7 +2727,7 @@
     "description": "AMMETER SELECTOR SWITCH 6A RISHABH",
     "sku": "ELEC-SWITCH-ASS-6A-RISHABH",
     "uom": "NOS",
-    "qty": 31
+    "qty": 0
   },
   {
     "id": 211,
@@ -2740,7 +2740,7 @@
     "description": "CHANGEOVER SWITCH 30A ACCL HAVELLS",
     "sku": "ELEC-SWITCH-CHANGEOVER-30A-ACCL-HAVELLS",
     "uom": "NOS",
-    "qty": 1
+    "qty": 0
   },
   {
     "id": 212,
@@ -2753,7 +2753,7 @@
     "description": "CHANGEOVER SWITCH 630A-4P LT",
     "sku": "ELEC-SWITCH-CHANGEOVER-630A-4P-LT",
     "uom": "NOS",
-    "qty": 1
+    "qty": 0
   },
   {
     "id": 213,
@@ -2766,7 +2766,7 @@
     "description": "CHANGEOVER MECHANISM 630A INSTASHIFT HAVELLS",
     "sku": "ELEC-SWITCH-CHANGEOVER-630A-INSTASHIFT-HAVELLS",
     "uom": "NOS",
-    "qty": 10
+    "qty": 0
   },
   {
     "id": 214,
@@ -2805,7 +2805,7 @@
     "description": "AUTOMATIC CHANGEOVER SWITCH ATES2-160A-4P ELMEASURE",
     "sku": "ELEC-SWITCH-CHANGEOVER-ATES2-160A-4P-ELMEASURE",
     "uom": "NOS",
-    "qty": 2
+    "qty": 0
   },
   {
     "id": 217,
@@ -2818,7 +2818,7 @@
     "description": "AUTOMATIC CHANGEOVER SWITCH ATES2-250A-4P ELMEASURE",
     "sku": "ELEC-SWITCH-CHANGEOVER-ATES2-250A-4P-ELMEASURE",
     "uom": "NOS",
-    "qty": 2
+    "qty": 0
   },
   {
     "id": 218,
@@ -2870,7 +2870,7 @@
     "description": "PANEL DOOR SWITCH 2A FTC",
     "sku": "ELEC-SWITCH-DOORSWITCH-2A-FTC",
     "uom": "NOS",
-    "qty": 442
+    "qty": 0
   },
   {
     "id": 222,
@@ -2883,7 +2883,7 @@
     "description": "ISOLATOR SWITCH 16A-1P KAYCEE",
     "sku": "ELEC-SWITCH-ISOLATOR-16A-1P-KAYCEE",
     "uom": "NOS",
-    "qty": 185
+    "qty": 0
   },
   {
     "id": 223,
@@ -2896,7 +2896,7 @@
     "description": "ISOLATOR SWITCH 16A-1P RISHABH",
     "sku": "ELEC-SWITCH-ISOLATOR-16A-1P-RISHABH",
     "uom": "NOS",
-    "qty": 150
+    "qty": 0
   },
   {
     "id": 224,
@@ -2909,7 +2909,7 @@
     "description": "ISOLATOR SWITCH 16A-1P SALZER",
     "sku": "ELEC-SWITCH-ISOLATOR-16A-1P-SALZER",
     "uom": "NOS",
-    "qty": 18
+    "qty": 0
   },
   {
     "id": 225,
@@ -2922,7 +2922,7 @@
     "description": "SFU 200A CSS-DF200-B-3N CNS",
     "sku": "ELEC-SWITCH-SFU-200A-CSSDF200B3N-CNS",
     "uom": "NOS",
-    "qty": 3
+    "qty": 0
   },
   {
     "id": 226,
@@ -2935,7 +2935,7 @@
     "description": "SFU 32A FN63 LT",
     "sku": "ELEC-SWITCH-SFU-32A-FN63-LT",
     "uom": "NOS",
-    "qty": 1
+    "qty": 0
   },
   {
     "id": 227,
@@ -2948,7 +2948,7 @@
     "description": "SFU 32A FTC",
     "sku": "ELEC-SWITCH-SFU-32A-FTC",
     "uom": "NOS",
-    "qty": 1
+    "qty": 0
   },
   {
     "id": 228,
@@ -2961,7 +2961,7 @@
     "description": "SWITCH FUSE UNIT 32A TPN HAVELLS",
     "sku": "ELEC-SWITCH-SFU-32A-TPN-HAVELLS",
     "uom": "NOS",
-    "qty": 200
+    "qty": 0
   },
   {
     "id": 229,
@@ -2974,7 +2974,7 @@
     "description": "SFU 63A FN63 LT",
     "sku": "ELEC-SWITCH-SFU-63A-FN63-LT",
     "uom": "NOS",
-    "qty": 3
+    "qty": 0
   },
   {
     "id": 230,
@@ -2987,7 +2987,7 @@
     "description": "SFU 63A HAVELLS",
     "sku": "ELEC-SWITCH-SFU-63A-HAVELLS",
     "uom": "NOS",
-    "qty": 4
+    "qty": 0
   },
   {
     "id": 231,
@@ -3000,7 +3000,7 @@
     "description": "SWITCH SOCKET COMBINED 16A BOX",
     "sku": "ELEC-SWITCH-SSCOMBINED-16A-BOX",
     "uom": "NOS",
-    "qty": 30
+    "qty": 0
   },
   {
     "id": 232,
@@ -3013,7 +3013,7 @@
     "description": "SWITCH SOCKET COMBINED 16A GENERIC",
     "sku": "ELEC-SWITCH-SSCOMBINED-16A-GENERIC",
     "uom": "NOS",
-    "qty": 50
+    "qty": 0
   },
   {
     "id": 233,
@@ -3026,7 +3026,7 @@
     "description": "SWITCH SOCKET COMBINED 20A ANCHOR",
     "sku": "ELEC-SWITCH-SSCOMBINED-20A-ANCHOR",
     "uom": "NOS",
-    "qty": 70
+    "qty": 0
   },
   {
     "id": 234,
@@ -3039,7 +3039,7 @@
     "description": "SWITCH SOCKET COMBINED 20A BOX ANCHOR",
     "sku": "ELEC-SWITCH-SSCOMBINED-20A-BOX-ANCHOR",
     "uom": "NOS",
-    "qty": 10
+    "qty": 0
   },
   {
     "id": 235,
@@ -3052,7 +3052,7 @@
     "description": "SWITCH SOCKET COMBINED 6A BOX ANCHOR",
     "sku": "ELEC-SWITCH-SSCOMBINED-6A-BOX-ANCHOR",
     "uom": "NOS",
-    "qty": 29
+    "qty": 0
   },
   {
     "id": 236,
@@ -3078,7 +3078,7 @@
     "description": "TOGGLE SWITCH 6A FTC",
     "sku": "ELEC-SWITCH-TOGGLE-6A-FTC",
     "uom": "NOS",
-    "qty": 179
+    "qty": 0
   },
   {
     "id": 238,
@@ -3091,7 +3091,7 @@
     "description": "VOLTMETER SELECTOR SWITCH 6A KAYCEE",
     "sku": "ELEC-SWITCH-VSS-6A-KAYCEE",
     "uom": "NOS",
-    "qty": 1
+    "qty": 0
   },
   {
     "id": 239,
@@ -3104,7 +3104,7 @@
     "description": "VOLTMETER SELECTOR SWITCH 6STEP 10A KAYCEE",
     "sku": "ELEC-SWITCH-VSS-6STEP-10A-KAYCEE",
     "uom": "NOS",
-    "qty": 269
+    "qty": 0
   },
   {
     "id": 240,
@@ -3117,7 +3117,7 @@
     "description": "VOLTMETER SELECTOR SWITCH 6STEP 6A SALZER",
     "sku": "ELEC-SWITCH-VSS-6STEP-6A-SALZER",
     "uom": "NOS",
-    "qty": 4
+    "qty": 0
   },
   {
     "id": 241,
@@ -3130,7 +3130,7 @@
     "description": "INSULATION TAPE BLACK 600V ABRO",
     "sku": "ELEC-TAPE-INSULATION-BLACK-600V-ABRO",
     "uom": "NOS",
-    "qty": 9
+    "qty": 0
   },
   {
     "id": 242,
@@ -3143,7 +3143,7 @@
     "description": "INSULATION TAPE BLACK 600V OKO",
     "sku": "ELEC-TAPE-INSULATION-BLACK-600V-OKO",
     "uom": "NOS",
-    "qty": 20
+    "qty": 0
   },
   {
     "id": 243,
@@ -3156,7 +3156,7 @@
     "description": "INSULATION TAPE BLUE 600V ABRO",
     "sku": "ELEC-TAPE-INSULATION-BLUE-600V-ABRO",
     "uom": "NOS",
-    "qty": 12
+    "qty": 0
   },
   {
     "id": 244,
@@ -3169,7 +3169,7 @@
     "description": "INSULATION TAPE BLUE 600V OKO",
     "sku": "ELEC-TAPE-INSULATION-BLUE-600V-OKO",
     "uom": "NOS",
-    "qty": 20
+    "qty": 0
   },
   {
     "id": 245,
@@ -3182,7 +3182,7 @@
     "description": "INSULATION TAPE GREEN 600V ABRO",
     "sku": "ELEC-TAPE-INSULATION-GREEN-600V-ABRO",
     "uom": "NOS",
-    "qty": 8
+    "qty": 0
   },
   {
     "id": 246,
@@ -3195,7 +3195,7 @@
     "description": "INSULATION TAPE GREEN 600V OKO",
     "sku": "ELEC-TAPE-INSULATION-GREEN-600V-OKO",
     "uom": "NOS",
-    "qty": 20
+    "qty": 0
   },
   {
     "id": 247,
@@ -3208,7 +3208,7 @@
     "description": "INSULATION TAPE RED 600V ABRO",
     "sku": "ELEC-TAPE-INSULATION-RED-600V-ABRO",
     "uom": "NOS",
-    "qty": 10
+    "qty": 0
   },
   {
     "id": 248,
@@ -3221,7 +3221,7 @@
     "description": "INSULATION TAPE RED 600V OKO",
     "sku": "ELEC-TAPE-INSULATION-RED-600V-OKO",
     "uom": "NOS",
-    "qty": 20
+    "qty": 0
   },
   {
     "id": 249,
@@ -3234,7 +3234,7 @@
     "description": "INSULATION TAPE YELLOW 600V ABRO",
     "sku": "ELEC-TAPE-INSULATION-YELLOW-600V-ABRO",
     "uom": "NOS",
-    "qty": 10
+    "qty": 0
   },
   {
     "id": 250,
@@ -3247,7 +3247,7 @@
     "description": "INSULATION TAPE YELLOW 600V OKO",
     "sku": "ELEC-TAPE-INSULATION-YELLOW-600V-OKO",
     "uom": "NOS",
-    "qty": 20
+    "qty": 0
   },
   {
     "id": 251,
@@ -3260,7 +3260,7 @@
     "description": "ADD-ON BLOCK 1NC SALZER",
     "sku": "ELEC-TERMINAL-ADDONBLOCK-1NC-SALZER",
     "uom": "NOS",
-    "qty": 4
+    "qty": 0
   },
   {
     "id": 252,
@@ -3273,7 +3273,7 @@
     "description": "ADD-ON BLOCK 1NO SALZER",
     "sku": "ELEC-TERMINAL-ADDONBLOCK-1NO-SALZER",
     "uom": "NOS",
-    "qty": 3
+    "qty": 0
   },
   {
     "id": 253,
@@ -3286,7 +3286,7 @@
     "description": "ADD-ON BLOCK TA1DN11 CNS",
     "sku": "ELEC-TERMINAL-ADDONBLOCK-TA1DN11-CNS",
     "uom": "NOS",
-    "qty": 10
+    "qty": 0
   },
   {
     "id": 254,
@@ -3299,7 +3299,7 @@
     "description": "TERMINAL BLOCK 130A DPBB-50 ELMEX",
     "sku": "ELEC-TERMINAL-BLOCK-130A-DPBB50-ELMEX",
     "uom": "NOS",
-    "qty": 97
+    "qty": 0
   },
   {
     "id": 255,
@@ -3312,7 +3312,7 @@
     "description": "TERMINAL BLOCK 230A DPBB-120 ELMEX",
     "sku": "ELEC-TERMINAL-BLOCK-230A-DPBB120-ELMEX",
     "uom": "NOS",
-    "qty": 4
+    "qty": 0
   },
   {
     "id": 256,
@@ -3325,7 +3325,7 @@
     "description": "TERMINAL BLOCK 57A FSTS-B4 FTC",
     "sku": "ELEC-TERMINAL-BLOCK-57A-FSTSB4-FTC",
     "uom": "NOS",
-    "qty": 1750
+    "qty": 0
   },
   {
     "id": 257,
@@ -3338,7 +3338,7 @@
     "description": "TERMINAL BLOCK CATDM4 ELMEX",
     "sku": "ELEC-TERMINAL-BLOCK-CATDM4-ELMEX",
     "uom": "NOS",
-    "qty": 1365
+    "qty": 0
   },
   {
     "id": 258,
@@ -3351,7 +3351,7 @@
     "description": "TERMINAL BLOCK CBT-M4 ELMEX",
     "sku": "ELEC-TERMINAL-BLOCK-CBTM4-ELMEX",
     "uom": "NOS",
-    "qty": 3191
+    "qty": 0
   },
   {
     "id": 259,
@@ -3364,7 +3364,7 @@
     "description": "TERMINAL BLOCK CBT-M6 ELMEX",
     "sku": "ELEC-TERMINAL-BLOCK-CBTM6-ELMEX",
     "uom": "NOS",
-    "qty": 250
+    "qty": 0
   },
   {
     "id": 260,
@@ -3377,7 +3377,7 @@
     "description": "TERMINAL BLOCK CBT-N5 ELMEX",
     "sku": "ELEC-TERMINAL-BLOCK-CBTN5-ELMEX",
     "uom": "NOS",
-    "qty": 210
+    "qty": 0
   },
   {
     "id": 261,
@@ -3390,7 +3390,7 @@
     "description": "TERMINAL BLOCK CLTDM4 ELMEX",
     "sku": "ELEC-TERMINAL-BLOCK-CLTDM4-ELMEX",
     "uom": "NOS",
-    "qty": 2000
+    "qty": 0
   },
   {
     "id": 262,
@@ -3403,7 +3403,7 @@
     "description": "TERMINAL BLOCK CST16 ELMEX",
     "sku": "ELEC-TERMINAL-BLOCK-CST16-ELMEX",
     "uom": "NOS",
-    "qty": 1111
+    "qty": 0
   },
   {
     "id": 263,
@@ -3416,7 +3416,7 @@
     "description": "TERMINAL BLOCK CST6 ELMEX",
     "sku": "ELEC-TERMINAL-BLOCK-CST6-ELMEX",
     "uom": "NOS",
-    "qty": 1028
+    "qty": 0
   },
   {
     "id": 264,
@@ -3429,7 +3429,7 @@
     "description": "TERMINAL BLOCK DISCONNECTING TYPE FLTDM4 FTC",
     "sku": "ELEC-TERMINAL-BLOCK-DISCONNECTING-FLTDM4-FTC",
     "uom": "NOS",
-    "qty": 844
+    "qty": 0
   },
   {
     "id": 265,
@@ -3442,7 +3442,7 @@
     "description": "TERMINAL BLOCK FDTS4 FTC",
     "sku": "ELEC-TERMINAL-BLOCK-FDTS4-FTC",
     "uom": "NOS",
-    "qty": 10
+    "qty": 0
   },
   {
     "id": 266,
@@ -3455,7 +3455,7 @@
     "description": "TERMINAL BLOCK FSTS-N4 FTC",
     "sku": "ELEC-TERMINAL-BLOCK-FSTSN4-FTC",
     "uom": "NOS",
-    "qty": 920
+    "qty": 0
   },
   {
     "id": 267,
@@ -3468,7 +3468,7 @@
     "description": "TERMINAL BLOCK FTS-10 FTC",
     "sku": "ELEC-TERMINAL-BLOCK-FTS-10-FTC",
     "uom": "NOS",
-    "qty": 65
+    "qty": 0
   },
   {
     "id": 268,
@@ -3481,7 +3481,7 @@
     "description": "TERMINAL BLOCK FTS-16 FTC",
     "sku": "ELEC-TERMINAL-BLOCK-FTS-16-FTC",
     "uom": "NOS",
-    "qty": 66
+    "qty": 0
   },
   {
     "id": 269,
@@ -3494,7 +3494,7 @@
     "description": "TERMINAL BLOCK FTS-6 FTC",
     "sku": "ELEC-TERMINAL-BLOCK-FTS-6-FTC",
     "uom": "NOS",
-    "qty": 18
+    "qty": 0
   },
   {
     "id": 270,
@@ -3507,7 +3507,7 @@
     "description": "TERMINAL BLOCK JDTTM4 JAINSON",
     "sku": "ELEC-TERMINAL-BLOCK-JDTTM4-JAINSON",
     "uom": "NOS",
-    "qty": 1504
+    "qty": 0
   },
   {
     "id": 271,
@@ -3520,7 +3520,7 @@
     "description": "TERMINAL BLOCK JSTN4 JAINSON",
     "sku": "ELEC-TERMINAL-BLOCK-JSTN4-JAINSON",
     "uom": "NOS",
-    "qty": 352
+    "qty": 0
   },
   {
     "id": 272,
@@ -3533,7 +3533,7 @@
     "description": "ENDPLATE EPD4 GENERIC",
     "sku": "ELEC-TERMINAL-ENDPLATE-EPD4-GENERIC",
     "uom": "NOS",
-    "qty": 100
+    "qty": 0
   },
   {
     "id": 273,
@@ -3546,7 +3546,7 @@
     "description": "ENDPLATE EP-FLTDM4 FTC",
     "sku": "ELEC-TERMINAL-ENDPLATE-EPFLTDM4-FTC",
     "uom": "NOS",
-    "qty": 444
+    "qty": 0
   },
   {
     "id": 274,
@@ -3559,7 +3559,7 @@
     "description": "ENDPLATE EPFSTS-N4 GENERIC",
     "sku": "ELEC-TERMINAL-ENDPLATE-EPFSTSN4-GENERIC",
     "uom": "NOS",
-    "qty": 100
+    "qty": 0
   },
   {
     "id": 275,
@@ -3572,7 +3572,7 @@
     "description": "ENDPLATE EPS-4 ELMEX",
     "sku": "ELEC-TERMINAL-ENDPLATE-EPS4-ELMEX",
     "uom": "NOS",
-    "qty": 348
+    "qty": 0
   },
   {
     "id": 276,
@@ -3585,7 +3585,7 @@
     "description": "ENDPLATE GENERIC",
     "sku": "ELEC-TERMINAL-ENDPLATE-GENERIC",
     "uom": "NOS",
-    "qty": 11
+    "qty": 0
   },
   {
     "id": 277,
@@ -3598,7 +3598,7 @@
     "description": "TB MARKERS 10 TO 20 GENERIC",
     "sku": "ELEC-TERMINAL-MARKER-10TO20-GENERIC",
     "uom": "NOS",
-    "qty": 200
+    "qty": 0
   },
   {
     "id": 278,
@@ -3611,7 +3611,7 @@
     "description": "TB MARKERS 1 TO 10 GENERIC",
     "sku": "ELEC-TERMINAL-MARKER-1TO10-GENERIC",
     "uom": "NOS",
-    "qty": 100
+    "qty": 0
   },
   {
     "id": 279,
@@ -3624,7 +3624,7 @@
     "description": "TB MARKERS 20 TO 30 GENERIC",
     "sku": "ELEC-TERMINAL-MARKER-20TO30-GENERIC",
     "uom": "NOS",
-    "qty": 500
+    "qty": 0
   },
   {
     "id": 280,
@@ -3637,7 +3637,7 @@
     "description": "TB MARKERS 30 TO 40 GENERIC",
     "sku": "ELEC-TERMINAL-MARKER-30TO40-GENERIC",
     "uom": "NOS",
-    "qty": 500
+    "qty": 0
   },
   {
     "id": 281,
@@ -3650,7 +3650,7 @@
     "description": "TB MARKERS 40 TO 50 GENERIC",
     "sku": "ELEC-TERMINAL-MARKER-40TO50-GENERIC",
     "uom": "NOS",
-    "qty": 500
+    "qty": 0
   },
   {
     "id": 282,
@@ -3663,7 +3663,7 @@
     "description": "NEUTRAL LINK 32A FNL-32 FTC",
     "sku": "ELEC-TERMINAL-NEUTRALLINK-32A-FNL32-FTC",
     "uom": "NOS",
-    "qty": 120
+    "qty": 0
   },
   {
     "id": 283,
@@ -3676,7 +3676,7 @@
     "description": "NEUTRAL LINK 63A FNL-63 FTC",
     "sku": "ELEC-TERMINAL-NEUTRALLINK-63A-FNL63-FTC",
     "uom": "NOS",
-    "qty": 62
+    "qty": 0
   },
   {
     "id": 284,
@@ -3689,7 +3689,7 @@
     "description": "NEUTRAL LINK CHANNEL MOUNT 32A FNL-32C FTC",
     "sku": "ELEC-TERMINAL-NEUTRALLINK-CHANNELMOUNT-32A-FNL32C-FTC",
     "uom": "NOS",
-    "qty": 200
+    "qty": 0
   },
   {
     "id": 285,
@@ -3702,7 +3702,7 @@
     "description": "OPEN TERMINALS 63A GENERIC",
     "sku": "ELEC-TERMINAL-OPENTERMINAL-63A-GENERIC",
     "uom": "NOS",
-    "qty": 9
+    "qty": 0
   },
   {
     "id": 286,
@@ -3715,7 +3715,7 @@
     "description": "TRANSFORMER 415V-110V GENERIC",
     "sku": "ELEC-TRANSFORMER-415-110V-GENERIC",
     "uom": "NOS",
-    "qty": 2
+    "qty": 0
   },
   {
     "id": 287,
@@ -3728,7 +3728,7 @@
     "description": "CUTTING WHEEL 16INCH NORTON",
     "sku": "RM-ABRASIVE-CUTTINGWHEEL-16IN-NORTON",
     "uom": "NOS",
-    "qty": 6
+    "qty": 0
   },
   {
     "id": 288,
@@ -3741,7 +3741,7 @@
     "description": "CUTTING WHEEL 4INCH ALKOPLUS",
     "sku": "RM-ABRASIVE-CUTTINGWHEEL-4IN-ALKOPLUS",
     "uom": "NOS",
-    "qty": 200
+    "qty": 0
   },
   {
     "id": 289,
@@ -3754,7 +3754,7 @@
     "description": "FLAP DISC 4INCH ALKOPLUS",
     "sku": "RM-ABRASIVE-FLAPDISC-4IN-ALKOPLUS",
     "uom": "NOS",
-    "qty": 170
+    "qty": 0
   },
   {
     "id": 290,
@@ -3767,7 +3767,7 @@
     "description": "FLAP DISC 7INCH MF GOLD",
     "sku": "RM-ABRASIVE-FLAPDISC-7IN-MFGOLD",
     "uom": "NOS",
-    "qty": 8
+    "qty": 0
   },
   {
     "id": 291,
@@ -3780,7 +3780,7 @@
     "description": "GRINDING WHEEL 4INCH BOSCH",
     "sku": "RM-ABRASIVE-GRINDINGWHEEL-4IN-BOSCH",
     "uom": "NOS",
-    "qty": 63
+    "qty": 0
   },
   {
     "id": 292,
@@ -3793,7 +3793,7 @@
     "description": "GRINDING WHEEL 7INCH BOSCH",
     "sku": "RM-ABRASIVE-GRINDINGWHEEL-7IN-BOSCH",
     "uom": "NOS",
-    "qty": 15
+    "qty": 0
   },
   {
     "id": 293,
@@ -3819,7 +3819,7 @@
     "description": "CABLE TIE 100MM",
     "sku": "RM-CABLETIE-100MM",
     "uom": "PAC",
-    "qty": 100
+    "qty": 0
   },
   {
     "id": 295,
@@ -3832,7 +3832,7 @@
     "description": "CABLE TIE 150MM",
     "sku": "RM-CABLETIE-150MM",
     "uom": "PAC",
-    "qty": 50
+    "qty": 0
   },
   {
     "id": 296,
@@ -3845,7 +3845,7 @@
     "description": "CASTING INGOT ALUMINIUM RAW",
     "sku": "RM-CASTING-ALU-INGOT-RAW",
     "uom": "KGS",
-    "qty": 576.96
+    "qty": 0
   },
   {
     "id": 297,
@@ -3858,7 +3858,7 @@
     "description": "AXLE STEEL KEYS",
     "sku": "RM-FASTENER-AXLEKEY-STEEL",
     "uom": "NOS",
-    "qty": 700
+    "qty": 0
   },
   {
     "id": 298,
@@ -3871,7 +3871,7 @@
     "description": "AXLE LOCK STEEL 25MM",
     "sku": "RM-FASTENER-AXLELOCK-STEEL-25MM",
     "uom": "NOS",
-    "qty": 1100
+    "qty": 0
   },
   {
     "id": 299,
@@ -3884,7 +3884,7 @@
     "description": "EYE BOLT 12MM",
     "sku": "RM-FASTENER-EYEBOLT-12MM",
     "uom": "NOS",
-    "qty": 150
+    "qty": 0
   },
   {
     "id": 300,
@@ -3897,7 +3897,7 @@
     "description": "AL HINGES",
     "sku": "RM-FASTENER-HINGE-ALUMINIUM",
     "uom": "NOS",
-    "qty": 50
+    "qty": 0
   },
   {
     "id": 301,
@@ -3910,7 +3910,7 @@
     "description": "WELDING HINGES 38MM",
     "sku": "RM-FASTENER-HINGE-WELDING-38MM",
     "uom": "NOS",
-    "qty": 1000
+    "qty": 0
   },
   {
     "id": 302,
@@ -3923,7 +3923,7 @@
     "description": "WELDING HINGES 45MM",
     "sku": "RM-FASTENER-HINGE-WELDING-45MM",
     "uom": "NOS",
-    "qty": 300
+    "qty": 0
   },
   {
     "id": 303,
@@ -3936,7 +3936,7 @@
     "description": "MS KEY PANEL LOCKS",
     "sku": "RM-FASTENER-KEY-PANELLOCK-MS",
     "uom": "NOS",
-    "qty": 300
+    "qty": 0
   },
   {
     "id": 304,
@@ -3949,7 +3949,7 @@
     "description": "STEEL PIN TYPE KEYS",
     "sku": "RM-FASTENER-KEY-PINTYPE-STEEL",
     "uom": "NOS",
-    "qty": 100
+    "qty": 0
   },
   {
     "id": 305,
@@ -3962,7 +3962,7 @@
     "description": "KNOBS 6X30MM",
     "sku": "RM-FASTENER-KNOB-6X30MM",
     "uom": "NOS",
-    "qty": 100
+    "qty": 0
   },
   {
     "id": 306,
@@ -3975,7 +3975,7 @@
     "description": "KNOBS 6X35MM",
     "sku": "RM-FASTENER-KNOB-6X35MM",
     "uom": "NOS",
-    "qty": 300
+    "qty": 0
   },
   {
     "id": 307,
@@ -3988,7 +3988,7 @@
     "description": "MS LOCK 25MM",
     "sku": "RM-FASTENER-LOCK-25MM-MS",
     "uom": "NOS",
-    "qty": 750
+    "qty": 0
   },
   {
     "id": 308,
@@ -4001,7 +4001,7 @@
     "description": "STEEL LOCKS PANEL 30MM",
     "sku": "RM-FASTENER-LOCK-PANEL-30MM-STEEL",
     "uom": "NOS",
-    "qty": 350
+    "qty": 0
   },
   {
     "id": 309,
@@ -4014,7 +4014,7 @@
     "description": "PIN TYPE LOCK 35MM",
     "sku": "RM-FASTENER-LOCK-PINTYPE-35MM",
     "uom": "NOS",
-    "qty": 30
+    "qty": 0
   },
   {
     "id": 310,
@@ -4027,7 +4027,7 @@
     "description": "FULL THREAD BOLT AND NUT M10X50 HDG GRADE 5.6",
     "sku": "RM-FASTENER-M10X50-HDG-GR5.6",
     "uom": "KGS",
-    "qty": 250
+    "qty": 0
   },
   {
     "id": 311,
@@ -4040,7 +4040,7 @@
     "description": "FULL THREAD BOLT AND NUT M12X50 HDG",
     "sku": "RM-FASTENER-M12X50-HDG",
     "uom": "KGS",
-    "qty": 50
+    "qty": 0
   },
   {
     "id": 312,
@@ -4053,7 +4053,7 @@
     "description": "BOLT AND NUT M16X110 HDG",
     "sku": "RM-FASTENER-M16X110",
     "uom": "KGS",
-    "qty": 100
+    "qty": 0
   },
   {
     "id": 313,
@@ -4066,7 +4066,7 @@
     "description": "FULL THREAD BOLT AND NUT M16X40 HDG",
     "sku": "RM-FASTENER-M16X40-HDG",
     "uom": "KGS",
-    "qty": 450
+    "qty": 0
   },
   {
     "id": 314,
@@ -4092,7 +4092,7 @@
     "description": "RIVETS NAMEPLATE",
     "sku": "RM-FASTENER-RIVET-NAMEPLATE",
     "uom": "PAC",
-    "qty": 2
+    "qty": 0
   },
   {
     "id": 316,
@@ -4105,7 +4105,7 @@
     "description": "SPRING WASHER 12MM",
     "sku": "RM-FASTENER-SPRINGWASHER-12MM",
     "uom": "NOS",
-    "qty": 1000
+    "qty": 0
   },
   {
     "id": 317,
@@ -4118,7 +4118,7 @@
     "description": "3-POINT LOCK PVC NO ROD",
     "sku": "RM-LOCK-3POINT-PVC-NOROD",
     "uom": "NOS",
-    "qty": 3
+    "qty": 0
   },
   {
     "id": 318,
@@ -4131,7 +4131,7 @@
     "description": "3-POINT LOCK WITH ROD",
     "sku": "RM-LOCK-3POINT-ROD",
     "uom": "NOS",
-    "qty": 100
+    "qty": 0
   },
   {
     "id": 319,
@@ -4144,7 +4144,7 @@
     "description": "NAMEPLATE ALPHA-3A ELMEASURE",
     "sku": "RM-NAMEPLATE-ALPHA3A-ELMEASURE",
     "uom": "NOS",
-    "qty": 5
+    "qty": 0
   },
   {
     "id": 320,
@@ -4157,7 +4157,7 @@
     "description": "NAMEPLATE ALPHA-3V ELMEASURE",
     "sku": "RM-NAMEPLATE-ALPHA3V-ELMEASURE",
     "uom": "NOS",
-    "qty": 5
+    "qty": 0
   },
   {
     "id": 321,
@@ -4170,7 +4170,7 @@
     "description": "NAMEPLATE",
     "sku": "RM-NAMEPLATE-GENERIC",
     "uom": "NOS",
-    "qty": 650
+    "qty": 0
   },
   {
     "id": 322,
@@ -4183,7 +4183,7 @@
     "description": "NAMEPLATE 120X20MM",
     "sku": "RM-NAMEPLATE-GENERIC-120X20",
     "uom": "NOS",
-    "qty": 100
+    "qty": 0
   },
   {
     "id": 323,
@@ -4196,7 +4196,7 @@
     "description": "NAMEPLATE 80X20MM",
     "sku": "RM-NAMEPLATE-GENERIC-80X20",
     "uom": "NOS",
-    "qty": 400
+    "qty": 0
   },
   {
     "id": 324,
@@ -4222,7 +4222,7 @@
     "description": "PROFILE ALUMINIUM",
     "sku": "RM-PROFILE-ALU-42MTR",
     "uom": "MTR",
-    "qty": 42
+    "qty": 0
   },
   {
     "id": 326,
@@ -4235,7 +4235,7 @@
     "description": "MS SHEET/COIL 1.6MM",
     "sku": "RM-SHEET-MS-1.6MM",
     "uom": "KGS",
-    "qty": 2105
+    "qty": 0
   },
   {
     "id": 327,
@@ -4248,7 +4248,7 @@
     "description": "SPRAY PAINT IS631",
     "sku": "RM-SPRAYPAINT-IS631",
     "uom": "NOS",
-    "qty": 2
+    "qty": 0
   },
   {
     "id": 328,
@@ -4261,7 +4261,7 @@
     "description": "MS ANGLE 40X5MM",
     "sku": "RM-STRUCTURAL-MSANGLE-40X5MM",
     "uom": "KGS",
-    "qty": 455
+    "qty": 0
   },
   {
     "id": 329,
@@ -4274,7 +4274,7 @@
     "description": "MS FLAT 18X4MM",
     "sku": "RM-STRUCTURAL-MSFLAT-18X4MM",
     "uom": "KGS",
-    "qty": 103
+    "qty": 0
   },
   {
     "id": 330,
@@ -4287,7 +4287,7 @@
     "description": "THINNER",
     "sku": "RM-THINNER",
     "uom": "LTR",
-    "qty": 1
+    "qty": 0
   },
   {
     "id": 331,
@@ -4300,7 +4300,7 @@
     "description": "PLAIN WASHER M12 HDG",
     "sku": "RM-WASHER-M12-HDG-PLAIN",
     "uom": "KGS",
-    "qty": 50
+    "qty": 0
   },
   {
     "id": 332,
@@ -4313,7 +4313,7 @@
     "description": "PLAIN WASHER M16 HDG",
     "sku": "RM-WASHER-M16-HDG-PLAIN",
     "uom": "KGS",
-    "qty": 50
+    "qty": 0
   },
   {
     "id": 333,
@@ -4326,7 +4326,7 @@
     "description": "ALUMINIUM SPOOL 1.6MM",
     "sku": "RM-WELDING-ALUSPOOL-1.6MM",
     "uom": "KGS",
-    "qty": 7
+    "qty": 0
   },
   {
     "id": 334,
@@ -4339,7 +4339,7 @@
     "description": "ARC WELDING RODS 3MM TATA",
     "sku": "RM-WELDING-ARCROD-3MM-TATA",
     "uom": "BOX",
-    "qty": 12
+    "qty": 0
   },
   {
     "id": 335,
@@ -4352,6 +4352,6 @@
     "description": "WELDING SPOOL 1.2MM PLATINUM",
     "sku": "RM-WELDING-SPOOL-1.2MM-PLATINUM",
     "uom": "KGS",
-    "qty": 30
+    "qty": 0
   }
 ]
